@@ -12,24 +12,24 @@ class ModelProducts(db.Model):
     brand = db.Column(db.Integer)
     minimum_stock = db.Column(db.Float(precision=2))
     maximum_stock = db.Column(db.Float(precision=2))
-    description = db.Column(db.Text)
-    obs = db.Column(db.String(120))
+    long_description = db.Column(db.Text)
+    short_description = db.Column(db.String(200))
     sale_price = db.Column(db.Float(precision=2))
 
-    __mapper_args = {
-        "order_by": id
-    }
+    # __mapper_args = {
+    #     "order_by": id_product
+    # }
 
     def __init__(self, id, name, category, brand, minimum_stock, maximum_stock,
-                 description, obs, sale_price):
+                 long_description, short_description, sale_price):
         self.id = id
         self.name = name
         self.category = category
         self.brand = brand
         self.minimum_stock = minimum_stock
         self.maximum_stock = maximum_stock
-        self.description = description
-        self.obs = obs
+        self.long_description = long_description
+        self.short_description = short_description
         self.sale_price = sale_price
 
     def list_product(self):
@@ -63,12 +63,12 @@ class ModelProducts(db.Model):
         db.session.commit()
 
     def update_product(self, id, name, category, brand, minimum_stock, maximum_stock,
-                       description, obs, sale_price):
+                       long_description, short_description, sale_price):
         self.name = name
         self.category = category
         self.brand = brand
         self.minimum_stock = minimum_stock
         self.maximum_stock = maximum_stock
-        self.description = description
-        self.obs = obs
+        self.long_description = long_description
+        self.short_description = short_description
         self.sale_price = sale_price
