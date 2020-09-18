@@ -128,3 +128,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 AzulERosa.code-workspace
+Api/migrations/
+Api/static/images/*

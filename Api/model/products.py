@@ -15,13 +15,22 @@ class ModelProducts(db.Model):
     long_description = db.Column(db.Text)
     short_description = db.Column(db.String(200))
     sale_price = db.Column(db.Float(precision=2))
+    available = db.Column(db.Boolean)
+    height = db.Column(db.Float(precision=2))
+    widht = db.Column(db.Float(precision=2))
+    length = db.Column(db.Float(precision=2))
+    weight = db.Column(db.Float(precision=2))
+    maximum_discount = db.Column(db.Float(precision=2))
+    images = db.relationship("ModelImagesProducts", lazy="select",
+                             backref=db.backref("product", lazy="joined"))
 
-    # __mapper_args = {
-    #     "order_by": id_product
-    # }
+    __mapper_args__ = {
+        "order_by": id_product
+    }
 
     def __init__(self, id, name, category, brand, minimum_stock, maximum_stock,
-                 long_description, short_description, sale_price):
+                 long_description, short_description, sale_price, weight,
+                 available, height, widht, length, maximum_discount, **kwargs):
         self.id = id
         self.name = name
         self.category = category
@@ -31,6 +40,12 @@ class ModelProducts(db.Model):
         self.long_description = long_description
         self.short_description = short_description
         self.sale_price = sale_price
+        self.available = available
+        self.height = height
+        self.widht = widht
+        self.length = length
+        self.weight = weight
+        self.maximum_discount = maximum_discount
 
     def list_product(self):
         return {
@@ -39,7 +54,9 @@ class ModelProducts(db.Model):
             "category": self.category,
             "brand": self.brand,
             "current_stock": 1,
-            "sale_price": self.sale_price
+            "sale_price": self.sale_price,
+            "available": self.available,
+            "images": [image.list_images() for image in self.images]
         }
 
     @classmethod
@@ -63,7 +80,8 @@ class ModelProducts(db.Model):
         db.session.commit()
 
     def update_product(self, id, name, category, brand, minimum_stock, maximum_stock,
-                       long_description, short_description, sale_price):
+                       long_description, short_description, sale_price, weight,
+                       available, height, widht, length, maximum_discount):
         self.name = name
         self.category = category
         self.brand = brand
@@ -72,3 +90,9 @@ class ModelProducts(db.Model):
         self.long_description = long_description
         self.short_description = short_description
         self.sale_price = sale_price
+        self.available = available
+        self.height = height
+        self.widht = widht
+        self.length = length
+        self.weight = weight
+        self.maximum_discount = maximum_discount
