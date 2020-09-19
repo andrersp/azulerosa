@@ -4,11 +4,11 @@ services:
     api:
         build: ./Api
         restart: always
-        command: python api.py run -h 0.0.0.0
+        command: gunicorn --bind 0.0.0.0:5000 api
         volumes: 
             - ./Api:/usr/src/api
-        ports:
-            - 5000:5000
+        expose: 
+            - 5000
         env_file: ./.env.dev
         
         depends_on: 
@@ -22,6 +22,10 @@ services:
             - POSTGRES_USER=loja
             - POSTGRES_PASSWORD=loja
             - POSTGRES_DATABASE=loja
+    nginx:
+        build: ./nginx
+        ports: 
+            - 80:80
 volumes: 
     postgres_data:
 
