@@ -54,7 +54,7 @@ def upload_image(image):
 class ProductsGet(Resource):
     # @jwt_required
     def get(self):
-        """ Get all products enabled in Stock """
+        """ Get all products in Stock """
         return {"data": [product.list_product() for product in ModelProducts.query.all()]}
 
     @required_params(schema)

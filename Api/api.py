@@ -13,6 +13,8 @@ from db import db
 from resources.products import product_space  # Products
 from resources.products_category import category_space  # Categories Product
 
+from resources.provider import provider_space
+
 
 app = Flask(__name__)
 
@@ -38,7 +40,11 @@ api = Api(blueprint, version="1.0", title="Azul e Rosa Rest APi",
 
 # Name Spaces APi
 api.add_namespace(product_space, path="/product")  # Product
-api.add_namespace(category_space, path="/category")  # Products Category
+# Products Category
+api.add_namespace(category_space, path="/product/category")
+
+# Provider
+api.add_namespace(provider_space, path="/provider")
 
 # jwt
 jwt = JWTManager(app)

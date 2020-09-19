@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-""" 
-    Wraps for check params for post endpoints and check role permission for access 
+"""
+    Wraps for check params for post endpoints and check role permission for access
 """
 from functools import wraps
 from flask import request
@@ -23,6 +23,26 @@ class CustonValidator(Validator):
                 return True
 
         self._error()
+
+    def _check_with_registration(self, field, value):
+
+        type_reg = self.document.get("type_registration")
+
+        if type_reg == 1:
+            if value == 1:
+                return True
+        if type_reg == 2:
+            if value == 2:
+                return True
+
+        if value == 1:
+            print("OK 1")
+            return True
+        if value == 2:
+            print("ok 2")
+            return True
+
+        self._error(field, "Must be an odd number")
 
     def _validate_description(self, description, field, value):
         """ Insert Description for swagger.

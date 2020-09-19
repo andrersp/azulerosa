@@ -8,10 +8,10 @@ from model.products_category import ModelCategoryProduct
 from wraps import required_params
 
 category_space = Namespace(
-    'Category', description="Resources for product category")
+    'Products Category', description="Resources for product category")
 
 schema = {
-    "id": {"type": "numeric", "required": True, "description": "numeric string value or int"},
+    "id": {"type": "numeric", "required": True, "empty": True, "description": "numeric string value or int"},
     "name": {"type": "string", "required": True, "empty": False, "description": "Name of category"},
     "description": {"type": "string", "required": True, "empty": True, "description": "Short Description of category"}
 }
@@ -66,3 +66,18 @@ class CategoryProductView(Resource):
             except:
 
                 return {"message": "Internal error"}
+
+
+@category_space.route("/<int:id_category>")
+class CategoryGet(Resource):
+
+    def get(self, id_category):
+        """ Get Category By Id """
+
+        category = ModelCategoryProduct.find_category(id_category)
+
+        if category:
+            return {"data": category.list_category()}, 200
+
+        return {"message": "Category not found"}, 404
+
