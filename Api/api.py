@@ -10,7 +10,9 @@ from flask_migrate import Migrate
 from db import db
 
 # Namespaces
-from resources.products import product_space
+from resources.products import product_space  # Products
+from resources.products_category import category_space  # Categories Product
+
 
 app = Flask(__name__)
 
@@ -35,7 +37,8 @@ api = Api(blueprint, version="1.0", title="Azul e Rosa Rest APi",
 
 
 # Name Spaces APi
-api.add_namespace(product_space, path="/product")
+api.add_namespace(product_space, path="/product")  # Product
+api.add_namespace(category_space, path="/category")  # Products Category
 
 # jwt
 jwt = JWTManager(app)

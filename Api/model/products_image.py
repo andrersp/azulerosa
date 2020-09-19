@@ -6,7 +6,8 @@ from db import db
 from flask import request, url_for
 
 
-class ModelImagesProducts(db.Model):
+class ModelImagesProduct(db.Model):
+    __tablename__ = "images"
     id_image = db.Column(db.Integer, primary_key=True)
     path = db.Column(db.String(80))
     product_id = db.Column(db.Integer, db.ForeignKey(

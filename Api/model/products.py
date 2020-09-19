@@ -8,7 +8,8 @@ class ModelProducts(db.Model):
     __tablename__ = "product"
     id_product = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80))
-    category = db.Column(db.Integer)
+    category = db.Column(db.Integer, db.ForeignKey(
+        'category.id_category'), nullable=False)
     brand = db.Column(db.Integer)
     minimum_stock = db.Column(db.Float(precision=2))
     maximum_stock = db.Column(db.Float(precision=2))
@@ -21,9 +22,10 @@ class ModelProducts(db.Model):
     length = db.Column(db.Float(precision=2))
     weight = db.Column(db.Float(precision=2))
     maximum_discount = db.Column(db.Float(precision=2))
-    images = db.relationship("ModelImagesProducts", lazy="select",
+    images = db.relationship("ModelImagesProduct", lazy="select",
                              backref=db.backref("product", lazy="joined"))
-
+    category_name = db.relationship(
+        "ModelCategoryProduct", backref=db.backref('products', lazy=True))
     __mapper_args__ = {
         "order_by": id_product
     }
@@ -51,7 +53,7 @@ class ModelProducts(db.Model):
         return {
             "id": self.id_product,
             "name": self.name,
-            "category": self.category,
+            "category": self.category_name.name,
             "brand": self.brand,
             "current_stock": 1,
             "sale_price": self.sale_price,

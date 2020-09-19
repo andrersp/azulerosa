@@ -12,7 +12,7 @@ from flask_jwt_extended import jwt_required
 from wraps import required_params
 
 from model.products import ModelProducts
-from model.products_image import ModelImagesProducts
+from model.products_image import ModelImagesProduct
 
 product_space = Namespace("Products", description="Resources for Produtos")
 
@@ -75,7 +75,7 @@ class ProductsGet(Resource):
             product = ModelProducts(**data)
 
             for images in data.get("images"):
-                product.images.append(ModelImagesProducts(
+                product.images.append(ModelImagesProduct(
                     upload_image(images), product))
             product.save_product()
 
@@ -129,7 +129,7 @@ class ProductImage(Resource):
     def delete(self, id_image):
         """ Delete Image of product by id """
 
-        image = ModelImagesProducts.find_image(id_image)
+        image = ModelImagesProduct.find_image(id_image)
 
         if image:
             try:
@@ -140,6 +140,5 @@ class ProductImage(Resource):
                 return {"message": "Internal error"}, 500
 
         return {"message": "Image not found"}, 404
-
 
         return {"message": "Delete Image"}
