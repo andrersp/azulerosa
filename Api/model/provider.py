@@ -33,8 +33,8 @@ class ModelProvider(db.Model):
     date_register = db.Column(db.DateTime, default=date.today())
     # register_by = db.Column(
     #     db.Integer, db.ForeignKey("usuario.usuario_id"))
-    # product = db.relationship('ModelProducts', secondary="provider_produto", lazy='dynamic',
-    #                           backref=db.backref('provideres', lazy=True))
+    products = db.relationship('ModelProducts', secondary="providers", lazy='dynamic',
+                               backref=db.backref('provider', lazy=True))
     date_update = db.Column(db.DateTime)
 
     __mapper_args__ = {
@@ -82,6 +82,13 @@ class ModelProvider(db.Model):
             "phone": self.phone,
             "email": self.email,
             "status": self.enable,
+            "products": [data.list_product_provider() for data in self.products]
+        }
+
+    def list_provider_product(self):
+        return {
+            "provider_id": self.provider_id,
+            "fancy_name": self.fancy_name
         }
 
     # def product_list(self):

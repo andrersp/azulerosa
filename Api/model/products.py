@@ -3,6 +3,14 @@
 from db import db
 
 
+providers = db.Table('providers',
+                     db.Column('privider_id', db.Integer, db.ForeignKey(
+                         'provider.provider_id'), primary_key=True),
+                     db.Column('product_id', db.Integer, db.ForeignKey(
+                         'product.id_product'), primary_key=True)
+                     )
+
+
 class ModelProducts(db.Model):
 
     __tablename__ = "product"
@@ -26,6 +34,9 @@ class ModelProducts(db.Model):
                              backref=db.backref("product", lazy="joined"))
     category_name = db.relationship(
         "ModelCategoryProduct", backref=db.backref('products', lazy=True))
+
+    providers = db.relationship('ModelProvider', secondary=providers, lazy='subquery',
+                                backref=db.backref('providers', lazy=True))
     __mapper_args__ = {
         "order_by": id_product
     }
@@ -58,7 +69,14 @@ class ModelProducts(db.Model):
             "current_stock": 1,
             "sale_price": self.sale_price,
             "available": self.available,
-            "images": [image.list_images() for image in self.images]
+            "images": [image.list_images() for image in self.images],
+            "providers": [data.list_provider_product() for data in self.providers]
+        }
+
+    def list_product_provider(self):
+        return {
+            "id": self.id_product,
+            "name": self.name
         }
 
     @classmethod
