@@ -121,3 +121,25 @@ class ProductGet(Resource):
     #         return {"data": product.list_product()}, 200
 
     #     return {"message": "product not found"}, 404
+
+
+@product_space.route("/image/<int:id_image>")
+class ProductImage(Resource):
+
+    def delete(self, id_image):
+        """ Delete Image of product by id """
+
+        image = ModelImagesProducts.find_image(id_image)
+
+        if image:
+            try:
+                image.delete_image()
+
+                return {"message": "image deleted"}, 200
+            except:
+                return {"message": "Internal error"}, 500
+
+        return {"message": "Image not found"}, 404
+
+
+        return {"message": "Delete Image"}

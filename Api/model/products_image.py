@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import os
+
 from db import db
 from flask import request, url_for
 
@@ -32,5 +34,8 @@ class ModelImagesProducts(db.Model):
         return None
 
     def delete_image(self):
+
+        path = "static/images/{}".format(self.path)
+        os.remove(path)
         db.session.delete(self)
         db.session.commit()
