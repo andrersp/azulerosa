@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import os
+
+from flask import request, url_for
+
 from db import db
 
 
@@ -23,6 +27,7 @@ class ModelProducts(db.Model):
     maximum_stock = db.Column(db.Float(precision=2))
     long_description = db.Column(db.Text)
     short_description = db.Column(db.String(200))
+    cover = db.Column(db.String(80))
     sale_price = db.Column(db.Float(precision=2))
     available = db.Column(db.Boolean)
     height = db.Column(db.Float(precision=2))
@@ -42,7 +47,8 @@ class ModelProducts(db.Model):
     }
 
     def __init__(self, id, name, category, brand, minimum_stock, maximum_stock,
-                 long_description, short_description, sale_price, weight,
+                 long_description, short_description, cover,
+                 sale_price, weight,
                  available, height, widht, length, maximum_discount, **kwargs):
         self.id = id
         self.name = name
@@ -59,6 +65,7 @@ class ModelProducts(db.Model):
         self.length = length
         self.weight = weight
         self.maximum_discount = maximum_discount
+        self.cover = cover
 
     def list_product(self):
         return {
@@ -66,6 +73,7 @@ class ModelProducts(db.Model):
             "name": self.name,
             "category": self.category_name.name,
             "brand": self.brand,
+            "cover": request.url_root[:-1] + url_for("api.static", filename="images/{}".format(self.cover)) if self.cover else "",
             "current_stock": 1,
             "sale_price": self.sale_price,
             "available": self.available,
@@ -101,6 +109,7 @@ class ModelProducts(db.Model):
 
     def update_product(self, id, name, category, brand, minimum_stock, maximum_stock,
                        long_description, short_description, sale_price, weight,
+                       cover, images,
                        available, height, widht, length, maximum_discount):
         self.name = name
         self.category = category
@@ -116,3 +125,8 @@ class ModelProducts(db.Model):
         self.length = length
         self.weight = weight
         self.maximum_discount = maximum_discount
+
+        if cover:
+            path = "static/images/{}".format(self.cover)
+            os.remove(path)
+            self.cover = cover

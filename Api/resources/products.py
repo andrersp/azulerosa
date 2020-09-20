@@ -4,6 +4,7 @@ from base64 import b64decode
 import os
 import imghdr
 from datetime import datetime
+from uuid import uuid4
 from PIL import Image
 from resizeimage import resizeimage
 import io
@@ -28,6 +29,7 @@ schema = {
     "maximum_stock": {"type": "float", "required": True, "description": "float value of maximum stock"},
     "long_description": {"type": "string", "required": True, "empty": True, "description": "Long Description of product"},
     "short_description": {"type": "string", "required": True, "empty": False, "description": "Short Description of product, max 200", "maxlength": 200},
+    "cover": {"type": "string", "required": True, "empty": True, "description": "tumbnail cover image"},
     "sale_price": {"type": "float", "required": True, "description": "value of sale price of product"},
     "available": {"type": "boolean", "required": True, "description": "if product is unavailable for sale"},
     "height": {"type": "float", "required": True, "description": "product height for shipping"},
@@ -41,26 +43,31 @@ schema = {
 
 # Function to converte base64 image to file
 
-def upload_image(image):
+def upload_image(image, cover=False):
 
     image = b64decode(image.encode())
     extension = imghdr.what(None, h=image)
-    filename = str(datetime.now().timestamp()) + "." + extension
+    filename = str(uuid4()) + "." + extension
 
-    # with open(os.path.join("static/images/" + filename), "wb") as file_to_save:
-    #     with Image.open(file_to_save) as image_pil:
-    #         cover = resizeimage.resize_cover(image_pil[200, 100])
-    #         cover.save(filename, image_pil.format)
+    if cover:
+        filename = str(uuid4()) + "-cover." + extension
+        pic = io.BytesIO(image)
+        with Image.open(pic) as image_pil:
+            cover = resizeimage.resize_cover(image_pil, [100, 100])
+            cover.save("static/images/{}".format(filename), image_pil.format)
+    else:
+        with open(os.path.join("static/images/" + filename), "wb") as file_to_save:
+            file_to_save.write(image)
 
-        # file_to_save.write(image)
-    
-    teste = io.BytesIO(image)
-
-    with Image.open(teste) as image_pil:
-        cover = resizeimage.resize_cover(image_pil, [100, 100])
-        cover.save("static/images/{}".format(filename), image_pil.format)
-
+        
     return filename
+
+    
+    
+
+    
+
+    
 
 
 @product_space.route("")
@@ -79,14 +86,24 @@ class ProductsGet(Resource):
         data = request.json
 
         product = ModelProducts.find_product(data.get("id"))
-
         if product:
             return self.put()
 
         try:
 
+            b64_cover = data.get("cover")
+
+            if b64_cover:
+                data["cover"] = upload_image(b64_cover, cover=True)
+                
+
             product = ModelProducts(**data)
 
+            if b64_cover:
+                product.images.append(ModelImagesProduct(upload_image(b64_cover), product))
+
+
+            
             for images in data.get("images"):
                 product.images.append(ModelImagesProduct(
                     upload_image(images), product))
@@ -105,10 +122,22 @@ class ProductsGet(Resource):
         product = ModelProducts.find_product(data.get("id"))
 
         try:
+            if data.get("cover"):
+                data["cover"] = upload_image(data.get("cover"), cover=True)
+
             product.update_product(**data)
+
+            for images in data.get("images"):
+                product.images.append(ModelImagesProduct(
+                    upload_image(images), product))
+            
+            
+                
+
             product.save_product()
             return {"message": "product updated", "data": product.list_product()}
-        except:
+        except Exception as err :
+            print(err)
             return {"message": "internal error"}, 500
 
 

@@ -4,8 +4,8 @@ services:
     api:
         build: ./Api
         restart: always
-        command: gunicorn --bind 0.0.0.0:5000 api:app
-        # command: python api.py run -h 0.0.0.0
+        # command: gunicorn --bind 0.0.0.0:5000 api:app
+        command: python api.py run -h 0.0.0.0
         volumes: 
             - ./Api:/usr/src/api
         # expose: 
@@ -33,14 +33,14 @@ services:
         networks: 
             - database
 
-    nginx:
-        build: ./nginx
-        ports: 
-            - 80:80
-        depends_on: 
-            - api
-        networks: 
-            - net
+    # nginx:
+    #     build: ./nginx
+    #     ports: 
+    #         - 80:80
+    #     depends_on: 
+    #         - api
+    #     networks: 
+    #         - net
 volumes: 
     postgres_data:
 
