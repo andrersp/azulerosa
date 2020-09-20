@@ -8,3 +8,5 @@ Flask-JWT-Extended==3.24.1
 bcrypt==3.2.0
 Flask-Bcrypt==0.7.1
 gunicorn
+Pillow
+python-resize-image

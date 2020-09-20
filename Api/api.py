@@ -35,7 +35,7 @@ authorizations = {
 
 # Inicilize Api
 api = Api(blueprint, version="1.0", title="Azul e Rosa Rest APi",
-          description="Api for product register", doc="/doc", authorizations=authorizations)
+          description="Api for product register", authorizations=authorizations)
 
 
 # Name Spaces APi
@@ -108,7 +108,7 @@ def create_tables():
 
 @app.route("/")
 def hello():
-    return redirect("/api/v1/doc")
+    return redirect("/api/v1")
 
 # Redirect for doc in 404
 @app.errorhandler(404)

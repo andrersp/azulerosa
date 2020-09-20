@@ -4,6 +4,9 @@ from base64 import b64decode
 import os
 import imghdr
 from datetime import datetime
+from PIL import Image
+from resizeimage import resizeimage
+import io
 
 from flask import request
 from flask_restx import Namespace, Resource
@@ -40,12 +43,22 @@ schema = {
 
 def upload_image(image):
 
-    image = b64decode(image)
+    image = b64decode(image.encode())
     extension = imghdr.what(None, h=image)
     filename = str(datetime.now().timestamp()) + "." + extension
 
-    with open(os.path.join("static/images/" + filename), "wb") as file_to_save:
-        file_to_save.write(image)
+    # with open(os.path.join("static/images/" + filename), "wb") as file_to_save:
+    #     with Image.open(file_to_save) as image_pil:
+    #         cover = resizeimage.resize_cover(image_pil[200, 100])
+    #         cover.save(filename, image_pil.format)
+
+        # file_to_save.write(image)
+    
+    teste = io.BytesIO(image)
+
+    with Image.open(teste) as image_pil:
+        cover = resizeimage.resize_cover(image_pil, [100, 100])
+        cover.save("static/images/{}".format(filename), image_pil.format)
 
     return filename
 
