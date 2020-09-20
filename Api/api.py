@@ -102,7 +102,8 @@ app.register_blueprint(blueprint)
 # Before first request
 @app.before_first_request
 def create_tables():
-    print("Criando tabelas")
+    db.create_all()
+    
 
 
 @app.route("/")
