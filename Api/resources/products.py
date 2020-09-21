@@ -91,16 +91,14 @@ class ProductsGet(Resource):
 
         try:
 
+            
             b64_cover = data.get("cover")
 
             if b64_cover:
                 data["cover"] = upload_image(b64_cover, cover=True)
                 
 
-            product = ModelProducts(**data)
-
-            if b64_cover:
-                product.images.append(ModelImagesProduct(upload_image(b64_cover), product))
+            product = ModelProducts(**data)   
 
 
             
