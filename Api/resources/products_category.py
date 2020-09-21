@@ -2,6 +2,7 @@
 
 from flask import request
 from flask_restx import Resource, Namespace
+from flask_jwt_extended import jwt_required
 
 from model.products_category import ModelCategoryProduct
 
@@ -27,6 +28,7 @@ class CategoryProductView(Resource):
 
     @category_space.doc(params=schema)
     @required_params(schema)
+    @jwt_required
     def post(self):
         """ Create of update a product category """
 
@@ -47,6 +49,7 @@ class CategoryProductView(Resource):
         except:
             return {"message": "Internal error"}, 500
 
+    @jwt_required
     @category_space.hide
     @required_params(schema)
     def put(self):

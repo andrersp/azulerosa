@@ -2,6 +2,7 @@
 
 from flask import request
 from flask_restx import Resource, Namespace
+from flask_jwt_extended import jwt_required
 
 from wraps import required_params
 
@@ -43,6 +44,7 @@ class ProviderView(Resource):
 
         return {"data": [data.list_provider() for data in ModelProvider.query.all()]}, 200
 
+    @jwt_required
     @provider_space.doc(params=schema)
     @required_params(schema)
     def post(self):

@@ -77,6 +77,7 @@ class ProductsGet(Resource):
         """ Get all products in Stock """
         return {"data": [product.list_product() for product in ModelProducts.query.all()]}
 
+    @jwt_required
     @required_params(schema)
     @product_space.doc(params=schema)
     def post(self):
@@ -114,6 +115,7 @@ class ProductsGet(Resource):
 
         return {"messa": "ok"}, 200
 
+    @jwt_required
     @product_space.hide
     def put(self):
         data = request.json
