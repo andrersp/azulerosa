@@ -9,3 +9,9 @@ O Projeto consiste em **3 etapas**:
 - Desenvolvimento da API
 - Desenvolvimento de Software Desktop utilizando [QT](https://www.qt.io/)
 - Desenvolvimento de Página Web utilizazndo [Flask](https://flask.palletsprojects.com/en/1.1.x/)
+
+### Features
+- [x] Cadastro de produtos
+- [x] Cadastro de categorias de produtos
+- [ ] Cadastro de fornecedores
+- [ ] Cadastro de clientes
