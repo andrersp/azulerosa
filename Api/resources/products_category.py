@@ -28,7 +28,7 @@ class CategoryProductView(Resource):
 
     @category_space.doc(params=schema)
     @required_params(schema)
-    @jwt_required
+    # @jwt_required
     def post(self):
         """ Create of update a product category """
 
@@ -83,4 +83,3 @@ class CategoryGet(Resource):
             return {"data": category.list_category()}, 200
 
         return {"message": "Category not found"}, 404
-

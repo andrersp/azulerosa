@@ -59,15 +59,7 @@ def upload_image(image, cover=False):
         with open(os.path.join("static/images/" + filename), "wb") as file_to_save:
             file_to_save.write(image)
 
-        
     return filename
-
-    
-    
-
-    
-
-    
 
 
 @product_space.route("")
@@ -77,7 +69,7 @@ class ProductsGet(Resource):
         """ Get all products in Stock """
         return {"data": [product.list_product() for product in ModelProducts.query.all()]}
 
-    @jwt_required
+    # @jwt_required
     @required_params(schema)
     @product_space.doc(params=schema)
     def post(self):
@@ -92,17 +84,12 @@ class ProductsGet(Resource):
 
         try:
 
-            
             b64_cover = data.get("cover")
 
             if b64_cover:
                 data["cover"] = upload_image(b64_cover, cover=True)
-                
 
-            product = ModelProducts(**data)   
-
-
-            
+            product = ModelProducts(**data)
             for images in data.get("images"):
                 product.images.append(ModelImagesProduct(
                     upload_image(images), product))
@@ -130,13 +117,10 @@ class ProductsGet(Resource):
             for images in data.get("images"):
                 product.images.append(ModelImagesProduct(
                     upload_image(images), product))
-            
-            
-                
 
             product.save_product()
             return {"message": "product updated", "data": product.list_product()}
-        except Exception as err :
+        except Exception as err:
             print(err)
             return {"message": "internal error"}, 500
 
