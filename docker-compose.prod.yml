@@ -4,13 +4,11 @@ services:
     api:
         build: ./Api
         restart: always
-        command: gunicorn --bind 0.0.0.0:5000 api:app
+        command: gunicorn --bind 0.0.0.0:5000 app:app
         volumes: 
             - ./Api:/usr/src/api
-        # expose: 
-        #     - 5000:5000
-        ports: 
-            - 5000:5000
+        expose: 
+            - 5000
         env_file: ./.env.dev.prod
         
         depends_on: 

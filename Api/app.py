@@ -1,50 +1,32 @@
 # -*- coding: utf-8
 
-from flask import Flask, jsonify, Blueprint, redirect
+from flask import Flask, jsonify, Blueprint, redirect, url_for
 from flask.cli import FlaskGroup
-from flask_restx import Api
 from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
 from flask_migrate import Migrate
 
+from restx import blueprint as api
+
 from db import db
-
-# Namespaces
-from resources.products import product_space  # Products
-from resources.products_category import category_space  # Categories Product
-
-from resources.provider import provider_space
 
 
 app = Flask(__name__)
 
 app.config.from_object("config.Config")
 
-# Set BluePrint
-blueprint = Blueprint(
-    'api', __name__, url_prefix="/api/v1", static_folder='static')
+# Register Bluprint
+app.register_blueprint(api, url_prefix="/api/v1")
 
+# BCrypt
+bcrypt = Bcrypt(app)
 
-authorizations = {
-    'apikey': {
-        'type': 'apiKey',
-        'in': 'header',
-        'name': 'Bearer'
-    }
-}
+# Data Base
+db.init_app(app)
 
-# Inicilize Api
-api = Api(blueprint, version="1.0", title="Azul e Rosa Rest APi",
-          description="Api for product register", authorizations=authorizations)
+# Migrate
+migrate = Migrate(app, db)
 
-
-# Name Spaces APi
-api.add_namespace(product_space, path="/product")  # Product
-# Products Category
-api.add_namespace(category_space, path="/product/category")
-
-# Provider
-api.add_namespace(provider_space, path="/provider")
 
 # jwt
 jwt = JWTManager(app)
@@ -86,24 +68,10 @@ def token_invalidado():
     return jsonify({"message": "Você não esta  logado. Faça login Novamente"}), 401
 
 
-# BCrypt
-bcrypt = Bcrypt(app)
-
-# Data Base
-db.init_app(app)
-
-# Migrate
-migrate = Migrate(app, db)
-
-# Register Bluprint
-app.register_blueprint(blueprint)
-
-
 # Before first request
 @app.before_first_request
 def create_tables():
     db.create_all()
-    
 
 
 @app.route("/")

@@ -70,7 +70,6 @@ class ModelProvider(db.Model):
         self.city = city
         self.state = state
         self.obs = obs
-        # self.date_register = date_register
         # self.cadastrado_por = cadastrado_por
 
     def list_provider(self):
@@ -144,10 +143,12 @@ class ModelProvider(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-    def update_provider(self, enable, type_registration, cnpj, state_registration, municipal_registration,
+    def update_provider(self, enable, type_registration, cnpj, state_registration,
+                        municipal_registration,
                         fancy_name, company_name, contact_name, phone, cell_phone,
                         email, site, zip_code, address, number, complement,
-                        neighborhood, city, state, obs, cadastrado_por):
+                        neighborhood, city, state, obs, **kwargs):
+        self.id = id
         self.enable = enable
         self.type_registration = type_registration
         self.cnpj = cnpj
@@ -168,5 +169,3 @@ class ModelProvider(db.Model):
         self.city = city
         self.state = state
         self.obs = obs
-        self.cadastrado_por = cadastrado_por
-        self.atualizado_em = date.today()

@@ -4,7 +4,7 @@ services:
     api:
         build: ./Api
         restart: always
-        command: python api.py run -h 0.0.0.0
+        command: python app.py run -h 0.0.0.0
         volumes: 
             - ./Api:/usr/src/api
         ports: 
