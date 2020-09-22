@@ -5,6 +5,8 @@ Será utitlizando o framework [Flask RESTX](https://github.com/python-restx/flas
 
 ![Badge](https://img.shields.io/static/v1?label=Python&message=3.8&color=green&style=flat&logo=PYTHON) ![Badge](https://img.shields.io/static/v1?label=Flask&message=1.1.2&color=blue&style=flat&logo=Flask) ![Badge](https://img.shields.io/github/license/andrersp/azulerosa)
 
+> Status do Projeto e Documentação: Em desenvolvimento :warning:
+
 O Projeto consiste em **3 etapas**:
 - Desenvolvimento da API
 - Desenvolvimento de Software Desktop utilizando [QT](https://www.qt.io/)
@@ -15,3 +17,5 @@ O Projeto consiste em **3 etapas**:
 - [x] Cadastro de categorias de produtos
 - [ ] Cadastro de fornecedores
 - [ ] Cadastro de clientes
+
+
