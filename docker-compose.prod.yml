@@ -7,10 +7,10 @@ services:
         command: gunicorn --workers=2 --threads=4 --worker-class=gthread --bind 0.0.0.0:5000 app:app
         volumes: 
             - ./Api:/usr/src/api
-        # expose: 
-        #     - 5000
-        ports: 
-            - 80:5000
+        expose: 
+            - 5000
+        # ports: 
+        #     - 80:5000
         env_file: ./.env.dev.prod
         
         depends_on: 
@@ -24,7 +24,7 @@ services:
     db:
         image: postgres:9.6
         volumes: 
-            - postgres_data:/var/lib/postgresql/data/
+            - postgres_data:/var/lib/postgresql/data
         environment: 
             - POSTGRES_USER=loja
             - POSTGRES_PASSWORD=loja
@@ -32,14 +32,14 @@ services:
         networks: 
             - database
 
-    # nginx:
-    #     build: ./nginx
-    #     ports: 
-    #         - 80:80
-    #     depends_on: 
-    #         - api
-    #     networks: 
-    #         - net
+    nginx:
+        build: ./nginx
+        ports: 
+            - 80:80
+        depends_on: 
+            - api
+        networks: 
+            - net
 volumes: 
     postgres_data:
 
