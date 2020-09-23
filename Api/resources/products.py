@@ -67,7 +67,23 @@ class ProductsGet(Resource):
     # @jwt_required
     def get(self):
         """ Get all products in Stock """
-        return {"data": [product.list_product() for product in ModelProducts.query.all()]}
+
+        data = [{
+            "id": 3000,
+            "name": "Produto Teste",
+            "category": "Nova Categoria 2",
+            "brand": 1,
+            "cover": "",
+            "current_stock": 1,
+            "sale_price": 10.5,
+            "available": True,
+            "images": [],
+            "providers": []
+        } for _ in range(5000)]
+
+        return {"data": data}
+
+        # return {"data": [product.list_product() for product in ModelProducts.query.all()]}
 
     # @jwt_required
     @required_params(schema)
