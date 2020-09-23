@@ -77,7 +77,7 @@ class ModelProducts(db.Model):
             "current_stock": 1,
             "sale_price": self.sale_price,
             "available": self.available,
-            # "images": [image.list_images() for image in self.images],
+            "images": [image.list_images() for image in self.images],
             "providers": [data.list_provider_product() for data in self.providers]
         }
 
