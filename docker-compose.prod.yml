@@ -22,7 +22,7 @@ services:
 
     
     db:
-        image: postgres:9.6
+        image: postgres
         volumes: 
             - postgres_data:/var/lib/postgresql/data
         environment: 
