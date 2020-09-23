@@ -9,8 +9,6 @@ from PIL import Image
 from resizeimage import resizeimage
 import io
 
-import time
-
 from flask import request
 from flask_restx import Namespace, Resource
 from flask_jwt_extended import jwt_required
@@ -69,14 +67,7 @@ class ProductsGet(Resource):
     # @jwt_required
     def get(self):
         """ Get all products in Stock """
-
-        start = time.time()
-
-        data = [product.list_product()
-                for product in ModelProducts.query.all()]
-
-        print("%.2f" % (start - time.time()))
-        return {"data": data}
+        return {"data": [product.list_product() for product in ModelProducts.query.all()]}
 
     # @jwt_required
     @required_params(schema)
