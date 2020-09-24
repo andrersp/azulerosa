@@ -17,6 +17,8 @@ from wraps import required_params
 
 from model.products import ModelProducts
 from model.products_image import ModelImagesProduct
+from model.provider import ModelProvider
+from model.products_category import ModelCategoryProduct
 
 product_space = Namespace("Products", description="Resources for Produtos")
 
@@ -37,7 +39,8 @@ schema = {
     "length": {"type": "float", "required": True, "description": "product length for shipping"},
     "weight": {"type": "float", "required": True, "description": "product weight for shipping"},
     "maximum_discount": {"type": "float", "required": True, "description": "maximum_discount for this product"},
-    "images": {"type": "list", "schema": {"type": "string"}, "required": True, "empty": True}
+    "images": {"type": "list", "schema": {"type": "string"}, "required": True, "empty": True},
+    "provider": {"type": "list", "schema": {"type": "integer", "required": True}, "required": True, "empty": True, "description": "List of id providers"}
 }
 
 
@@ -93,6 +96,22 @@ class ProductsGet(Resource):
             for images in data.get("images"):
                 product.images.append(ModelImagesProduct(
                     upload_image(images), product))
+            
+            # Check if category exist
+            if not ModelCategoryProduct.find_category(data.get("category")):
+                return {"message": "Category id {} not found".format(data.get("category"))}, 400
+            
+            lst_provider = []
+            for id_provider in data.get("provider"):
+                provider = ModelProvider.find_provider(id_provider)
+                if not provider:
+                    return {"message": "provider id {} not found".format(id_provider)}, 400
+                else:
+                    lst_provider.append(provider) 
+            
+            [product.providers.append(provider) for provider in lst_provider]
+
+
             product.save_product()
 
             return {"message": "product created", "data": product.list_product()}, 201

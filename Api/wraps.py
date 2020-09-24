@@ -7,8 +7,6 @@ from flask import request
 from cerberus import Validator
 from flask_jwt_extended import get_jwt_claims
 
-from inc import validate_cnpj
-from inc import validate_cpf
 from inc import validate_registation
 
 
