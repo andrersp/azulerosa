@@ -7,6 +7,10 @@ from flask import request
 from cerberus import Validator
 from flask_jwt_extended import get_jwt_claims
 
+from inc import validate_cnpj
+from inc import validate_cpf
+from inc import validate_registation
+
 
 class CustonValidator(Validator):
 
@@ -28,21 +32,81 @@ class CustonValidator(Validator):
 
         type_reg = self.document.get("type_registration")
 
+        if not value:
+            self._error(field, "empty values not allowed")
+            return     
+               
+
         if type_reg == 1:
-            if value == 1:
-                return True
+
+            if not validate_registation.validar_cpf(value):
+                self._error(field, "Valid cpf required")
+                return            
+
         if type_reg == 2:
-            if value == 2:
-                return True
 
-        if value == 1:
-            print("OK 1")
-            return True
-        if value == 2:
-            print("ok 2")
-            return True
+            if not validate_registation.validar_cnpj(value):
+                self._error(field, "Valid cnpj required")
 
-        self._error(field, "Must be an odd number")
+            # try:
+            #     cnpj = validate_cnpj.CNPJ(value)
+
+            #     if not cnpj.valido():
+            #         self._error(field, "Valid cnpj required")
+            #         return
+            # except Exception as err:
+            #     self._error(field, str(err))
+            #     return  
+
+
+        
+    
+    def _check_with_cellcheck(self, field, value):
+
+        phone = self.document.get("phone")
+
+
+        if not phone and not value:
+            self._error(field, "At least one contact number is required")
+            return False
+        
+        if value and len(value) < 10:
+            self._error(field, "min length is 10")
+            return False
+        
+        if value and len(value) > 11:
+            self._error(field, "max length is 11")
+            return False
+    
+    def _check_with_phonecheck(self, field, value):
+
+        cell_phone = self.document.get("cell_phone")
+
+
+        if not cell_phone and not value:
+            self._error(field, "At least one contact number is required")
+            return False
+        
+        if value and len(value) < 10:
+            self._error(field, "min length is 10")
+            return False
+        
+        if value and len(value) > 11:
+            self._error(field, "max length is 11")
+            return False
+
+
+        
+        
+        
+                
+
+
+
+        
+
+        
+        
 
     def _validate_description(self, description, field, value):
         """ Insert Description for swagger.

@@ -83,7 +83,7 @@ class ModelProvider(db.Model):
             "contact_name": self.contact_name,
             "phone": self.phone,
             "email": self.email,
-            "status": self.enable,
+            "enable": self.enable,
             "products": [data.list_product_provider() for data in self.products]
         }
 

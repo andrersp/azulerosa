@@ -15,7 +15,10 @@ O Projeto consiste em **3 etapas**:
 ### Features
 - [x] Cadastro de produtos
 - [x] Cadastro de categorias de produtos
-- [ ] Cadastro de fornecedores
+- [x] Cadastro de fornecedores
 - [ ] Cadastro de clientes
+
+### Extras
+
 
 
