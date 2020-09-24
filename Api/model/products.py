@@ -35,10 +35,10 @@ class ModelProducts(db.Model):
     length = db.Column(db.Float(precision=2))
     weight = db.Column(db.Float(precision=2))
     maximum_discount = db.Column(db.Float(precision=2))
-    images = db.relationship("ModelImagesProduct", lazy="select",
-                             backref=db.backref("product", lazy="joined"))
+    images = db.relationship("ModelImagesProduct",
+                             backref="product",  lazy="joined")
     category_name = db.relationship(
-        "ModelCategoryProduct", backref=db.backref('products', lazy=True))
+        "ModelCategoryProduct", backref=db.backref('products', lazy=False))
 
     providers = db.relationship('ModelProvider', secondary=providers, lazy='subquery',
                                 backref=db.backref('providers', lazy=True))
