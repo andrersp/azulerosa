@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from datetime import date
+from datetime import datetime
+from pytz import timezone, utc
+
+
 
 from db import db
 
@@ -30,12 +33,12 @@ class ModelProvider(db.Model):
     city = db.Column(db.String(80))
     state = db.Column(db.String(2))
     obs = db.Column(db.Text)
-    date_register = db.Column(db.DateTime, default=date.today())
+    date_register = db.Column(db.DateTime(timezone=True), default=datetime.now())
     # register_by = db.Column(
     #     db.Integer, db.ForeignKey("usuario.usuario_id"))
     products = db.relationship('ModelProducts', secondary="providers", lazy='dynamic',
                                backref=db.backref('provider', lazy=True))
-    date_update = db.Column(db.DateTime)
+    date_update = db.Column(db.DateTime(timezone=True))
 
     __mapper_args__ = {
         "order_by": provider_id
@@ -48,7 +51,7 @@ class ModelProvider(db.Model):
                  municipal_registration,
                  fancy_name, company_name, contact_name, phone, cell_phone,
                  email, site, zip_code, address, number, complement,
-                 neighborhood, city, state, obs, **kwargs):
+                 neighborhood, city, state, obs):
         self.id = id
         self.enable = enable
         self.type_registration = type_registration
@@ -74,7 +77,7 @@ class ModelProvider(db.Model):
 
     def list_provider(self):
         return {
-            "provider_id": self.provider_id,
+            "id": self.provider_id,
             "fancy_name": self.fancy_name,
             "type_registration": "CPF" if self.type_registration == 1 else "CNPJ",
             "contact_name": self.contact_name,
@@ -86,7 +89,7 @@ class ModelProvider(db.Model):
 
     def list_provider_product(self):
         return {
-            "provider_id": self.provider_id,
+            "id": self.provider_id,
             "fancy_name": self.fancy_name
         }
 
@@ -169,3 +172,4 @@ class ModelProvider(db.Model):
         self.city = city
         self.state = state
         self.obs = obs
+        self.date_update = datetime.now()

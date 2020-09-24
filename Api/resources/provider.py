@@ -44,17 +44,19 @@ class ProviderView(Resource):
 
         return {"data": [data.list_provider() for data in ModelProvider.query.all()]}, 200
 
-    @jwt_required
+    # @jwt_required
     @provider_space.doc(params=schema)
     @required_params(schema)
     def post(self):
+
+        """  Create or Updated provider """       
 
         data = request.json
 
         provider = ModelProvider.find_provider(data.get("id"))
 
         if provider:
-            return {"data": "update"}, 200
+            return self.put()
 
         try:
             provider = ModelProvider(**data)
@@ -66,3 +68,39 @@ class ProviderView(Resource):
             return {"message": "Internal error"}, 500
 
         return {"data": data}
+    
+    @provider_space.hide
+    @required_params(schema)
+    def put(self):
+
+        data = request.json
+
+        provider = ModelProvider.find_provider(data.get("id"))
+
+        if provider:
+
+            try:
+
+                provider.update_provider(**data)
+                provider.save_provider()
+
+                return {"message": "provider updated", "data": provider.json_provider()}, 200
+            
+            except:
+                return {"message": "Internal Error"}, 500
+        
+        return {"message": "Provider not found"}, 404
+
+@provider_space.route("/<int:id_provider>")
+class ProviderGet(Resource):
+
+
+    def get(self, id_provider):
+        """ Get provider By id """
+
+        provider = ModelProvider.find_provider(id_provider)
+
+        if provider:
+            return {"data": provider.json_provider()}, 200
+        
+        return {"message": "Provider not found"}, 404       
