@@ -11,6 +11,8 @@ from resources.products_category import category_space  # Categories Product
 
 from resources.provider import provider_space  # Providers
 
+from resources.clients import client_space # Clientes
+
 authorizations = {
     'apikey': {
         'type': 'apiKey',
@@ -45,3 +47,6 @@ api.add_namespace(category_space, path="/product/category")
 
 # Provider
 api.add_namespace(provider_space, path="/provider")
+
+# Cliente
+api.add_namespace(client_space, path="/client")
