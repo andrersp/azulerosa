@@ -61,7 +61,9 @@ class clientView(Resource):
     @required_params(schema)
     def post(self):
 
-        """  Create or Updated client """       
+        """  Create or Updated client 
+        For crente a new cliente send key "id" with a empty string
+        """       
 
         data = request.json
 
