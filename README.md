@@ -26,11 +26,26 @@ O Projeto consiste em **3 etapas**:
 - [ ] Relatorio de Compra
 - [ ] Integração com meios de pagamento
 
+## Deply
+Desenvolvimento:
+'''
+git clone https://github.com/andrersp/azulerosa
+cd azulerosa
+sudo docker-compose up -d --build
+
+'''
+Produção:
+'''
+git clone https://github.com/andrersp/azulerosa
+cd azulerosa
+sudo docker-compose -f docker-compose.prod.yml up -d --build
+
+'''
 
 ### Maintainers:
 * André França                rsp.assistencia@gmail.com
 
-## Contributing
+### Contributing
 
 1. Faça o _fork_ do projeto (<https://github.com/yourname/yourproject/fork>)
 2. Crie uma _branch_ para sua modificação (`git checkout -b feature/fooBar`)
