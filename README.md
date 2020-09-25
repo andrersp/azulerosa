@@ -28,14 +28,14 @@ O Projeto consiste em **3 etapas**:
 
 ## Deply
 Desenvolvimento:
-'''
+'''sh
 git clone https://github.com/andrersp/azulerosa
 cd azulerosa
 sudo docker-compose up -d --build
 
 '''
 Produção:
-'''
+'''sh
 git clone https://github.com/andrersp/azulerosa
 cd azulerosa
 sudo docker-compose -f docker-compose.prod.yml up -d --build
