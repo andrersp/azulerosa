@@ -10,7 +10,7 @@ from wraps import required_params
 
 from model.clients import ModelClient, ModelDelivereAdrressClient
 
-client_space = Namespace("Clilentes", description="Resource for clients")
+client_space = Namespace("Clients", description="Resource for clients")
 
 schema = {
     "id": {"type": "numeric", "required": True, "description": "numeric string value or int"},
@@ -32,16 +32,16 @@ schema = {
     "neighborhood": {"type": "string", "required": True, "description": "neighborhood name", "empty": False, "maxlength": 80},
     "city": {"type": "string", "required": True, "description": "Company city", "empty": False, "maxlength": 80},
     "state": {"type": "string", "required": True, "description": "Company State", "empty": False, "maxlength": 2},
-    "delivery_address": {"type": "list", "required": True, "empty": True, "schema": {"type": "dict", "schema": {
+    "delivery_address": {"type": "list", "required": True, "empty": False, "schema": {"type": "dict", "schema": {
         "zip_code": {"type": "string", "required": True, "maxlength": 8, "minlength": 8, "empty": False, "description": "Zip Code address", "regex": '[0-9]+'},
         "address": {"type": "string", "required": True, "description": "Company Address", "empty": False, "maxlength": 80},
-    "number": {"type": "string", "required": True, "description": "Address number", "empty": True, "maxlength": 60},
-    "complement": {"type": "string", "required": True, "description": "Address Complement", "empty": True, "maxlength": 40},
-    "neighborhood": {"type": "string", "required": True, "description": "neighborhood name", "empty": False, "maxlength": 80},
-    "city": {"type": "string", "required": True, "description": "Company city", "empty": False, "maxlength": 80},
-    "state": {"type": "string", "required": True, "description": "Company State", "empty": False, "maxlength": 2},
-    "current": {"type": "boolean", "required": True}
-    }} },
+        "number": {"type": "string", "required": True, "description": "Address number", "empty": True, "maxlength": 60},
+        "complement": {"type": "string", "required": True, "description": "Address Complement", "empty": True, "maxlength": 40},
+        "neighborhood": {"type": "string", "required": True, "description": "neighborhood name", "empty": False, "maxlength": 80},
+        "city": {"type": "string", "required": True, "description": "Company city", "empty": False, "maxlength": 80},
+        "state": {"type": "string", "required": True, "description": "Company State", "empty": False, "maxlength": 2},
+        "current": {"type": "boolean", "required": True}
+        }}},
     "obs": {"type": "string", "required": True, "description": "Company Observation", "empty": True},
     "notify": {"type": "boolean", "required": True, "description": "If customer wants to receive promotions"}
 
@@ -62,24 +62,31 @@ class clientView(Resource):
     def post(self):
 
         """  Create or Updated client 
-        For crente a new cliente send key "id" with a empty string
+        For crente a new cliente send key "id" with a empty string.
+        
         """       
 
         data = request.json
 
-        client = ModelClient.find_client(data.get("id"))
+        # Check if delivery_addres has one current selected
+        current = len([address.get("current") for address in data.get("delivery_address", "{}") if address.get("current")])
+        
+        if current != 1:
+            return {"message": "Only one address current required"}, 400
+        # End check current address
 
+
+        client = ModelClient.find_client(data.get("id"))
+                
         if client:
-            return {"message": 'update'}, 200
-            # return self.put()
+            return self.put()
 
         try:
             client = ModelClient(**data)
-
-            for address in data.get("delivery_address"):
-                print(address)
+            
+            for address in data.get("delivery_address"):                
                 client.delivery_address.append(ModelDelivereAdrressClient(client=client, **address))
-
+            
             client.save_client()
 
             return {"message": "Client created", "data": client.json_client()}, 201
@@ -100,8 +107,9 @@ class clientView(Resource):
         if client:
 
             try:
-
+                
                 client.update_client(**data)
+
                 client.save_client()
 
                 return {"message": "client updated", "data": client.json_client()}, 200
@@ -110,6 +118,62 @@ class clientView(Resource):
                 return {"message": "Internal Error"}, 500
         
         return {"message": "client not found"}, 404
+
+
+
+schema = {
+        "zip_code": {"type": "string", "required": True, "maxlength": 8, "minlength": 8, "empty": False, "description": "Zip Code address", "regex": '[0-9]+'},
+        "address": {"type": "string", "required": True, "description": "Company Address", "empty": False, "maxlength": 80},
+        "number": {"type": "string", "required": True, "description": "Address number", "empty": True, "maxlength": 60},
+        "complement": {"type": "string", "required": True, "description": "Address Complement", "empty": True, "maxlength": 40},
+        "neighborhood": {"type": "string", "required": True, "description": "neighborhood name", "empty": False, "maxlength": 80},
+        "city": {"type": "string", "required": True, "description": "Company city", "empty": False, "maxlength": 80},
+        "state": {"type": "string", "required": True, "description": "Company State", "empty": False, "maxlength": 2},
+        "current": {"type": "boolean", "required": True}
+        
+}
+@client_space.route("/<int:id_client>/<int:id_address>")
+class ClientAddress(Resource):
+    def delete(self, id_client, id_address):
+        """ Delete Client Delivery Address """ 
+        address = ModelDelivereAdrressClient.query.filter_by(id=id_address).filter_by(client=id_client).first()
+
+        if address:
+            try:
+                address.delete_address()
+                return {"message": "address deleted"}, 200
+            except:
+                return {"message": "Internal error"}, 500
+        
+        return {"message": "Address not found"}, 404
+
+    @required_params(schema)    
+    def patch(self, id_client, id_address):
+
+        """ Update delivery address """
+
+        data = request.json
+
+        address = ModelDelivereAdrressClient.query.filter_by(id=id_address).filter_by(client=id_client).first()
+
+
+        if address:
+            
+            try:
+
+                address.update_address(**data)
+                address.save_address()
+                
+                return {"message": "address updated", "data": address.list_address()}, 200
+            except Exception as err:
+                print(err)
+                return {"message": "Internal error"}, 500
+        
+        return {"message": "Address not found"}, 404
+
+    
+
+
 
 @client_space.route("/<int:id_client>")
 class clientGet(Resource):

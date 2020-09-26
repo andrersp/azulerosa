@@ -26,7 +26,7 @@ O Projeto consiste em **3 etapas**:
 - [ ] Relatorio de Compra
 - [ ] Integração com meios de pagamento
 
-## Deply
+## Deploy
 Desenvolvimento:
 ```sh
 git clone https://github.com/andrersp/azulerosa

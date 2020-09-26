@@ -218,6 +218,25 @@ class ModelDelivereAdrressClient(db.Model):
             return address
         
         return None
+    def save_address(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete_address(self):
+        db.session.delete(self)
+        db.session.commit()
+    
+    def update_address(self, zip_code, address, number, complement, neighborhood,
+                city, state, current):
+        self.zip_code = zip_code
+        self.address = address
+        self.number = number
+        self.complement = complement
+        self.neighborhood = neighborhood
+        self.state = state
+        self.current = current
+        self.city = city
+
     
 
 
