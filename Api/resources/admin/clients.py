@@ -32,6 +32,16 @@ schema = {
     "neighborhood": {"type": "string", "required": True, "description": "neighborhood name", "empty": False, "maxlength": 80},
     "city": {"type": "string", "required": True, "description": "Company city", "empty": False, "maxlength": 80},
     "state": {"type": "string", "required": True, "description": "Company State", "empty": False, "maxlength": 2},
+    "delivery_address": {"type": "list", "required": True, "empty": False, "schema": {"type": "dict", "schema": {
+        "zip_code": {"type": "string", "required": True, "maxlength": 8, "minlength": 8, "empty": False, "description": "Zip Code address", "regex": '[0-9]+'},
+        "address": {"type": "string", "required": True, "description": "Company Address", "empty": False, "maxlength": 80},
+        "number": {"type": "string", "required": True, "description": "Address number", "empty": True, "maxlength": 60},
+        "complement": {"type": "string", "required": True, "description": "Address Complement", "empty": True, "maxlength": 40},
+        "neighborhood": {"type": "string", "required": True, "description": "neighborhood name", "empty": False, "maxlength": 80},
+        "city": {"type": "string", "required": True, "description": "Company city", "empty": False, "maxlength": 80},
+        "state": {"type": "string", "required": True, "description": "Company State", "empty": False, "maxlength": 2},
+        "current": {"type": "boolean", "required": True}
+        }}},
     "obs": {"type": "string", "required": True, "description": "Company Observation", "empty": True},
     "notify": {"type": "boolean", "required": True, "description": "If customer wants to receive promotions"}
 
@@ -60,9 +70,11 @@ class clientView(Resource):
 
         # Check if delivery_addres has one current selected
         current = len([address.get("current") for address in data.get("delivery_address", "{}") if address.get("current")])
-        
-        if current != 1:
-            return {"message": "Only one address current required"}, 400
+        if len(data.get("delivery_address"))  > 1:
+            if current != 1:
+                return {"message": "Only one address current required"}, 400
+        else:
+            data["delivery_address"][0]["current"] = True
         # End check current address
 
 
@@ -135,7 +147,7 @@ schema = {
         "current": {"type": "boolean", "required": True}
         
 }
-@client_space.route("/<int:id_client>/<int:id_address>")
+@client_space.route("/<int:id_client>/address/<int:id_address>")
 class ClientAddress(Resource):
     def delete(self, id_client, id_address):
         """ Delete Client Delivery Address """ 
