@@ -12,13 +12,54 @@ O Projeto consiste em **3 etapas**:
 - Desenvolvimento de Software Desktop utilizando [QT](https://www.qt.io/)
 - Desenvolvimento de Página Web utilizazndo [Flask](https://flask.palletsprojects.com/en/1.1.x/)
 
-### Features
+# Features
+### Gerenciamento
 - [x] Cadastro de produtos
 - [x] Cadastro de categorias de produtos
 - [x] Cadastro de fornecedores
-- [ ] Cadastro de clientes
+- [x] Cadastro de clientes
+- [ ] Compras
+- [ ] Vendas
+- [ ] Controle de estoque
+- [ ] Contas a pagar
+- [ ] Contas a receber
+- [ ] Relatório de Venda
+- [ ] Relatorio de Compra
+- [ ] Integração com meios de pagamento
 
-### Extras
+### Consumo
+- [ ] Cadastro Cliente
+- [ ] Meios de pagamento
+- [ ] Carrinho de compras
+
+
+
+## Deploy
+Desenvolvimento:
+```sh
+git clone https://github.com/andrersp/azulerosa
+cd azulerosa
+sudo docker-compose up -d --build
+
+```
+Produção:
+```sh
+git clone https://github.com/andrersp/azulerosa
+cd azulerosa
+sudo docker-compose -f docker-compose.prod.yml up -d --build
+
+```
+
+### Maintainers:
+* André França                rsp.assistencia@gmail.com
+
+### Contributing
+
+1. Faça o _fork_ do projeto (<https://github.com/yourname/yourproject/fork>)
+2. Crie uma _branch_ para sua modificação (`git checkout -b feature/fooBar`)
+3. Faça o _commit_ (`git commit -am 'Add some fooBar'`)
+4. _Push_ (`git push origin feature/fooBar`)
+5. Crie um novo _Pull Request_
 
 
 

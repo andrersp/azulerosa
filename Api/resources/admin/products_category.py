@@ -49,7 +49,7 @@ class CategoryProductView(Resource):
         except:
             return {"message": "Internal error"}, 500
 
-    @jwt_required
+    # @jwt_required
     @category_space.hide
     @required_params(schema)
     def put(self):

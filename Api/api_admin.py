@@ -6,10 +6,12 @@ from sqlalchemy.orm.exc import NoResultFound
 
 
 # Namespaces
-from resources.products import product_space  # Products
-from resources.products_category import category_space  # Categories Product
+from resources.admin.products import product_space  # Products
+from resources.admin.products_category import category_space  # Categories Product
 
-from resources.provider import provider_space  # Providers
+from resources.admin.provider import provider_space  # Providers
+
+from resources.admin.clients import client_space # Clientes
 
 authorizations = {
     'apikey': {
@@ -21,12 +23,15 @@ authorizations = {
 
 # Set BluePrint
 blueprint = Blueprint(
-    'api', __name__, url_prefix="/api/v1", static_folder='static')
+    'api', __name__, static_folder='static')
+
+
+
 
 # Inicilize Api
 api = Api(blueprint, version="1.0", title="Azul e Rosa Rest APi",
           description="Api for product register", authorizations=authorizations)
-
+        
 
 @api.errorhandler
 def default_error_handler(e):
@@ -45,3 +50,6 @@ api.add_namespace(category_space, path="/product/category")
 
 # Provider
 api.add_namespace(provider_space, path="/provider")
+
+# Cliente
+api.add_namespace(client_space, path="/client")

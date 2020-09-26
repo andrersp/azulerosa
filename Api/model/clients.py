@@ -8,11 +8,11 @@ from pytz import timezone, utc
 from db import db
 
 
-class ModelProvider(db.Model):
+class ModelClient(db.Model):
 
-    __tablename__ = "provider"
+    __tablename__ = "client"
 
-    provider_id = db.Column(db.Integer, primary_key=True)
+    client_id = db.Column(db.Integer, primary_key=True)
     enable = db.Column(db.Boolean, default=True)
     type_registration = db.Column(db.Integer)
     cnpj = db.Column(db.String(20))
@@ -24,7 +24,6 @@ class ModelProvider(db.Model):
     phone = db.Column(db.String(80))
     cell_phone = db.Column(db.String(12))
     email = db.Column(db.String(40))
-    site = db.Column(db.String(50))
     zip_code = db.Column(db.String(11))
     address = db.Column(db.String(80))
     number = db.Column(db.String(60))
@@ -34,24 +33,24 @@ class ModelProvider(db.Model):
     state = db.Column(db.String(2))
     obs = db.Column(db.Text)
     date_register = db.Column(db.DateTime(timezone=True), default=datetime.now())
-    # register_by = db.Column(
-    #     db.Integer, db.ForeignKey("usuario.usuario_id"))
-    products = db.relationship('ModelProducts', secondary="providers", lazy='dynamic',
-                               backref=db.backref('provider', lazy=True))
+    register_by = db.Column(db.Integer)
+    salesman = db.Column(db.Integer)
+    notify = db.Column(db.Boolean)
     date_update = db.Column(db.DateTime(timezone=True))
+    delivery_address = db.relationship("ModelDelivereAdrressClient", backref='addresses', lazy="joined")
 
     __mapper_args__ = {
-        "order_by": provider_id
+        "order_by": client_id
     }
 
     def __repr__(self):
-        return "<provider %r>" % self.fancy_name
+        return "<client %r>" % self.fancy_name
 
     def __init__(self, id, enable, type_registration, cnpj, state_registration,
-                 municipal_registration,
+                 municipal_registration, delivery_address,
                  fancy_name, company_name, contact_name, phone, cell_phone,
-                 email, site, zip_code, address, number, complement,
-                 neighborhood, city, state, obs):
+                 email, zip_code, address, number, complement,
+                 neighborhood, city, state, obs, notify):
         self.id = id
         self.enable = enable
         self.type_registration = type_registration
@@ -64,7 +63,6 @@ class ModelProvider(db.Model):
         self.phone = phone
         self.cell_phone = cell_phone
         self.email = email
-        self.site = site
         self.zip_code = zip_code
         self.address = address
         self.number = number
@@ -73,32 +71,23 @@ class ModelProvider(db.Model):
         self.city = city
         self.state = state
         self.obs = obs
-        # self.cadastrado_por = cadastrado_por
+        self.notify = notify
 
-    def list_provider(self):
+    def list_client(self):
         return {
-            "id": self.provider_id,
+            "id": self.client_id,
             "fancy_name": self.fancy_name,
             "type_registration": "CPF" if self.type_registration == 1 else "CNPJ",
             "contact_name": self.contact_name,
             "phone": self.phone,
             "email": self.email,
-            "enable": self.enable,
-            "products": [data.list_product_provider() for data in self.products]
+            "enable": self.enable
+            
         }
 
-    def list_provider_product(self):
+    def json_client(self):
         return {
-            "id": self.provider_id,
-            "fancy_name": self.fancy_name
-        }
-
-    # def product_list(self):
-    #     return [self.provider_id, self.fancy_name]
-
-    def json_provider(self):
-        return {
-            "provider_id": self.provider_id,
+            "client_id": self.client_id,
             "enable": self.enable,
             "type_registration": self.type_registration,
             "cnpj": self.cnpj,
@@ -110,7 +99,6 @@ class ModelProvider(db.Model):
             "phone": self.phone,
             "cell_phone": self.cell_phone,
             "email": self.email,
-            "site": self.site,
             "zip_code": self.zip_code,
             "address": self.address,
             "number": self.number,
@@ -122,35 +110,37 @@ class ModelProvider(db.Model):
             "date_register": "{}-{}-{}".format(self.date_register.day,
                                                self.date_register.month,
                                                self.date_register.year),
+            "notify": self.notify,
+            "delivery_address": [address.list_address() for address in self.delivery_address]
             # "cadastrado_por": self.cadastrado_por,
             # "produtos": [products.lista_json() for products in self.products]
         }
 
     @classmethod
-    def find_provider(cls, provider_id):
+    def find_client(cls, client_id):
 
-        if not provider_id:
+        if not client_id:
             return None
 
-        provider = cls.query.filter_by(provider_id=provider_id).first()
+        client = cls.query.filter_by(client_id=client_id).first()
 
-        if provider:
-            return provider
+        if client:
+            return client
         return None
 
-    def save_provider(self):
+    def save_client(self):
         db.session.add(self)
         db.session.commit()
 
-    def delete_provider(self):
+    def delete_client(self):
         db.session.delete(self)
         db.session.commit()
 
-    def update_provider(self, enable, type_registration, cnpj, state_registration,
+    def update_client(self, enable, type_registration, cnpj, state_registration,
                         municipal_registration,
                         fancy_name, company_name, contact_name, phone, cell_phone,
-                        email, site, zip_code, address, number, complement,
-                        neighborhood, city, state, obs, **kwargs):
+                        email, zip_code, address, number, complement,
+                        neighborhood, city, state, obs, notify, **kwargs):
         self.id = id
         self.enable = enable
         self.type_registration = type_registration
@@ -163,7 +153,6 @@ class ModelProvider(db.Model):
         self.phone = phone
         self.cell_phone = cell_phone
         self.email = email
-        self.site = site
         self.zip_code = zip_code
         self.address = address
         self.number = number
@@ -173,3 +162,82 @@ class ModelProvider(db.Model):
         self.state = state
         self.obs = obs
         self.date_update = datetime.now()
+        self.notify = notify
+
+class ModelDelivereAdrressClient(db.Model):
+
+    __tablename__ = "delivery_address_cliente"
+    id = db.Column(db.Integer, primary_key=True)
+    zip_code = db.Column(db.String(8))
+    address = db.Column(db.String(80))
+    number = db.Column(db.String(60))
+    complement = db.Column(db.String(40))
+    neighborhood = db.Column(db.String(80))
+    city = db.Column(db.String(80))
+    state = db.Column(db.String(2))
+    current = db.Column(db.Boolean)
+    client = db.Column(db.Integer, db.ForeignKey("client.client_id"), nullable=False)
+
+    __mapper_args__ = {
+        "order_by": id
+    }
+
+    def __init__(self, zip_code, address, number, complement, neighborhood,
+                city, state, current, client):
+        self.zip_code = zip_code
+        self.address = address
+        self.number = number
+        self.complement = complement
+        self.neighborhood = neighborhood
+        self.state = state
+        self.current = current
+        self.client = client
+        self.city = city
+    
+    def list_address(self):
+        return {
+            "id": self.id,
+            "zip_code": self.zip_code,
+            "address": self.address,
+            "number": self.number,
+            "complement": self.complement,
+            "neighborhood": self.neighborhood,
+            "city": self.city,
+            "state": self.state,
+            "current": self.current
+            }
+    
+    @classmethod
+    def find_address(cls, id_address):
+
+        if not id_address:
+            return False
+        
+        address = cls.query.filter_by(id=id_address).first()
+
+        if address:
+            return address
+        
+        return None
+    def save_address(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete_address(self):
+        db.session.delete(self)
+        db.session.commit()
+    
+    def update_address(self, zip_code, address, number, complement, neighborhood,
+                city, state, current):
+        self.zip_code = zip_code
+        self.address = address
+        self.number = number
+        self.complement = complement
+        self.neighborhood = neighborhood
+        self.state = state
+        self.current = current
+        self.city = city
+
+    
+
+
