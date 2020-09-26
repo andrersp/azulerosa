@@ -8,7 +8,7 @@ from wraps import required_params
 
 from model.provider import ModelProvider
 
-provider_space = Namespace("Providers", description="REsource for providers")
+provider_space = Namespace("Providers Manager", description="REsource for providers")
 
 schema = {
     "id": {"type": "numeric", "required": True, "description": "numeric string value or int"},

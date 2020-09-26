@@ -9,7 +9,7 @@ from model.products_category import ModelCategoryProduct
 from wraps import required_params
 
 category_space = Namespace(
-    'Products Category', description="Resources for product category")
+    'Products Category Manager', description="Resources for product category")
 
 schema = {
     "id": {"type": "numeric", "required": True, "empty": True, "description": "numeric string value or int"},

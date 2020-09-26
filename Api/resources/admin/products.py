@@ -20,7 +20,7 @@ from model.products_image import ModelImagesProduct
 from model.provider import ModelProvider
 from model.products_category import ModelCategoryProduct
 
-product_space = Namespace("Products", description="Resources for Produtos")
+product_space = Namespace("Products Manager", description="Resources for Produtos")
 
 schema = {
     "id": {"type": "numeric", "required": True, "description": "numeric string value or int"},
