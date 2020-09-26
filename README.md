@@ -12,8 +12,8 @@ O Projeto consiste em **3 etapas**:
 - Desenvolvimento de Software Desktop utilizando [QT](https://www.qt.io/)
 - Desenvolvimento de Página Web utilizazndo [Flask](https://flask.palletsprojects.com/en/1.1.x/)
 
-## Features
-### Admin
+# Features
+### Gerenciamento
 - [x] Cadastro de produtos
 - [x] Cadastro de categorias de produtos
 - [x] Cadastro de fornecedores
@@ -26,6 +26,13 @@ O Projeto consiste em **3 etapas**:
 - [ ] Relatório de Venda
 - [ ] Relatorio de Compra
 - [ ] Integração com meios de pagamento
+
+### Consumo
+- [ ] Cadastro Cliente
+- [ ] Meios de pagamento
+- [ ] Carrinho de compras
+
+
 
 ## Deploy
 Desenvolvimento:
