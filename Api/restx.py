@@ -22,13 +22,20 @@ authorizations = {
 }
 
 # Set BluePrint
-blueprint = Blueprint(
-    'api', __name__, url_prefix="/api/v1", static_folder='static')
+admin = Blueprint(
+    'api', __name__, url_prefix="/api/v1/admin", static_folder='static')
+
+front = Blueprint(
+    'front', __name__, url_prefix="/api/v1/", static_folder='static')
+
+
 
 # Inicilize Api
-api = Api(blueprint, version="1.0", title="Azul e Rosa Rest APi",
+api = Api(admin, version="1.0", title="Azul e Rosa Rest APi",
           description="Api for product register", authorizations=authorizations)
-
+        
+api_front = Api(front, version="1.0", title="Azul e Rosa Rest APi",
+          description="Api for product register", authorizations=authorizations)
 
 @api.errorhandler
 def default_error_handler(e):

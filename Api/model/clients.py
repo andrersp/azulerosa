@@ -47,7 +47,7 @@ class ModelClient(db.Model):
         return "<client %r>" % self.fancy_name
 
     def __init__(self, id, enable, type_registration, cnpj, state_registration,
-                 municipal_registration, delivery_address,
+                 municipal_registration,
                  fancy_name, company_name, contact_name, phone, cell_phone,
                  email, zip_code, address, number, complement,
                  neighborhood, city, state, obs, notify):
@@ -203,7 +203,8 @@ class ModelDelivereAdrressClient(db.Model):
             "complement": self.complement,
             "neighborhood": self.neighborhood,
             "city": self.city,
-            "state": self.state
+            "state": self.state,
+            "current": self.current
             }
     
     @classmethod

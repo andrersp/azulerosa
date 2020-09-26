@@ -6,7 +6,8 @@ from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
 from flask_migrate import Migrate
 
-from restx import blueprint as api
+from restx import admin as api
+from restx import front as api2
 
 from db import db
 
@@ -16,7 +17,8 @@ app = Flask(__name__)
 app.config.from_object("config.Config")
 
 # Register Bluprint
-app.register_blueprint(api, url_prefix="/api/v1")
+app.register_blueprint(api)
+app.register_blueprint(api2)
 
 # BCrypt
 bcrypt = Bcrypt(app)
