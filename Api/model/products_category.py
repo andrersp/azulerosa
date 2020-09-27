@@ -1,5 +1,7 @@
 # -*- coding: utf-* -*-
 
+from sqlalchemy import event, DDL
+
 from db import db
 
 
@@ -50,3 +52,42 @@ class ModelCategoryProduct(db.Model):
     def update_category(self, id, name, description):
         self.name = name
         self.description = description
+
+# mytable = db.Table(
+#     'mytable', db.metadata,
+#     db.Column('id', db.Integer, primary_key=True),
+#     db.Column('data', db.String(50))
+# )
+
+
+# func = db.DDL(
+#    "CREATE FUNCTION my_func() "
+#     "RETURNS TRIGGER AS $teste_trigger$ "
+#     "BEGIN "
+#     "INSERT INTO mytable (data) VALUES (NEW.name);"
+#     "RETURN NEW; "
+#     "END; $teste_trigger$ LANGUAGE PLPGSQL"
+# )
+
+# trigger = db.DDL(
+#       "CREATE TRIGGER dt_ins AFTER INSERT ON category "
+#     "FOR EACH ROW EXECUTE PROCEDURE my_func();"
+# )
+
+# def test1(self):
+#     print("Triggor")
+
+# db.event.listen(
+#     ModelCategoryProduct.__table__,
+#     'after_create',
+#     func.execute_if(dialect='postgresql')
+# )
+
+# def test2(self):
+#     print("Triggor")
+
+# db.event.listen(
+#     ModelCategoryProduct.__table__,
+#     'after_create',
+#     trigger.execute_if(dialect='postgresql')
+# )

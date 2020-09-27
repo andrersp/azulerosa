@@ -6,6 +6,8 @@ from flask import request, url_for
 
 from db import db
 
+from model.stock import ModelStock
+
 
 providers = db.Table('providers',
                      db.Column('privider_id', db.Integer, db.ForeignKey(
@@ -39,9 +41,11 @@ class ModelProducts(db.Model):
                              backref="product",  lazy="joined")
     category_name = db.relationship(
         "ModelCategoryProduct", backref=db.backref('products', lazy=False))
-
     providers = db.relationship('ModelProvider', secondary=providers, lazy='subquery',
                                 backref=db.backref('providers', lazy=True))
+
+    stock = db.relationship('ModelStock', backref='product_stock', lazy='joined', uselist=False)
+
     __mapper_args__ = {
         "order_by": id_product
     }
@@ -65,7 +69,7 @@ class ModelProducts(db.Model):
         self.length = length
         self.weight = weight
         self.maximum_discount = maximum_discount
-        self.cover = cover
+        self.cover = cover        
 
     def list_product(self):
         return {
@@ -78,7 +82,8 @@ class ModelProducts(db.Model):
             "sale_price": self.sale_price,
             "available": self.available,
             "images": [image.list_images() for image in self.images],
-            "providers": [data.list_provider_product() for data in self.providers]
+            "providers": [data.list_provider_product() for data in self.providers],
+            "stock": self.stock.get_stoc()
         }
 
     def list_product_provider(self):
@@ -130,3 +135,34 @@ class ModelProducts(db.Model):
             path = "static/images/{}".format(self.cover)
             os.remove(path)
             self.cover = cover
+
+
+""" Trigers """
+func = db.DDL(
+
+    "CREATE FUNCTION insert_stock() "
+    "RETURNS TRIGGER AS $TGR_Stock$ "
+    "BEGIN "
+    "INSERT INTO stock (product_id) VALUES (NEW.id_product); "
+    "RETURN NEW; "
+    " END; $TGR_Stock$ LANGUAGE PLPGSQL"
+
+)
+trigger = db.DDL(
+
+    "CREATE TRIGGER  insert_stock "
+    "AFTER INSERT ON product "
+    "FOR EACH ROW "
+    "EXECUTE PROCEDURE insert_stock();"
+
+)
+db.event.listen(
+    ModelProducts.__table__,
+    'after_create',
+    func.execute_if(dialect='postgresql')
+)
+db.event.listen(
+    ModelProducts.__table__,
+    'after_create',
+    trigger.execute_if(dialect='postgresql')
+)
