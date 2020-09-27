@@ -139,21 +139,23 @@ class ModelProducts(db.Model):
 
 """ Trigers """
 func = db.DDL(
-
-    "CREATE FUNCTION insert_stock() "
-    "RETURNS TRIGGER AS $TGR_Stock$ "
-    "BEGIN "
-    "INSERT INTO stock (product_id) VALUES (NEW.id_product); "
-    "RETURN NEW; "
-    " END; $TGR_Stock$ LANGUAGE PLPGSQL"
+    """
+    CREATE FUNCTION insert_stock() 
+    RETURNS TRIGGER AS $TGR_Stock$ 
+    BEGIN 
+    INSERT INTO stock (product_id) VALUES (NEW.id_product); 
+    RETURN NEW; 
+    END; $TGR_Stock$ LANGUAGE PLPGSQL
+    """
 
 )
 trigger = db.DDL(
-
-    "CREATE TRIGGER  insert_stock "
-    "AFTER INSERT ON product "
-    "FOR EACH ROW "
-    "EXECUTE PROCEDURE insert_stock();"
+    """
+    CREATE TRIGGER  insert_stock 
+    AFTER INSERT ON product 
+    FOR EACH ROW 
+    EXECUTE PROCEDURE insert_stock();
+    """
 
 )
 db.event.listen(
