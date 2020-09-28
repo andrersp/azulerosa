@@ -54,6 +54,7 @@ class PurchaseGet(Resource):
     @required_params(schema)
     @ns_purchase.doc(params=schema)
     def post(self):
+        """ Create or update purchase """
 
         data = request.json
 
