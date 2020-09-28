@@ -32,7 +32,6 @@ schema = {
     "city": {"type": "string", "required": True, "description": "Company city", "empty": False, "maxlength": 80},
     "state": {"type": "string", "required": True, "description": "Company State", "empty": False, "maxlength": 2},
     "obs": {"type": "string", "required": True, "description": "Company Observation", "empty": True}
-
 }
 
 
