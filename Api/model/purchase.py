@@ -19,8 +19,9 @@ class ModelPurchase(db.Model):
     tracking_cod = db.Column(db.String(20))
     payment_method = db.Column(db.Integer)
     parcel = db.Column(db.Integer, default=1)
-    delivery_status = db.Column(db.Integer)
-    payment_status = db.Column(db.Integer)
+    delivery_status = db.Column(
+        db.Integer, db.ForeignKey('delivery_status.id_status'), default=2)
+    payment_status = db.Column(db.Integer, db.ForeignKey('payment_status.id_status'), default=2)
     status = db.Column(db.Integer)
     obs = db.Column(db.String(80))
     date = db.Column(db.DateTime, default=datetime.now())
@@ -29,12 +30,14 @@ class ModelPurchase(db.Model):
 
     provider_name = db.relationship(
         "ModelProvider", backref='provider_name', lazy='joined')
+    delivery_status_name = db.relationship(
+        "ModelDeliveryStatus", backref='delivery_status_name', lazy='joined')
 
     __mapper_args__ = {
         "order_by": id_purchase
     }
 
-    def __init__(self, id, provider_id, value, freight, discount, total_value,
+    def __init__(self, id, provider_id, value, freight, discount, total_value,                 
                  delivery_time, payment_method, parcel,
                  status, obs, itens):
         self.id = id
@@ -59,7 +62,7 @@ class ModelPurchase(db.Model):
                                                self.delivery_time.month,
                                                self.delivery_time.year),
             "tracking_cod": self.tracking_cod,
-            "delivery_status": self.delivery_status,
+            "delivery_status": self.delivery_status_name.name,
             "payment_status": self.payment_status,
             "status": self.status,
             "itens": [item.list_itens() for item in self.itens]

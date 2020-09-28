@@ -140,7 +140,7 @@ class ModelProducts(db.Model):
 """ Trigers """
 func = db.DDL(
     """
-    CREATE FUNCTION insert_stock() 
+    CREATE OR REPLACE FUNCTION insert_stock() 
     RETURNS TRIGGER AS $TGR_Stock$ 
     BEGIN 
     INSERT INTO stock (product_id) VALUES (NEW.id_product); 

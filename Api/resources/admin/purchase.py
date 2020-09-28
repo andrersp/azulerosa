@@ -10,6 +10,7 @@ from wraps import required_params
 from model.purchase import ModelPurchaseItem, ModelPurchase
 from model.provider import ModelProvider
 from model.products import ModelProducts
+from model.purchase_options import ModelDeliveryStatus, ModelPaymentStatus
 
 
 ns_purchase = Namespace("Purchasing Management",
@@ -26,7 +27,8 @@ schema = {
     "freight": {"type": "float", "required": True, "empty": False, "description": "cost of freight"},
     "discount": {"type": "float", "required": True, "empty": False, "description": "cost of discount"},
     "total_value": {"type": "float", "required": True, "empty": False, "description": "total value"},
-    "delivery_time": {"type": "date", "required": True, "empty": False, "description": "Expected Delivery Date", "coerce": to_date},
+    "delivery_status": {"type": "integer", "required": True, "empty": False, "allowed": [1, 2], "description": "Delivery Status integer id: 1 - Entregue, 2 - Pendente" }, 
+    "delivery_time": {"type": "date", "required": True, "empty": False, "description": "Expected Delivery Date", "coerce": "form_date"},
     "payment_method": {"type": "integer", "required": True, "empty": False, "allowed": [1, 2], "description": "Payment method: 1 - Money, 2 - Card"},
     "parcel": {"type": "integer", "required": True, "min": 1, "description": "number of installments"},
     "status": {"type": "integer", "required": True, "empty": False, "allowed": [1, 2, 3], "description": "Stus: 1 - Orcamento, 2 - Aprovado, 3 Cancelado"},

@@ -6,11 +6,16 @@ from functools import wraps
 from flask import request
 from cerberus import Validator
 from flask_jwt_extended import get_jwt_claims
+from datetime import datetime
 
 from inc import validate_registation
 
+# to_date(s): return datetime.strptime(s, "%Y-%m-%d")
+def to_date(s): return datetime.strptime(s, "%Y-%m-%d")
 
 class CustonValidator(Validator):
+
+    def to_date(s): return datetime.strptime(s, "%Y-%m-%d")
 
     def _validate_type_numeric(self, number):
 
@@ -46,18 +51,6 @@ class CustonValidator(Validator):
             if not validate_registation.validar_cnpj(value):
                 self._error(field, "Valid cnpj required")
 
-            # try:
-            #     cnpj = validate_cnpj.CNPJ(value)
-
-            #     if not cnpj.valido():
-            #         self._error(field, "Valid cnpj required")
-            #         return
-            # except Exception as err:
-            #     self._error(field, str(err))
-            #     return  
-
-
-        
     
     def _check_with_cellcheck(self, field, value):
 
@@ -92,6 +85,9 @@ class CustonValidator(Validator):
         if value and len(value) > 11:
             self._error(field, "max length is 11")
             return False
+    
+    def _normalize_coerce_form_date(self, value):
+        return to_date(value)
 
 
         
