@@ -11,7 +11,9 @@ from resources.admin.products_category import category_space  # Categories Produ
 
 from resources.admin.provider import provider_space  # Providers
 
-from resources.admin.clients import client_space # Clientes
+from resources.admin.clients import client_space  # Clientes
+
+from resources.admin.purchase import ns_purchase  # Purchases
 
 authorizations = {
     'apikey': {
@@ -26,12 +28,10 @@ blueprint = Blueprint(
     'api', __name__, static_folder='static')
 
 
-
-
 # Inicilize Api
 api = Api(blueprint, version="1.0", title="Azul e Rosa Rest APi",
           description="Api for product register", authorizations=authorizations)
-        
+
 
 @api.errorhandler
 def default_error_handler(e):
@@ -53,3 +53,6 @@ api.add_namespace(provider_space, path="/provider")
 
 # Cliente
 api.add_namespace(client_space, path="/client")
+
+# purchases
+api.add_namespace(ns_purchase, path="/purchase")
