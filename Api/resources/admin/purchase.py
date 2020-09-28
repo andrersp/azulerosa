@@ -8,6 +8,8 @@ from flask_restx import Resource, Namespace
 from wraps import required_params
 
 from model.purchase import ModelPurchaseItem, ModelPurchase
+from model.provider import ModelProvider
+from model.products import ModelProducts
 
 
 ns_purchase = Namespace("Purchasing Management",
@@ -58,8 +60,21 @@ class PurchaseGet(Resource):
 
         data = request.json
 
-        purchase = ModelPurchase.find_purchase(data.get("id"))
+        provider = ModelProvider.find_provider(data.get("provider_id"))
 
+        if not provider:
+            return {"message": "Provider not found"}, 400
+        
+        for item in data.get("itens"):
+            
+            item = ModelProducts.find_product(item.get("id"))
+
+            if not item:
+                return {"message": "Item Not Found", "item": item}, 400
+
+
+
+        purchase = ModelPurchase.find_purchase(data.get("id"))
         if purchase:
             return {"message": "update"}, 200
 
