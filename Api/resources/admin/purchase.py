@@ -34,7 +34,8 @@ schema = {
     "itens": {"type": "list", "required": True, "empty": False, "schema": {
         "type": "dict", "schema": {
             "id": {"type": "numeric", "required": True, "description": "item id, empty string on create purchase or integer on edit"},
-            "id_product": {"type": "integer", "required": True, "empty": False, "description": "id product"},
+            "product_id": {"type": "integer", "required": True, "empty": False, "description": "id product"},
+            "product_name": {"type": "string", "required": False, "empty": True, "description": "Optional name of product"},
             "unit_price": {"type": "float", "required": True, "empty": False, "description": "unit purchase value"},
             "qtde": {"type": "float", "required": True, "empty": False, "description": "Qtde of products"},
             "total_price": {"type": "float", "required": True, "empty": False, "description": "total purchase value"},
@@ -65,12 +66,12 @@ class PurchaseGet(Resource):
         if not provider:
             return {"message": "Provider not found"}, 400
         
-        for item in data.get("itens"):
-            
-            item = ModelProducts.find_product(item.get("id"))
+        for itens in data.get("itens"):
+
+            item = ModelProducts.find_product(itens.get("product_id"))
 
             if not item:
-                return {"message": "Item Not Found", "item": item}, 400
+                return {"message": "Item Not Found", "item": itens}, 400
 
 
 
@@ -91,7 +92,7 @@ class PurchaseGet(Resource):
             return {"message": "purchase saved", "data": purchase.list_purchases()}, 201
         except Exception as err:
             print(err)
-            return {"message": "Internal error"}
+            return {"message": "Internal error"}, 500
 
         return {
             "data": data

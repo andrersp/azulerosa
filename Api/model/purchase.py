@@ -112,11 +112,11 @@ class ModelPurchaseItem(db.Model):
     product_name = db.relationship(
         "ModelProducts", backref=db.backref('product_name', lazy=False))
 
-    def __init__(self, id, id_purchase, id_product, unit_price,
-                 qtde, total_price, obs):
+    def __init__(self, id, id_purchase, product_id, unit_price,
+                 qtde, total_price, obs, **kwargs):
         self.id = id
         self.id_purchase = id_purchase
-        self.id_product = id_product
+        self.id_product = product_id
         self.unit_price = unit_price
         self.qtde = qtde
         self.total_price = total_price
