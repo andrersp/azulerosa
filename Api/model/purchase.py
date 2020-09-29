@@ -21,7 +21,8 @@ class ModelPurchase(db.Model):
     parcel = db.Column(db.Integer, default=1)
     delivery_status = db.Column(
         db.Integer, db.ForeignKey('delivery_status.id_status'), default=2)
-    payment_status = db.Column(db.Integer, db.ForeignKey('payment_status.id_status'), default=2)
+    payment_status = db.Column(db.Integer, db.ForeignKey(
+        'payment_status.id_status'), default=1)
     status = db.Column(db.Integer)
     obs = db.Column(db.String(80))
     date = db.Column(db.DateTime, default=datetime.now())
@@ -33,12 +34,15 @@ class ModelPurchase(db.Model):
     delivery_status_name = db.relationship(
         "ModelDeliveryStatus", backref='delivery_status_name', lazy='joined')
 
+    payment_status_name = db.relationship('ModelPaymentStatus',
+                                          backref='payment_status', lazy='joined')
+
     __mapper_args__ = {
         "order_by": id_purchase
     }
 
-    def __init__(self, id, provider_id, value, freight, discount, total_value,                 
-                 delivery_time, payment_method, parcel,
+    def __init__(self, id, provider_id, value, freight, discount, total_value,
+                 delivery_time, payment_method, parcel, delivery_status,
                  status, obs, itens):
         self.id = id
         self.provider_id = provider_id
@@ -46,6 +50,7 @@ class ModelPurchase(db.Model):
         self.freight = freight
         self.discount = discount
         self.total_value = total_value
+        self.delivery_status = delivery_status
         self.delivery_time = delivery_time
         self.payment_method = payment_method
         self.parcel = parcel
@@ -61,9 +66,9 @@ class ModelPurchase(db.Model):
             "delivery_time": "{}-{}-{}".format(self.delivery_time.day,
                                                self.delivery_time.month,
                                                self.delivery_time.year),
-            "tracking_cod": self.tracking_cod,
+            "tracking_cod": self.tracking_cod if self.tracking_cod else "",
             "delivery_status": self.delivery_status_name.name,
-            "payment_status": self.payment_status,
+            "payment_status": self.payment_status_name.name,
             "status": self.status,
             "itens": [item.list_itens() for item in self.itens]
         }
@@ -98,6 +103,9 @@ class ModelPurchase(db.Model):
         self.obs = obs
         self.itens = itens
 
+    def update_livery_status(self, status):
+        self.delivery_status = status
+
 
 class ModelPurchaseItem(db.Model):
     __tablename__ = "purchase_item"
@@ -105,7 +113,7 @@ class ModelPurchaseItem(db.Model):
     id_purchase = db.Column(db.Integer, db.ForeignKey('purchase.id_purchase'))
     id_product = db.Column(db.Integer, db.ForeignKey(
         'product.id_product'), nullable=False)
-    provider_id = db.Column(db.Integer)
+    provider_id = db.Column(db.Integer, db.ForeignKey('provider.provider_id'))
     unit_price = db.Column(db.Float(precision=2), default=0.00)
     qtde = db.Column(db.Float(precision=2))
     total_price = db.Column(db.Float(precision=2), default=0.00)
@@ -116,12 +124,14 @@ class ModelPurchaseItem(db.Model):
         "ModelProducts", backref=db.backref('product_name', lazy=False))
 
     def __init__(self, id, id_purchase, product_id, unit_price,
+                 provider_id,
                  qtde, total_price, obs, **kwargs):
         self.id = id
         self.id_purchase = id_purchase
         self.id_product = product_id
         self.unit_price = unit_price
         self.qtde = qtde
+        self.provider_id = provider_id
         self.total_price = total_price
         self.obs = obs
 
@@ -134,3 +144,53 @@ class ModelPurchaseItem(db.Model):
             "total_price": self.total_price,
             "obs": self.total_price
         }
+
+
+""" Trigger """
+
+func = db.DDL(
+    """
+    CREATE OR REPLACE FUNCTION purchase_audit()
+    RETURNS TRIGGER as $TGR_Purchase$
+    DECLARE 
+        item record;
+        old_qtde integer;
+
+    BEGIN
+
+    IF (NEW.delivery_status = 3) THEN
+        
+        FOR item IN SELECT * FROM purchase_item WHERE id_purchase=NEW.id_purchase
+        LOOP
+
+        SELECT (maximum_stock) into old_qtde FROM product WHERE id_product=item.id_product;
+
+        UPDATE product SET maximum_stock=(old_qtde + item.qtde) WHERE id_product=item.id_product;
+        
+        END LOOP;
+    END IF;
+    RETURN NEW;
+    END; $TGR_Purchase$ LANGUAGE PLPGSQL
+    """
+)
+
+trigger = db.DDL(
+    """
+    CREATE TRIGGER purchase_audit
+    AFTER INSERT OR UPDATE OR DELETE ON purchase
+    FOR EACH ROW
+    EXECUTE PROCEDURE purchase_audit();
+    """
+)
+
+db.event.listen(
+    ModelPurchase.__table__,
+    "after_create",
+    func.execute_if(dialect='postgresql')
+)
+
+db.event.listen(
+    ModelPurchase.__table__,
+    "after_create",
+    trigger.execute_if(dialect='postgresql')
+)

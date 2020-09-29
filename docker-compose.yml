@@ -27,6 +27,7 @@ services:
             - POSTGRES_USER=loja
             - POSTGRES_PASSWORD=loja
             - POSTGRES_DATABASE=loja
+            - TZ="America/Sao_Paulo"
         networks: 
             - database
 
