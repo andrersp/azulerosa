@@ -23,7 +23,6 @@ class ModelPurchase(db.Model):
         db.Integer, db.ForeignKey('delivery_status.id_status'), default=2)
     payment_status = db.Column(db.Integer, db.ForeignKey(
         'payment_status.id_status'), default=1)
-    status = db.Column(db.Integer)
     obs = db.Column(db.String(80))
     date = db.Column(db.DateTime, default=datetime.now())
     itens = db.relationship('ModelPurchaseItem',
@@ -43,7 +42,7 @@ class ModelPurchase(db.Model):
 
     def __init__(self, id, provider_id, value, freight, discount, total_value,
                  delivery_time, payment_method, parcel, delivery_status,
-                 status, obs, itens):
+                 obs, itens):
         self.id = id
         self.provider_id = provider_id
         self.value = value
@@ -55,7 +54,6 @@ class ModelPurchase(db.Model):
         self.payment_method = payment_method
         self.parcel = parcel
         self.obs = obs
-        self.status = status
         # self.itens = itens
 
     def list_purchases(self):
@@ -69,7 +67,6 @@ class ModelPurchase(db.Model):
             "tracking_cod": self.tracking_cod if self.tracking_cod else "",
             "delivery_status": self.delivery_status_name.name,
             "payment_status": self.payment_status_name.name,
-            "status": self.status,
             "itens": [item.list_itens() for item in self.itens]
         }
 
@@ -91,7 +88,7 @@ class ModelPurchase(db.Model):
 
     def update_purchase(self, id, provider_id, value, freight, discount, total_value,
                         delivery_time, payment_method, parcel,
-                        status, obs, itens):
+                        obs, itens):
         self.provider_id = provider_id
         self.value = value
         self.freight = freight
@@ -123,6 +120,9 @@ class ModelPurchaseItem(db.Model):
     product_name = db.relationship(
         "ModelProducts", backref=db.backref('product_name', lazy=False))
 
+    privider_name = db.relationship("ModelProvider",
+                                    backref='name_provider', lazy='joined')
+
     def __init__(self, id, id_purchase, product_id, unit_price,
                  provider_id,
                  qtde, total_price, obs, **kwargs):
@@ -145,6 +145,15 @@ class ModelPurchaseItem(db.Model):
             "obs": self.total_price
         }
 
+    def latest(self):
+        return {
+            "qtde": self.qtde,
+            "unit_price": self.unit_price,
+            "provider": self.privider_name.fancy_name,
+            "delivery_date": "{}-{}-{}".format(self.delivery_date.year,
+                                               self.delivery_date.month, self.delivery_date.day)
+        }
+
 
 """ Trigger """
 
@@ -163,9 +172,9 @@ func = db.DDL(
         FOR item IN SELECT * FROM purchase_item WHERE id_purchase=NEW.id_purchase
         LOOP
 
-        SELECT (maximum_stock) into old_qtde FROM product WHERE id_product=item.id_product;
-
-        UPDATE product SET maximum_stock=(old_qtde + item.qtde) WHERE id_product=item.id_product;
+        SELECT (qtde) into old_qtde FROM stock WHERE product_id=item.id_product;
+        UPDATE purchase_item SET delivery_date=now() WHERE id_item=item.id_item;
+        UPDATE stock SET qtde=(old_qtde + item.qtde), purchase_price=item.unit_price  WHERE product_id=item.id_product;
         
         END LOOP;
     END IF;

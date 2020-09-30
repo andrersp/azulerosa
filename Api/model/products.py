@@ -43,8 +43,11 @@ class ModelProducts(db.Model):
         "ModelCategoryProduct", backref=db.backref('products', lazy=False))
     providers = db.relationship('ModelProvider', secondary=providers, lazy='subquery',
                                 backref=db.backref('providers', lazy=True))
+    latest_purchases = db.relationship(
+        'ModelPurchaseItem', backref='purchases', lazy='joined')
 
-    stock = db.relationship('ModelStock', backref='product_stock', lazy='joined', uselist=False)
+    stock = db.relationship(
+        'ModelStock', backref='product_stock', lazy='joined', uselist=False)
 
     __mapper_args__ = {
         "order_by": id_product
@@ -69,7 +72,7 @@ class ModelProducts(db.Model):
         self.length = length
         self.weight = weight
         self.maximum_discount = maximum_discount
-        self.cover = cover        
+        self.cover = cover
 
     def list_product(self):
         return {
@@ -83,7 +86,8 @@ class ModelProducts(db.Model):
             "available": self.available,
             "images": [image.list_images() for image in self.images],
             "providers": [data.list_provider_product() for data in self.providers],
-            "stock": self.stock.get_stoc()
+            "stock": self.stock.get_stoc(),
+            "latest_purchases": [data.latest() for data in self.latest_purchases]
         }
 
     def list_product_provider(self):
@@ -143,7 +147,9 @@ func = db.DDL(
     CREATE OR REPLACE FUNCTION insert_stock() 
     RETURNS TRIGGER AS $TGR_Stock$ 
     BEGIN 
-    INSERT INTO stock (product_id) VALUES (NEW.id_product); 
+    INSERT INTO stock (product_id, qtde, purchase_price) 
+    VALUES 
+    (NEW.id_product, 0.00, 0.00); 
     RETURN NEW; 
     END; $TGR_Stock$ LANGUAGE PLPGSQL
     """

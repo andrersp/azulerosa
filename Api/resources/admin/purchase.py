@@ -31,7 +31,6 @@ schema = {
     "delivery_time": {"type": "date", "required": True, "empty": False, "description": "Expected Delivery Date", "coerce": "form_date"},
     "payment_method": {"type": "integer", "required": True, "empty": False, "allowed": [1, 2], "description": "Payment method: 1 - Money, 2 - Card"},
     "parcel": {"type": "integer", "required": True, "min": 1, "description": "number of installments"},
-    "status": {"type": "integer", "required": True, "empty": False, "allowed": [1, 2, 3], "description": "Stus: 1 - Orcamento, 2 - Aprovado, 3 Cancelado"},
     "obs": {"type": "string", "required": True, "empty": True, "description": "obs string"},
     "itens": {"type": "list", "required": True, "empty": False, "schema": {
         "type": "dict", "schema": {
@@ -43,7 +42,7 @@ schema = {
             "total_price": {"type": "float", "required": True, "empty": False, "description": "total purchase value"},
             "obs": {"type": "string", "required": True, "empty": True, "description": "obs string"}
         }
-    }}
+    }, "description": "List with dictionaries of itens"}
 
 }
 
