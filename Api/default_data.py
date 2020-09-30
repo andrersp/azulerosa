@@ -129,5 +129,5 @@ def delivery_data():
 
     if not prod:
 
-        for _ in range(6000):
+        for _ in range(1):
             ModelProducts(**product).save_product()

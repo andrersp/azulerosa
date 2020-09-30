@@ -172,9 +172,9 @@ func = db.DDL(
         FOR item IN SELECT * FROM purchase_item WHERE id_purchase=NEW.id_purchase
         LOOP
 
-        SELECT (qtde) into old_qtde FROM stock WHERE product_id=item.id_product;
+        SELECT (available_stock) into old_qtde FROM product WHERE id_product=item.id_product;
         UPDATE purchase_item SET delivery_date=now() WHERE id_item=item.id_item;
-        UPDATE stock SET qtde=(old_qtde + item.qtde), purchase_price=item.unit_price  WHERE product_id=item.id_product;
+        UPDATE product SET available_stock=(old_qtde + item.qtde), purchase_price=item.unit_price  WHERE id_product=item.id_product;
         
         END LOOP;
     END IF;
