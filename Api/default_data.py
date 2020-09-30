@@ -105,7 +105,7 @@ def delivery_data():
         provider.save_provider()
 
     product = {
-        "id": "1",
+        "id": "0",
         "name": "Produto Teste",
         "brand": 1,
         "category": 1,
@@ -128,4 +128,6 @@ def delivery_data():
     prod = ModelProducts.find_product(product.get("id"))
 
     if not prod:
-        ModelProducts(**product).save_product()
+
+        for _ in range(6000):
+            ModelProducts(**product).save_product()

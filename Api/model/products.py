@@ -38,16 +38,21 @@ class ModelProducts(db.Model):
     weight = db.Column(db.Float(precision=2))
     maximum_discount = db.Column(db.Float(precision=2))
     images = db.relationship("ModelImagesProduct",
-                             backref="product",  lazy="joined")
+                             backref="product", lazy="joined")
+
     category_name = db.relationship(
-        "ModelCategoryProduct", backref=db.backref('products', lazy=False))
+        "ModelCategoryProduct", foreign_keys=category)
+
+    # category_name = db.relationship(    ##fast
+    #     "ModelCategoryProduct", backref=db.backref('category', lazy='dynamic'))
+
     providers = db.relationship('ModelProvider', secondary=providers, lazy='subquery',
                                 backref=db.backref('providers', lazy=True))
     latest_purchases = db.relationship(
-        'ModelPurchaseItem', backref='purchases', lazy='joined')
+        'ModelPurchaseItem', backref='product', lazy=True)
 
     stock = db.relationship(
-        'ModelStock', backref='product_stock', lazy='joined', uselist=False)
+        'ModelStock', backref='product', lazy=True, uselist=False)
 
     __mapper_args__ = {
         "order_by": id_product
@@ -79,6 +84,19 @@ class ModelProducts(db.Model):
             "id": self.id_product,
             "name": self.name,
             "category": self.category_name.name,
+            "brand": self.brand,
+            "cover": request.url_root[:-1] + url_for("api.static", filename="images/{}".format(self.cover)) if self.cover else "",
+            "current_stock": 1,
+            "sale_price": self.sale_price,
+            "available": self.available,
+            "images": [image.list_images() for image in self.images]
+        }
+
+    def json_product(self):
+        return {
+            "id": self.id_product,
+            "name": self.name,
+            # "category": self.category_name.name,
             "brand": self.brand,
             "cover": request.url_root[:-1] + url_for("api.static", filename="images/{}".format(self.cover)) if self.cover else "",
             "current_stock": 1,
