@@ -38,7 +38,7 @@ class ModelProducts(db.Model):
     weight = db.Column(db.Float(precision=2))
     maximum_discount = db.Column(db.Float(precision=2))
     images = db.relationship("ModelImagesProduct",
-                             backref="product", lazy="joined")
+                             backref="product", lazy=True)
 
     category_name = db.relationship(
         "ModelCategoryProduct", foreign_keys=category)
@@ -88,8 +88,8 @@ class ModelProducts(db.Model):
             "cover": request.url_root[:-1] + url_for("api.static", filename="images/{}".format(self.cover)) if self.cover else "",
             "current_stock": 1,
             "sale_price": self.sale_price,
-            "available": self.available,
-            "images": [image.list_images() for image in self.images]
+            "available": self.available
+
         }
 
     def json_product(self):
