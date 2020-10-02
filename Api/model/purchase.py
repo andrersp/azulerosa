@@ -17,7 +17,9 @@ class ModelPurchase(db.Model):
     total_value = db.Column(db.Float(precision=2))
     delivery_time = db.Column(db.DateTime)
     tracking_cod = db.Column(db.String(20))
-    payment_method = db.Column(db.Integer)
+    payment_form = db.Column(db.Integer, db.ForeignKey('payment_form.id_form'))
+    payment_method = db.Column(
+        db.Integer, db.ForeignKey('payment_method.id_method'))
     parcel = db.Column(db.Integer, default=1)
     delivery_status = db.Column(
         db.Integer, db.ForeignKey('delivery_status.id_status'), default=2)
@@ -26,15 +28,21 @@ class ModelPurchase(db.Model):
     obs = db.Column(db.String(80))
     date = db.Column(db.DateTime, default=datetime.now())
     itens = db.relationship('ModelPurchaseItem',
-                            backref='purchase', lazy='joined')
+                            backref='purchase_item', lazy=True)
 
     provider_name = db.relationship(
-        "ModelProvider", backref='provider_name', lazy='joined')
+        "ModelProvider", foreign_keys=provider_id, lazy='joined')
+
     delivery_status_name = db.relationship(
-        "ModelDeliveryStatus", backref='delivery_status_name', lazy='joined')
+        "ModelDeliveryStatus", foreign_keys=delivery_status, lazy='joined')
+
+    # payment_form_name = db.relationship(
+    #     'ModelPaymentForm', foreign_keys=payment_form, lazy="joined")
+    # payment_method_name = db.relationship(
+    #     'ModelPaymentMethod', foreign_keys=payment_method, lazy='joined')
 
     payment_status_name = db.relationship('ModelPaymentStatus',
-                                          backref='payment_status', lazy='joined')
+                                          foreign_keys=payment_status, lazy='joined')
 
     __mapper_args__ = {
         "order_by": id_purchase
@@ -42,6 +50,7 @@ class ModelPurchase(db.Model):
 
     def __init__(self, id, provider_id, value, freight, discount, total_value,
                  delivery_time, payment_method, parcel, delivery_status,
+                 payment_form,
                  obs, itens):
         self.id = id
         self.provider_id = provider_id
@@ -54,19 +63,39 @@ class ModelPurchase(db.Model):
         self.payment_method = payment_method
         self.parcel = parcel
         self.obs = obs
+        self.payment_form = payment_form
         # self.itens = itens
 
     def list_purchases(self):
         return {
             "id": self.id_purchase,
             "provider": self.provider_name.fancy_name,
-            "value": "%.2f" % (self.value),
             "delivery_time": "{}-{}-{}".format(self.delivery_time.day,
                                                self.delivery_time.month,
                                                self.delivery_time.year),
-            "tracking_cod": self.tracking_cod if self.tracking_cod else "",
             "delivery_status": self.delivery_status_name.name,
             "payment_status": self.payment_status_name.name,
+            "total_value": "%.2f" % (self.total_value)
+        }
+
+    def json_purchase(self):
+        return {
+            "id_purchase": self.id_purchase,
+            "provider_id": self.provider_id,
+            "value": self.value,
+            "freight": self.freight,
+            "discount": self.discount,
+            "total_value": self.total_value,
+            "delivery_time": "{}-{}-{}".format(self.delivery_time.day,
+                                               self.delivery_time.month,
+                                               self.delivery_time.year),
+            "tracking_cod": self.tracking_cod,
+            "payment_form": self.payment_form,
+            "payment_method": self.payment_method,
+            "parcel": self.parcel,
+            "delivery_status": self.delivery_status,
+            "payment_status": self.payment_status,
+            "obs": self.obs,
             "itens": [item.list_itens() for item in self.itens]
         }
 
@@ -167,7 +196,7 @@ func = db.DDL(
 
     BEGIN
 
-    IF (NEW.delivery_status = 3) THEN
+    IF (NEW.delivery_status = 1) THEN
         
         FOR item IN SELECT * FROM purchase_item WHERE id_purchase=NEW.id_purchase
         LOOP

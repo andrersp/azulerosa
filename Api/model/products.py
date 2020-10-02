@@ -6,8 +6,6 @@ from flask import request, url_for
 
 from db import db
 
-from model.stock import ModelStock
-
 
 providers = db.Table('providers',
                      db.Column('privider_id', db.Integer, db.ForeignKey(
@@ -37,7 +35,7 @@ class ModelProducts(db.Model):
     purchase_price = db.Column(db.Float(precision=2))
     percentage_sale = db.Column(db.Float(precision=2), nullable=True)
     update_price = db.Column(db.Boolean, default=False)
-    sale_price = db.Column(db.Float(precision=2))    
+    sale_price = db.Column(db.Float(precision=2))
     available_stock = db.Column(db.Float(precision=2), default=0.00)
     maximum_discount = db.Column(db.Float(precision=2))
     available = db.Column(db.Boolean)
@@ -55,15 +53,12 @@ class ModelProducts(db.Model):
     latest_purchases = db.relationship(
         'ModelPurchaseItem', backref='product', lazy=True)
 
-    stock = db.relationship(
-        'ModelStock', backref='product', lazy=True, uselist=False)
-
     __mapper_args__ = {
         "order_by": id_product
     }
 
     def __init__(self, id, name, category, brand, minimum_stock, maximum_stock,
-                 long_description, short_description, cover,
+                 long_description, short_description, cover, available_stock,
                  sale_price, weight,
                  available, height, widht, length, maximum_discount, **kwargs):
         self.id = id
@@ -82,6 +77,7 @@ class ModelProducts(db.Model):
         self.weight = weight
         self.maximum_discount = maximum_discount
         self.cover = cover
+        self.available = available_stock
 
     def list_product(self):
         return {
@@ -90,7 +86,7 @@ class ModelProducts(db.Model):
             "category": self.category_name.name,
             "brand": self.brand,
             "cover": request.url_root[:-1] + url_for("api.static", filename="images/{}".format(self.cover)) if self.cover else "",
-            "current_stock": 1,
+            "available_stock": self.available_stock,
             "sale_price": self.sale_price,
             "available": self.available
 
@@ -103,12 +99,11 @@ class ModelProducts(db.Model):
             # "category": self.category_name.name,
             "brand": self.brand,
             "cover": request.url_root[:-1] + url_for("api.static", filename="images/{}".format(self.cover)) if self.cover else "",
-            "current_stock": 1,
+            "available_stock": self.available_stock,
             "sale_price": self.sale_price,
             "available": self.available,
             "images": [image.list_images() for image in self.images],
             "providers": [data.list_provider_product() for data in self.providers],
-            "stock": self.stock.get_stoc(),
             "latest_purchases": [data.latest() for data in self.latest_purchases]
         }
 
@@ -163,36 +158,36 @@ class ModelProducts(db.Model):
             self.cover = cover
 
 
-""" Trigers """
-func = db.DDL(
-    """
-    CREATE OR REPLACE FUNCTION insert_stock() 
-    RETURNS TRIGGER AS $TGR_Stock$ 
-    BEGIN 
-    INSERT INTO stock (product_id, qtde, purchase_price) 
-    VALUES 
-    (NEW.id_product, 0.00, 0.00); 
-    RETURN NEW; 
-    END; $TGR_Stock$ LANGUAGE PLPGSQL
-    """
+# """ Trigers """
+# func = db.DDL(
+#     """
+#     CREATE OR REPLACE FUNCTION insert_stock()
+#     RETURNS TRIGGER AS $TGR_Stock$
+#     BEGIN
+#     INSERT INTO stock (product_id, qtde, purchase_price)
+#     VALUES
+#     (NEW.id_product, 0.00, 0.00);
+#     RETURN NEW;
+#     END; $TGR_Stock$ LANGUAGE PLPGSQL
+#     """
 
-)
-trigger = db.DDL(
-    """
-    CREATE TRIGGER  insert_stock 
-    AFTER INSERT ON product 
-    FOR EACH ROW 
-    EXECUTE PROCEDURE insert_stock();
-    """
+# )
+# trigger = db.DDL(
+#     """
+#     CREATE TRIGGER  insert_stock
+#     AFTER INSERT ON product
+#     FOR EACH ROW
+#     EXECUTE PROCEDURE insert_stock();
+#     """
 
-)
-db.event.listen(
-    ModelProducts.__table__,
-    'after_create',
-    func.execute_if(dialect='postgresql')
-)
-db.event.listen(
-    ModelProducts.__table__,
-    'after_create',
-    trigger.execute_if(dialect='postgresql')
-)
+# )
+# db.event.listen(
+#     ModelProducts.__table__,
+#     'after_create',
+#     func.execute_if(dialect='postgresql')
+# )
+# db.event.listen(
+#     ModelProducts.__table__,
+#     'after_create',
+#     trigger.execute_if(dialect='postgresql')
+# )

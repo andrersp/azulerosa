@@ -36,6 +36,7 @@ schema = {
     "sale_price": {"type": "float", "required": True, "description": "value of sale price of product"},
     "available": {"type": "boolean", "required": True, "description": "if product is unavailable for sale"},
     "height": {"type": "float", "required": True, "description": "product height for shipping"},
+    "available_stock": {"type": "float", "required": True, "description": "Avalilable stock"},
     "widht": {"type": "float", "required": True, "description": "product widht for shipping"},
     "length": {"type": "float", "required": True, "description": "product length for shipping"},
     "weight": {"type": "float", "required": True, "description": "product weight for shipping"},
