@@ -176,7 +176,7 @@ def delivery_data():
 
     if not prod:
 
-        for _ in range(1):
+        for _ in range(10):
             print(_)
             ModelProducts(**product).save_product()
 
@@ -207,11 +207,11 @@ def delivery_data():
 
     }
 
-    for _ in range(6000):
+    # for _ in range(10):
 
-        puchase = ModelPurchase(**purchase)
+    #     puchase = ModelPurchase(**purchase)
 
-        for item in purchase.get("itens"):
-            puchase.itens.append(ModelPurchaseItem(
-                **item, id_purchase=puchase, provider_id=purchase.get("provider_id")))
-        puchase.save_purchase()
+    #     for item in purchase.get("itens"):
+    #         puchase.itens.append(ModelPurchaseItem(
+    #             **item, id_purchase=puchase, provider_id=purchase.get("provider_id")))
+    #     puchase.save_purchase()

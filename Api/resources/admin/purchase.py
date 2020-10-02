@@ -52,7 +52,7 @@ schema = {
 
 
 @ns_purchase.route("")
-class PurchaseGet(Resource):
+class Purchase(Resource):
 
     def get(self):
         """ Get list of all purchase """
@@ -85,7 +85,7 @@ class PurchaseGet(Resource):
             total.append(itens.get("total_price"))
 
         if sum(total) != data.get("value"):
-            return {"message": "does not check"}, 400
+            return {"message": "Value does not check"}, 400
         # 11 + 5 - 1
 
         total_check = sum(total) + data.get("freight") - data.get("discount")
@@ -121,6 +121,20 @@ schema = {
     "id": {"type": "integer", "required": True, "description": "integer id of purchase"},
     "delivery_status": {"type": "integer", "required": True, "allowed": [1, 2, 3, 4], "description": "integer status of delivery"}
 }
+
+
+@ns_purchase.route("/<int:id_purchase>")
+class PurchaseGet(Resource):
+
+    def get(self, id_purchase):
+        """ Seleciona compra por ID """
+
+        purchase = ModelPurchase.find_purchase(id_purchase)
+
+        if purchase:
+            return {"data": purchase.json_purchase()}, 200
+        
+        return {"message": "Purchase not foud"}
 
 
 @ns_purchase.route("/delivery")

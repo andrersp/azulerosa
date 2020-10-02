@@ -89,7 +89,7 @@ class ModelPurchase(db.Model):
             "delivery_time": "{}-{}-{}".format(self.delivery_time.day,
                                                self.delivery_time.month,
                                                self.delivery_time.year),
-            "tracking_cod": self.tracking_cod,
+            "tracking_cod": self.tracking_cod if self.tracking_cod else "",
             "payment_form": self.payment_form,
             "payment_method": self.payment_method,
             "parcel": self.parcel,
@@ -171,7 +171,7 @@ class ModelPurchaseItem(db.Model):
             "unit_price": self.unit_price,
             "qtde": self.qtde,
             "total_price": self.total_price,
-            "obs": self.total_price
+            "obs": self.obs
         }
 
     def latest(self):
