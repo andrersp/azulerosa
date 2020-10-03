@@ -80,7 +80,7 @@ class ModelPurchase(db.Model):
 
     def json_purchase(self):
         return {
-            "id_purchase": self.id_purchase,
+            "id": self.id_purchase,
             "provider_id": self.provider_id,
             "value": self.value,
             "freight": self.freight,
@@ -116,18 +116,23 @@ class ModelPurchase(db.Model):
         return None
 
     def update_purchase(self, id, provider_id, value, freight, discount, total_value,
-                        delivery_time, payment_method, parcel,
+                        delivery_time, payment_method, parcel, delivery_status,
+                        payment_form,
                         obs, itens):
+        self.id = id
         self.provider_id = provider_id
         self.value = value
         self.freight = freight
         self.discount = discount
         self.total_value = total_value
+        self.delivery_status = delivery_status
         self.delivery_time = delivery_time
         self.payment_method = payment_method
         self.parcel = parcel
         self.obs = obs
-        self.itens = itens
+        self.payment_form = payment_form
+
+        [item.delete_item() for item in self.itens]
 
     def update_livery_status(self, status):
         self.delivery_status = status
@@ -147,15 +152,14 @@ class ModelPurchaseItem(db.Model):
     obs = db.Column(db.String(120))
 
     product_name = db.relationship(
-        "ModelProducts", backref=db.backref('product_name', lazy=False))
+        "ModelProducts", backref='product', lazy=True)
 
     privider_name = db.relationship("ModelProvider",
-                                    backref='name_provider', lazy='joined')
+                                    backref='provider', lazy=True)
 
-    def __init__(self, id, id_purchase, product_id, unit_price,
+    def __init__(self, id_purchase, product_id, unit_price,
                  provider_id,
                  qtde, total_price, obs, **kwargs):
-        self.id = id
         self.id_purchase = id_purchase
         self.id_product = product_id
         self.unit_price = unit_price
@@ -166,8 +170,8 @@ class ModelPurchaseItem(db.Model):
 
     def list_itens(self):
         return {
-            "id": self.id_item,
-            "product": self.product_name.name,
+            "product_id": self.id_product,
+            "product_name": self.product_name.name,
             "unit_price": self.unit_price,
             "qtde": self.qtde,
             "total_price": self.total_price,
@@ -182,6 +186,10 @@ class ModelPurchaseItem(db.Model):
             "delivery_date": "{}-{}-{}".format(self.delivery_date.year,
                                                self.delivery_date.month, self.delivery_date.day)
         }
+
+    def delete_item(self):
+        db.session.delete(self)
+        db.session.commit()
 
 
 """ Trigger """

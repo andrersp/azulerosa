@@ -31,14 +31,13 @@ schema = {
     "discount": {"type": "float", "required": True, "empty": False, "description": "Valor do desconto. 0 Se não houver"},
     "total_value": {"type": "float", "required": True, "empty": False, "description": "Valor Total incluindo Frete e/ou Desconto"},
     "delivery_status": {"type": "integer", "required": True, "empty": False, "allowed": [2, 3], "description": "ID estatus entrega: 2 - Em trânsito, 3 - Pendente, "},
-    "delivery_time": {"type": "date", "required": True, "empty": False, "description": "Data prevista para entrega", "coerce": "form_date"},
+    "delivery_time": {"type": "string", "required": True, "empty": False, "description": "Data prevista para entrega"},
     "payment_form": {"type": "integer", "required": True, "empty": False, "allowed": [1, 2, 3], "description": "ID Forma de pagamento. 1 - À Vista, 2 - Depósito Bancário, 3 - A Prazo"},
     "payment_method": {"type": "integer", "required": True, "empty": False, "allowed": [1, 2], "description": "ID Meio de Pagamento: 1 - Dinheiro, 2 - Cartão, 3 - Tranferência Bancaria"},
     "parcel": {"type": "integer", "required": True, "min": 1, "check_with": "payment_method", "description": "Número de parcelas. 1 para pagemento a vista"},
     "obs": {"type": "string", "required": True, "empty": True, "description": "String para observação se houver"},
     "itens": {"type": "list", "required": True, "empty": False, "schema": {
         "type": "dict", "schema": {
-            "id": {"type": "numeric", "required": True, "description": "String vazia para adicionar novo item ou Inteiro com id do item para edição. ID Recebida em GET."},
             "product_id": {"type": "integer", "required": True, "empty": False, "description": "ID do Produto"},
             "product_name": {"type": "string", "required": False, "empty": True, "description": "Nome do Produto. Opcional. Usado para mensagem caso produto não exista"},
             "unit_price": {"type": "float", "required": True, "empty": False, "description": "Valor de compra unitário"},
@@ -65,6 +64,12 @@ class Purchase(Resource):
         """ Create or update purchase """
 
         data = request.json
+
+        # Find if purchase exist
+        purchase = ModelPurchase.find_purchase(data.get("id"))
+
+        if purchase:
+            return self.put()
 
         provider = ModelProvider.find_provider(data.get("provider_id"))
 
@@ -93,28 +98,78 @@ class Purchase(Resource):
         if total_check != data.get("total_value"):
             return {"message": "total value does not check "}, 400
 
-        purchase = ModelPurchase.find_purchase(data.get("id"))
-        if purchase:
-            return {"message": "update"}, 200
-
         try:
             purchase = ModelPurchase(**data)
 
             for itens in data.get("itens"):
                 purchase.itens.append(ModelPurchaseItem(
                     **itens, id_purchase=purchase, provider_id=provider.provider_id))
-                print(itens)
 
             purchase.save_purchase()
 
-            return {"message": "purchase saved", "data": purchase.list_purchases()}, 201
+            return {"message": "purchase saved", "data": purchase.json_purchase()}, 201
         except Exception as err:
             print(err)
             return {"message": "Internal error"}, 500
 
-        return {
-            "data": data
-        }, 200
+    # Update Purchase
+
+    @ns_purchase.hide
+    def put(self):
+
+        data = request.json
+        print(data.get("delivery_time"))
+
+        purchase = ModelPurchase.find_purchase(data.get("id"))
+
+        if not purchase:
+            return {"message": "Compra não encontrada"}, 404
+
+        if purchase.delivery_status == 1:
+            return {"message": "Compra ja entregue não pode ser alterada"}, 400
+
+        provider = ModelProvider.find_provider(data.get("provider_id"))
+
+        if not provider:
+            return {"message": "Provider not found"}, 400
+
+        total = []
+        for itens in data.get("itens"):
+
+            item = ModelProducts.find_product(itens.get("product_id"))
+
+            if not item:
+                return {"message": "Item Not Found", "item": itens}, 400
+
+            if not itens.get("unit_price") * itens.get("qtde") == itens.get("total_price"):
+                return {"message": "Total value of item: {} does not check".format(item.name)}, 400
+
+            total.append(itens.get("total_price"))
+
+        if sum(total) != data.get("value"):
+            return {"message": "Value does not check"}, 400
+        # 11 + 5 - 1
+
+        total_check = sum(total) + data.get("freight") - data.get("discount")
+
+        if total_check != data.get("total_value"):
+            return {"message": "total value does not check "}, 400
+
+        try:
+            purchase.update_purchase(**data)
+
+            for itens in data.get("itens"):
+                purchase.itens.append(ModelPurchaseItem(
+                    **itens, id_purchase=purchase, provider_id=provider.provider_id))
+
+            purchase.save_purchase()
+
+            return {"message": "Compra atualizada", "data": purchase.json_purchase()}, 200
+        except Exception as err:
+            print(err)
+            return {"message": "Internal error"}, 500
+
+        return {"data": data}, 200
 
 
 schema = {
@@ -133,7 +188,7 @@ class PurchaseGet(Resource):
 
         if purchase:
             return {"data": purchase.json_purchase()}, 200
-        
+
         return {"message": "Purchase not foud"}
 
 

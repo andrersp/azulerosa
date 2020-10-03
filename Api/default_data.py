@@ -207,11 +207,11 @@ def delivery_data():
 
     }
 
-    # for _ in range(10):
+    for _ in range(6000):
 
-    #     puchase = ModelPurchase(**purchase)
+        puchase = ModelPurchase(**purchase)
 
-    #     for item in purchase.get("itens"):
-    #         puchase.itens.append(ModelPurchaseItem(
-    #             **item, id_purchase=puchase, provider_id=purchase.get("provider_id")))
-    #     puchase.save_purchase()
+        for item in purchase.get("itens"):
+            puchase.itens.append(ModelPurchaseItem(
+                **item, id_purchase=puchase, provider_id=purchase.get("provider_id")))
+        puchase.save_purchase()
