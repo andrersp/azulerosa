@@ -10,6 +10,7 @@ from api_admin import blueprint as api_admin
 
 
 from db import db
+from default_data import delivery_data
 
 
 app = Flask(__name__)
@@ -87,6 +88,20 @@ def page_not_found(e):
 
 
 cli = FlaskGroup(app)
+
+
+# Commands
+@cli.command('create_db')
+def createdb():
+    db.drop_all()
+    db.create_all()
+    db.session.commit()
+
+# Defaults Data
+@cli.command('create_data')
+def create_data():
+    delivery_data()
+
 
 if __name__ == "__main__":
     cli()

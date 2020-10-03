@@ -20,7 +20,8 @@ from model.products_image import ModelImagesProduct
 from model.provider import ModelProvider
 from model.products_category import ModelCategoryProduct
 
-product_space = Namespace("Products Manager", description="Resources for Produtos")
+product_space = Namespace(
+    "Products Manager", description="Resources for Produtos")
 
 schema = {
     "id": {"type": "numeric", "required": True, "description": "numeric string value or int"},
@@ -35,6 +36,7 @@ schema = {
     "sale_price": {"type": "float", "required": True, "description": "value of sale price of product"},
     "available": {"type": "boolean", "required": True, "description": "if product is unavailable for sale"},
     "height": {"type": "float", "required": True, "description": "product height for shipping"},
+    "available_stock": {"type": "float", "required": True, "description": "Avalilable stock"},
     "widht": {"type": "float", "required": True, "description": "product widht for shipping"},
     "length": {"type": "float", "required": True, "description": "product length for shipping"},
     "weight": {"type": "float", "required": True, "description": "product weight for shipping"},
@@ -96,21 +98,20 @@ class ProductsGet(Resource):
             for images in data.get("images"):
                 product.images.append(ModelImagesProduct(
                     upload_image(images), product))
-            
+
             # Check if category exist
             if not ModelCategoryProduct.find_category(data.get("category")):
                 return {"message": "Category id {} not found".format(data.get("category"))}, 400
-            
+
             lst_provider = []
             for id_provider in data.get("provider"):
                 provider = ModelProvider.find_provider(id_provider)
                 if not provider:
                     return {"message": "provider id {} not found".format(id_provider)}, 400
                 else:
-                    lst_provider.append(provider) 
-            
-            [product.providers.append(provider) for provider in lst_provider]
+                    lst_provider.append(provider)
 
+            [product.providers.append(provider) for provider in lst_provider]
 
             product.save_product()
 
@@ -153,7 +154,7 @@ class ProductGet(Resource):
         product = ModelProducts.find_product(id_product)
 
         if product:
-            return {"data": product.list_product()}, 200
+            return {"data": product.json_product()}, 200
 
         return {"message": "product not found"}, 404
 

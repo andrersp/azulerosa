@@ -6,8 +6,6 @@ from flask import request, url_for
 
 from db import db
 
-from model.stock import ModelStock
-
 
 providers = db.Table('providers',
                      db.Column('privider_id', db.Integer, db.ForeignKey(
@@ -30,28 +28,37 @@ class ModelProducts(db.Model):
     long_description = db.Column(db.Text)
     short_description = db.Column(db.String(200))
     cover = db.Column(db.String(80))
-    sale_price = db.Column(db.Float(precision=2))
-    available = db.Column(db.Boolean)
     height = db.Column(db.Float(precision=2))
     widht = db.Column(db.Float(precision=2))
     length = db.Column(db.Float(precision=2))
     weight = db.Column(db.Float(precision=2))
+    purchase_price = db.Column(db.Float(precision=2))
+    percentage_sale = db.Column(db.Float(precision=2), nullable=True)
+    update_price = db.Column(db.Boolean, default=False)
+    sale_price = db.Column(db.Float(precision=2))
+    available_stock = db.Column(db.Float(precision=2), default=0.00)
     maximum_discount = db.Column(db.Float(precision=2))
+    available = db.Column(db.Boolean)
     images = db.relationship("ModelImagesProduct",
-                             backref="product",  lazy="joined")
+                             backref="product", lazy=True)
+
     category_name = db.relationship(
-        "ModelCategoryProduct", backref=db.backref('products', lazy=False))
+        "ModelCategoryProduct", foreign_keys=category)
+
+    # category_name = db.relationship(    ##fast
+    #     "ModelCategoryProduct", backref=db.backref('category', lazy='dynamic'))
+
     providers = db.relationship('ModelProvider', secondary=providers, lazy='subquery',
                                 backref=db.backref('providers', lazy=True))
-
-    stock = db.relationship('ModelStock', backref='product_stock', lazy='joined', uselist=False)
+    latest_purchases = db.relationship(
+        'ModelPurchaseItem', backref='product', lazy=True)
 
     __mapper_args__ = {
         "order_by": id_product
     }
 
     def __init__(self, id, name, category, brand, minimum_stock, maximum_stock,
-                 long_description, short_description, cover,
+                 long_description, short_description, cover, available_stock,
                  sale_price, weight,
                  available, height, widht, length, maximum_discount, **kwargs):
         self.id = id
@@ -69,7 +76,8 @@ class ModelProducts(db.Model):
         self.length = length
         self.weight = weight
         self.maximum_discount = maximum_discount
-        self.cover = cover        
+        self.cover = cover
+        self.available = available_stock
 
     def list_product(self):
         return {
@@ -78,12 +86,25 @@ class ModelProducts(db.Model):
             "category": self.category_name.name,
             "brand": self.brand,
             "cover": request.url_root[:-1] + url_for("api.static", filename="images/{}".format(self.cover)) if self.cover else "",
-            "current_stock": 1,
+            "available_stock": self.available_stock,
+            "sale_price": self.sale_price,
+            "available": self.available
+
+        }
+
+    def json_product(self):
+        return {
+            "id": self.id_product,
+            "name": self.name,
+            # "category": self.category_name.name,
+            "brand": self.brand,
+            "cover": request.url_root[:-1] + url_for("api.static", filename="images/{}".format(self.cover)) if self.cover else "",
+            "available_stock": self.available_stock,
             "sale_price": self.sale_price,
             "available": self.available,
             "images": [image.list_images() for image in self.images],
             "providers": [data.list_provider_product() for data in self.providers],
-            "stock": self.stock.get_stoc()
+            "latest_purchases": [data.latest() for data in self.latest_purchases]
         }
 
     def list_product_provider(self):
@@ -137,34 +158,36 @@ class ModelProducts(db.Model):
             self.cover = cover
 
 
-""" Trigers """
-func = db.DDL(
-    """
-    CREATE FUNCTION insert_stock() 
-    RETURNS TRIGGER AS $TGR_Stock$ 
-    BEGIN 
-    INSERT INTO stock (product_id) VALUES (NEW.id_product); 
-    RETURN NEW; 
-    END; $TGR_Stock$ LANGUAGE PLPGSQL
-    """
+# """ Trigers """
+# func = db.DDL(
+#     """
+#     CREATE OR REPLACE FUNCTION insert_stock()
+#     RETURNS TRIGGER AS $TGR_Stock$
+#     BEGIN
+#     INSERT INTO stock (product_id, qtde, purchase_price)
+#     VALUES
+#     (NEW.id_product, 0.00, 0.00);
+#     RETURN NEW;
+#     END; $TGR_Stock$ LANGUAGE PLPGSQL
+#     """
 
-)
-trigger = db.DDL(
-    """
-    CREATE TRIGGER  insert_stock 
-    AFTER INSERT ON product 
-    FOR EACH ROW 
-    EXECUTE PROCEDURE insert_stock();
-    """
+# )
+# trigger = db.DDL(
+#     """
+#     CREATE TRIGGER  insert_stock
+#     AFTER INSERT ON product
+#     FOR EACH ROW
+#     EXECUTE PROCEDURE insert_stock();
+#     """
 
-)
-db.event.listen(
-    ModelProducts.__table__,
-    'after_create',
-    func.execute_if(dialect='postgresql')
-)
-db.event.listen(
-    ModelProducts.__table__,
-    'after_create',
-    trigger.execute_if(dialect='postgresql')
-)
+# )
+# db.event.listen(
+#     ModelProducts.__table__,
+#     'after_create',
+#     func.execute_if(dialect='postgresql')
+# )
+# db.event.listen(
+#     ModelProducts.__table__,
+#     'after_create',
+#     trigger.execute_if(dialect='postgresql')
+# )

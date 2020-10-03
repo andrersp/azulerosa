@@ -29,8 +29,8 @@ blueprint = Blueprint(
 
 
 # Inicilize Api
-api = Api(blueprint, version="1.0", title="Azul e Rosa Rest APi",
-          description="Api for product register", authorizations=authorizations)
+api = Api(blueprint, version="1.0", title="Azul e Rosa Rest APi", contact={"email": "rsp.assistencia@gmail.com"},
+          description="Api for product register [http://swagger.io](http://swagger.io)", authorizations=authorizations)
 
 
 @api.errorhandler
