@@ -171,8 +171,7 @@ class Purchase(Resource):
 
 
 schema = {
-    "id": {"type": "integer", "required": True, "description": "integer id of purchase"},
-    "delivery_status": {"type": "integer", "required": True, "allowed": [1, 2, 3, 4], "description": "integer status of delivery"}
+    "delivery_status": {"type": "integer", "required": True, "allowed": [1, 2, 3], "description": "Int ID status entrega. Permitidos: 1, 2 ou 3"}
 }
 
 
@@ -190,17 +189,21 @@ class PurchaseGet(Resource):
         return {"message": "Purchase not foud"}
 
 
-@ns_purchase.route("/delivery")
+@ns_purchase.route("/<int:id_purchase>/delivery")
 class PurchaseDeliveStatus(Resource):
 
     @required_params(schema)
     @ns_purchase.doc(params=schema)
-    def put(self):
-        """ Update Delivery Status """
+    def post(self, id_purchase):
+        """ Atualizar status da entrega.
+        1: Pendente
+        2: Em Transito
+        3: Entregue (Dar entrada do produto no estoque)
+        """
 
         data = request.json
 
-        purchase = ModelPurchase.find_purchase(data.get("id"))
+        purchase = ModelPurchase.find_purchase(id_purchase)
 
         if purchase:
 
@@ -208,7 +211,7 @@ class PurchaseDeliveStatus(Resource):
                 return {"message": "nothing to change"}, 400
 
             purchase.update_livery_status(data.get("delivery_status"))
-            purchase.save_purchase()
+            # purchase.save_purchase()
 
             return {"message": "updated"}
 

@@ -120,8 +120,8 @@ def delivery_data():
         cat = ModelCategoryProduct(**category)
         cat.save_category()
 
-    provider_data = {
-        "id": "",
+    provider = {
+        "id": "1",
         "enable": True,
         "type_registration": 2,
         "cnpj": "16897733000100",
@@ -144,8 +144,10 @@ def delivery_data():
         "zip_code": "28015161"
     }
 
-    for _ in range(3):
-        provider = ModelProvider(**provider_data)
+    prov = ModelProvider.find_provider(provider.get("id"))
+
+    if not prov:
+        provider = ModelProvider(**provider)
         provider.save_provider()
 
     product = {
@@ -205,11 +207,11 @@ def delivery_data():
 
     }
 
-    for _ in range(1):
+    # for _ in range(10):
 
-        puchase = ModelPurchase(**purchase)
+    #     puchase = ModelPurchase(**purchase)
 
-        for item in purchase.get("itens"):
-            puchase.itens.append(ModelPurchaseItem(
-                **item, id_purchase=puchase, provider_id=purchase.get("provider_id")))
-        puchase.save_purchase()
+    #     for item in purchase.get("itens"):
+    #         puchase.itens.append(ModelPurchaseItem(
+    #             **item, id_purchase=puchase, provider_id=purchase.get("provider_id")))
+    #     puchase.save_purchase()
