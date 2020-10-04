@@ -77,7 +77,7 @@ class ModelProducts(db.Model):
         self.weight = weight
         self.maximum_discount = maximum_discount
         self.cover = cover
-        self.available = available_stock
+        self.available_stock = available_stock
 
     def list_product(self):
         return {
@@ -135,7 +135,7 @@ class ModelProducts(db.Model):
 
     def update_product(self, id, name, category, brand, minimum_stock, maximum_stock,
                        long_description, short_description, sale_price, weight,
-                       cover, images,
+                       cover, images, provider, available_stock,
                        available, height, widht, length, maximum_discount):
         self.name = name
         self.category = category
@@ -151,6 +151,7 @@ class ModelProducts(db.Model):
         self.length = length
         self.weight = weight
         self.maximum_discount = maximum_discount
+        # self.provider = provider
 
         if cover:
             path = "static/images/{}".format(self.cover)

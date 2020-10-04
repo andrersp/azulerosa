@@ -10,12 +10,12 @@ class ModelImagesProduct(db.Model):
     __tablename__ = "images"
     id_image = db.Column(db.Integer, primary_key=True)
     path = db.Column(db.String(80))
-    product_id = db.Column(db.Integer, db.ForeignKey(
+    id_product = db.Column(db.Integer, db.ForeignKey(
         "product.id_product"), nullable=False)
 
-    def __init__(self, path, product_id):
+    def __init__(self, path, id_product):
         self.path = path
-        self.product_id = product_id
+        self.id_product = id_product
 
     def list_images(self):
         return {
@@ -24,11 +24,14 @@ class ModelImagesProduct(db.Model):
         }
 
     @classmethod
-    def find_image(cls, id_image):
+    def find_image(cls, id_product, id_image):
+
+        print(id_product, id_image)
         if not id_image:
             return None
 
-        image = cls.query.filter_by(id_image=id_image).first()
+        image = cls.query.filter_by(id_product=id_product).filter_by(
+            id_image=id_image).first()
 
         if image:
             return image

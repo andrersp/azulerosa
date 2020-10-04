@@ -184,7 +184,7 @@ class ModelPurchaseItem(db.Model):
             "unit_price": self.unit_price,
             "provider": self.privider_name.fancy_name,
             "delivery_date": "{}-{}-{}".format(self.delivery_date.year,
-                                               self.delivery_date.month, self.delivery_date.day)
+                                               self.delivery_date.month, self.delivery_date.day) if self.delivery_date else "Pendente"
         }
 
     def delete_item(self):

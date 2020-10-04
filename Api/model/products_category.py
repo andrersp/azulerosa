@@ -10,7 +10,7 @@ class ModelCategoryProduct(db.Model):
     __tablename__ = "category"
     id_category = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80))
-    description = db.Column(db.Text)
+    description = db.Column(db.String(120))
 
     __mapper_args__ = {
         "order_by": id_category

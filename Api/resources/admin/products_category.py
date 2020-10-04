@@ -9,12 +9,12 @@ from model.products_category import ModelCategoryProduct
 from wraps import required_params
 
 category_space = Namespace(
-    'Products Category Manager', description="Resources for product category")
+    'Gerenciamento de categorias do produtos', description="Endpoints para gerenciamento de categorias dos produtos")
 
 schema = {
-    "id": {"type": "numeric", "required": True, "empty": True, "description": "numeric string value or int"},
-    "name": {"type": "string", "required": True, "empty": False, "description": "Name of category"},
-    "description": {"type": "string", "required": True, "empty": True, "description": "Short Description of category"}
+    "id": {"type": "numeric", "required": True, "empty": True, "description": "String vazia ou Int com o ID da categoria"},
+    "name": {"type": "string", "required": True, "empty": False, "description": "Nome da Categoria"},
+    "description": {"type": "string", "required": True, "empty": True, "description": "Pequena descrição da categoria. Max 120 caracteres", "maxlength": 120}
 }
 
 
@@ -22,7 +22,8 @@ schema = {
 class CategoryProductView(Resource):
 
     def get(self):
-        """ Get All Products Category """
+        """ Lista de todos as categorias cadastradas.
+        Retorna uma lista contendo todos as categorias"""
 
         return {"data": [data.list_category() for data in ModelCategoryProduct.query.all()]}, 200
 
@@ -30,7 +31,8 @@ class CategoryProductView(Resource):
     @required_params(schema)
     # @jwt_required
     def post(self):
-        """ Create of update a product category """
+        """ Adicionar ou editar categoria.
+        Para criar envie string vazia em id e para editar envie um int com o ID da categoria"""
 
         data = request.json
 
@@ -75,7 +77,8 @@ class CategoryProductView(Resource):
 class CategoryGet(Resource):
 
     def get(self, id_category):
-        """ Get Category By Id """
+        """ Seleciona categoria pelo ID.
+        Retorna a categoria seleciona caso exista."""
 
         category = ModelCategoryProduct.find_category(id_category)
 

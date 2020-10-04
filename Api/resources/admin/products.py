@@ -21,28 +21,28 @@ from model.provider import ModelProvider
 from model.products_category import ModelCategoryProduct
 
 product_space = Namespace(
-    "Products Manager", description="Resources for Produtos")
+    "Gerenciamento de Produtos", description="Endpoints para gerenciamento de produto")
 
 schema = {
-    "id": {"type": "numeric", "required": True, "description": "numeric string value or int"},
-    "name": {"type": "string", "required": True, "empty": False, "description": "name of product"},
-    "category": {"type": "integer", "required": True, "description": "integer value of category"},
-    "brand": {"type": "integer", "required": True, "description": "integer valur of brand"},
-    "minimum_stock": {"type": "float", "required": True, "description": "float value of minimum stock"},
-    "maximum_stock": {"type": "float", "required": True, "description": "float value of maximum stock"},
-    "long_description": {"type": "string", "required": True, "empty": True, "description": "Long Description of product"},
-    "short_description": {"type": "string", "required": True, "empty": False, "description": "Short Description of product, max 200", "maxlength": 200},
-    "cover": {"type": "string", "required": True, "empty": True, "description": "tumbnail cover image"},
-    "sale_price": {"type": "float", "required": True, "description": "value of sale price of product"},
-    "available": {"type": "boolean", "required": True, "description": "if product is unavailable for sale"},
-    "height": {"type": "float", "required": True, "description": "product height for shipping"},
+    "id": {"type": "numeric", "required": True, "description": "String vazia ou Int com o ID do produto"},
+    "name": {"type": "string", "required": True, "empty": False, "description": "Nome do produto"},
+    "category": {"type": "integer", "required": True, "description": "int ID da categoria"},
+    "brand": {"type": "integer", "required": True, "description": "int ID da marca ou 0 para nenhuma"},
+    "minimum_stock": {"type": "float", "required": True, "description": "Float Quantidade mínima em estoque."},
+    "maximum_stock": {"type": "float", "required": True, "description": "Float Quantidade máxima em estoque"},
+    "short_description": {"type": "string", "required": True, "empty": False, "description": "Descrição curta do produto, Máximo 200 caracteres ", "maxlength": 200},
+    "long_description": {"type": "string", "required": True, "empty": True, "description": "Descrição longa do produto. Aceita HTML"},
+    "cover": {"type": "string", "required": True, "empty": True, "description": "Imagem de descate do produto."},
+    "sale_price": {"type": "float", "required": True, "description": "Float valor de venda."},
+    "available": {"type": "boolean", "required": True, "description": "Se produto esta disponível"},
+    "height": {"type": "float", "required": True, "description": "Altura da embalagem. "},
     "available_stock": {"type": "float", "required": True, "description": "Avalilable stock"},
-    "widht": {"type": "float", "required": True, "description": "product widht for shipping"},
-    "length": {"type": "float", "required": True, "description": "product length for shipping"},
-    "weight": {"type": "float", "required": True, "description": "product weight for shipping"},
-    "maximum_discount": {"type": "float", "required": True, "description": "maximum_discount for this product"},
-    "images": {"type": "list", "schema": {"type": "string"}, "required": True, "empty": True},
-    "provider": {"type": "list", "schema": {"type": "integer", "required": True}, "required": True, "empty": True, "description": "List of id providers"}
+    "widht": {"type": "float", "required": True, "description": "Largura da embalagem"},
+    "length": {"type": "float", "required": True, "description": "Comprimento da embalagem"},
+    "weight": {"type": "float", "required": True, "description": "Peso da embalagem"},
+    "maximum_discount": {"type": "float", "required": True, "description": "Desconto máximo para este produto"},
+    "images": {"type": "list", "schema": {"type": "string"}, "required": True, "empty": True, "description": "List com as imagens codificadas em base64"},
+    "provider": {"type": "list", "schema": {"type": "integer", "required": True}, "required": True, "empty": True, "description": "List com ID de fornecedores deste produto"}
 }
 
 
@@ -68,24 +68,42 @@ def upload_image(image, cover=False):
 
 
 @product_space.route("")
-class ProductsGet(Resource):
+class Products(Resource):
     # @jwt_required
     def get(self):
-        """ Get all products in Stock """
+        """Lista de todos os produtos cadastrados.
+        Retorna uma lista contendo todos os produtos"""
+
         return {"data": [product.list_product() for product in ModelProducts.query.all()]}
 
     # @jwt_required
     @required_params(schema)
     @product_space.doc(params=schema)
     def post(self):
-        """ Create or Update product.
-        For create a new product send a empty string value or send a int id product value for update """
+        """ Adicionar ou editar produto.
+        Para criar envie string vazia em id e para editar envie um int com o ID do produto"""
 
         data = request.json
 
         product = ModelProducts.find_product(data.get("id"))
         if product:
             return self.put()
+
+        # Check if category exist
+        if not ModelCategoryProduct.find_category(data.get("category")):
+            return {"message": "Category id {} not found".format(data.get("category"))}, 400
+
+        # Check if brand exist
+        # if not Model
+
+        # Check if provider exist
+        lst_provider = []
+        for id_provider in data.get("provider"):
+            provider = ModelProvider.find_provider(id_provider)
+            if not provider:
+                return {"message": "provider id {} not found".format(id_provider)}, 400
+
+            lst_provider.append(provider)
 
         try:
 
@@ -95,38 +113,44 @@ class ProductsGet(Resource):
                 data["cover"] = upload_image(b64_cover, cover=True)
 
             product = ModelProducts(**data)
+
+            # Appending Images
             for images in data.get("images"):
                 product.images.append(ModelImagesProduct(
                     upload_image(images), product))
 
-            # Check if category exist
-            if not ModelCategoryProduct.find_category(data.get("category")):
-                return {"message": "Category id {} not found".format(data.get("category"))}, 400
-
-            lst_provider = []
-            for id_provider in data.get("provider"):
-                provider = ModelProvider.find_provider(id_provider)
-                if not provider:
-                    return {"message": "provider id {} not found".format(id_provider)}, 400
-                else:
-                    lst_provider.append(provider)
-
+            # Appending provider
             [product.providers.append(provider) for provider in lst_provider]
 
+            # Save Product
             product.save_product()
 
-            return {"message": "product created", "data": product.list_product()}, 201
-        except Exception as err:
-            print(err)
+            return {"message": "product created", "data": product.json_product()}, 201
+
+        except:
             return {"message": "Internal error"}, 500
 
         return {"messa": "ok"}, 200
 
-    @jwt_required
+    # @jwt_required
     @product_space.hide
     def put(self):
         data = request.json
+
         product = ModelProducts.find_product(data.get("id"))
+
+        # Check if category exist
+        if not ModelCategoryProduct.find_category(data.get("category")):
+            return {"message": "Category id {} not found".format(data.get("category"))}, 400
+
+        # Check if provider exist
+        lst_provider = []
+        for id_provider in data.get("provider"):
+            provider = ModelProvider.find_provider(id_provider)
+            if not provider:
+                return {"message": "provider id {} not found".format(id_provider)}, 400
+
+            lst_provider.append(provider)
 
         try:
             if data.get("cover"):
@@ -134,14 +158,19 @@ class ProductsGet(Resource):
 
             product.update_product(**data)
 
+            # Appending Images
             for images in data.get("images"):
                 product.images.append(ModelImagesProduct(
                     upload_image(images), product))
 
+            # Appending provider
+            [product.providers.append(provider) for provider in lst_provider]
+
+            # Save Prodict
             product.save_product()
-            return {"message": "product updated", "data": product.list_product()}
-        except Exception as err:
-            print(err)
+
+            return {"message": "product updated", "data": product.json_product()}
+        except:
             return {"message": "internal error"}, 500
 
 
@@ -149,7 +178,8 @@ class ProductsGet(Resource):
 class ProductGet(Resource):
 
     def get(self, id_product):
-        """ Get Product by id """
+        """ Seleciona o produto pelo ID
+        Retorna o produto selecionado por id caso exista."""
 
         product = ModelProducts.find_product(id_product)
 
@@ -158,24 +188,14 @@ class ProductGet(Resource):
 
         return {"message": "product not found"}, 404
 
-    # def get(self, id_product):
-    #     """ Get Product by id """
 
-    #     product = ModelProducts.find_product(id_product)
-
-    #     if product:
-    #         return {"data": product.list_product()}, 200
-
-    #     return {"message": "product not found"}, 404
-
-
-@product_space.route("/image/<int:id_image>")
+@product_space.route("/image/<int:id_product>/<int:id_image>")
 class ProductImage(Resource):
 
-    def delete(self, id_image):
-        """ Delete Image of product by id """
+    def delete(self, id_product, id_image):
+        """ Deletar imagem por ID do produto e ID da Imagem. """
 
-        image = ModelImagesProduct.find_image(id_image)
+        image = ModelImagesProduct.find_image(id_product, id_image)
 
         if image:
             try:
@@ -186,5 +206,3 @@ class ProductImage(Resource):
                 return {"message": "Internal error"}, 500
 
         return {"message": "Image not found"}, 404
-
-        return {"message": "Delete Image"}

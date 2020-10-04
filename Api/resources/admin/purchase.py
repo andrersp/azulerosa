@@ -91,7 +91,6 @@ class Purchase(Resource):
 
         if sum(total) != data.get("value"):
             return {"message": "Value does not check"}, 400
-        # 11 + 5 - 1
 
         total_check = sum(total) + data.get("freight") - data.get("discount")
 
@@ -148,7 +147,6 @@ class Purchase(Resource):
 
         if sum(total) != data.get("value"):
             return {"message": "Value does not check"}, 400
-        # 11 + 5 - 1
 
         total_check = sum(total) + data.get("freight") - data.get("discount")
 
