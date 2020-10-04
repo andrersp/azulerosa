@@ -152,6 +152,7 @@ class ModelProducts(db.Model):
         self.weight = weight
         self.maximum_discount = maximum_discount
         # self.provider = provider
+        self.providers.clear()
 
         if cover:
             path = "static/images/{}".format(self.cover)

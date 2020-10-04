@@ -131,6 +131,7 @@ class ModelPurchase(db.Model):
         self.parcel = parcel
         self.obs = obs
         self.payment_form = payment_form
+        # self.itens.clear()
 
         [item.delete_item() for item in self.itens]
 

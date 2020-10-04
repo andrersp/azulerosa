@@ -157,7 +157,6 @@ class Products(Resource):
                 data["cover"] = upload_image(data.get("cover"), cover=True)
 
             product.update_product(**data)
-
             # Appending Images
             for images in data.get("images"):
                 product.images.append(ModelImagesProduct(
@@ -170,7 +169,8 @@ class Products(Resource):
             product.save_product()
 
             return {"message": "product updated", "data": product.json_product()}
-        except:
+        except Exception as err:
+            print(err)
             return {"message": "internal error"}, 500
 
 
