@@ -30,7 +30,7 @@ schema = {
     "freight": {"type": "float", "required": True, "empty": False, "description": "Valor do Frete. 0 Se não hoyver"},
     "discount": {"type": "float", "required": True, "empty": False, "description": "Valor do desconto. 0 Se não houver"},
     "total_value": {"type": "float", "required": True, "empty": False, "description": "Valor Total incluindo Frete e/ou Desconto"},
-    "delivery_status": {"type": "integer", "required": True, "empty": False, "allowed": [2, 3], "description": "ID estatus entrega: 2 - Em trânsito, 3 - Pendente, "},
+    "delivery_status": {"type": "integer", "required": True, "empty": False, "allowed": [1, 2], "description": "ID estatus entrega: 1 - Pendente, 2 - Em trânsito, "},
     "delivery_time": {"type": "string", "required": True, "empty": False, "description": "Data prevista para entrega"},
     "payment_form": {"type": "integer", "required": True, "empty": False, "allowed": [1, 2, 3], "description": "ID Forma de pagamento. 1 - À Vista, 2 - Depósito Bancário, 3 - A Prazo"},
     "payment_method": {"type": "integer", "required": True, "empty": False, "allowed": [1, 2], "description": "ID Meio de Pagamento: 1 - Dinheiro, 2 - Cartão, 3 - Tranferência Bancaria"},
@@ -202,17 +202,26 @@ class PurchaseDeliveStatus(Resource):
         """
 
         data = request.json
+        print(id_purchase)
 
         purchase = ModelPurchase.find_purchase(id_purchase)
 
         if purchase:
 
-            if data.get("delivery_status") == purchase.delivery_status:
-                return {"message": "nothing to change"}, 400
+            delivery_status = purchase.delivery_status
 
-            purchase.update_livery_status(data.get("delivery_status"))
-            # purchase.save_purchase()
+            if delivery_status == 3:
+                return {"message": "Compras recebidas não podem ser alteradas"}, 400
 
-            return {"message": "updated"}
+            if data.get("delivery_status") == delivery_status:
+                return {"message": "Nenhuma alteração a fazer"}, 400
+
+            try:
+                purchase.update_delivery_status(data.get("delivery_status"))
+                purchase.save_purchase()
+                return {"message": "Status de entrega alterado", "status": purchase.delivery_status_name.name}
+            except Exception as err:
+                print(err)
+                return {"message": "internal error"}, 400
 
         return {"message": "purchase not found"}, 404

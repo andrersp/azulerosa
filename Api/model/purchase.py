@@ -5,6 +5,8 @@ from datetime import datetime
 
 from db import db
 
+from model.stock import ModelStockEntry
+
 
 class ModelPurchase(db.Model):
     __tablename__ = 'purchase'
@@ -22,7 +24,7 @@ class ModelPurchase(db.Model):
         db.Integer, db.ForeignKey('payment_method.id_method'))
     parcel = db.Column(db.Integer, default=1)
     delivery_status = db.Column(
-        db.Integer, db.ForeignKey('delivery_status.id_status'), default=2)
+        db.Integer, db.ForeignKey('delivery_status.id_status'), default=1)
     payment_status = db.Column(db.Integer, db.ForeignKey(
         'payment_status.id_status'), default=1)
     obs = db.Column(db.String(80))
@@ -135,7 +137,7 @@ class ModelPurchase(db.Model):
 
         [item.delete_item() for item in self.itens]
 
-    def update_livery_status(self, status):
+    def update_delivery_status(self, status):
         self.delivery_status = status
 
 
@@ -149,7 +151,6 @@ class ModelPurchaseItem(db.Model):
     unit_price = db.Column(db.Float(precision=2), default=0.00)
     qtde = db.Column(db.Float(precision=2))
     total_price = db.Column(db.Float(precision=2), default=0.00)
-    delivery_date = db.Column(db.DateTime)
     obs = db.Column(db.String(120))
 
     product_name = db.relationship(
@@ -184,8 +185,8 @@ class ModelPurchaseItem(db.Model):
             "qtde": self.qtde,
             "unit_price": self.unit_price,
             "provider": self.privider_name.fancy_name,
-            "delivery_date": "{}-{}-{}".format(self.delivery_date.year,
-                                               self.delivery_date.month, self.delivery_date.day) if self.delivery_date else "Pendente"
+            # "delivery_date": "{}-{}-{}".format(self.delivery_date.year,
+            #                                    self.delivery_date.month, self.delivery_date.day) if self.delivery_date else "Pendente"
         }
 
     def delete_item(self):
@@ -201,19 +202,17 @@ func = db.DDL(
     RETURNS TRIGGER as $TGR_Purchase$
     DECLARE 
         item record;
-        old_qtde integer;
+        
 
     BEGIN
 
-    IF (NEW.delivery_status = 1) THEN
+    IF (NEW.delivery_status = 3) THEN
         
         FOR item IN SELECT * FROM purchase_item WHERE id_purchase=NEW.id_purchase
         LOOP
-
-        SELECT (available_stock) into old_qtde FROM product WHERE id_product=item.id_product;
-        UPDATE purchase_item SET delivery_date=now() WHERE id_item=item.id_item;
-        UPDATE product SET available_stock=(old_qtde + item.qtde), purchase_price=item.unit_price  WHERE id_product=item.id_product;
-        
+        INSERT INTO stock_entry (id_product, qtde, purchase_price) 
+        VALUES
+        (item.id_product, item.qtde, item.unit_price);        
         END LOOP;
     END IF;
     RETURN NEW;
@@ -241,3 +240,7 @@ db.event.listen(
     "after_create",
     trigger.execute_if(dialect='postgresql')
 )
+
+# old_qtde integer;
+# available_stock=(old_qtde + item.qtde), purchase_price=item.unit_price  WHERE id_product=item.id_product;
+# SELECT (available_stock) into old_qtde FROM stock WHERE id_product=item.id_product;

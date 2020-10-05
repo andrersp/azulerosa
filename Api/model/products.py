@@ -6,6 +6,7 @@ from flask import request, url_for
 
 from db import db
 
+from model.stock import ModelStock
 
 providers = db.Table('providers',
                      db.Column('privider_id', db.Integer, db.ForeignKey(
@@ -160,36 +161,36 @@ class ModelProducts(db.Model):
             self.cover = cover
 
 
-# """ Trigers """
-# func = db.DDL(
-#     """
-#     CREATE OR REPLACE FUNCTION insert_stock()
-#     RETURNS TRIGGER AS $TGR_Stock$
-#     BEGIN
-#     INSERT INTO stock (product_id, qtde, purchase_price)
-#     VALUES
-#     (NEW.id_product, 0.00, 0.00);
-#     RETURN NEW;
-#     END; $TGR_Stock$ LANGUAGE PLPGSQL
-#     """
+""" Trigers """
+func = db.DDL(
+    """
+    CREATE OR REPLACE FUNCTION create_stock()
+    RETURNS TRIGGER AS $TGR_Stock$
+    BEGIN
+    INSERT INTO stock (id_product, available_stock, purchase_price)
+    VALUES
+    (NEW.id_product, NEW.available_stock, NEW.purchase_price);
+    RETURN NEW;
+    END; $TGR_Stock$ LANGUAGE PLPGSQL
+    """
 
-# )
-# trigger = db.DDL(
-#     """
-#     CREATE TRIGGER  insert_stock
-#     AFTER INSERT ON product
-#     FOR EACH ROW
-#     EXECUTE PROCEDURE insert_stock();
-#     """
+)
+trigger = db.DDL(
+    """
+    CREATE TRIGGER  create_stock
+    AFTER INSERT ON product
+    FOR EACH ROW
+    EXECUTE PROCEDURE create_stock();
+    """
 
-# )
-# db.event.listen(
-#     ModelProducts.__table__,
-#     'after_create',
-#     func.execute_if(dialect='postgresql')
-# )
-# db.event.listen(
-#     ModelProducts.__table__,
-#     'after_create',
-#     trigger.execute_if(dialect='postgresql')
-# )
+)
+db.event.listen(
+    ModelProducts.__table__,
+    'after_create',
+    func.execute_if(dialect='postgresql')
+)
+db.event.listen(
+    ModelProducts.__table__,
+    'after_create',
+    trigger.execute_if(dialect='postgresql')
+)
