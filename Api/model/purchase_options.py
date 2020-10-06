@@ -161,3 +161,40 @@ class ModelPaymentMethod(db.Model):
     def update_method(self, id, name, description):
         self.name = name
         self.description = description
+
+
+@db.event.listens_for(ModelDeliveryStatus.__table__, 'after_create')
+def initial_delivery_status(*args, **kwargs):
+    db.session.add(ModelDeliveryStatus(
+        "1", "Pendente", "Envio pendente pelo fornecedor"))
+    db.session.add(ModelDeliveryStatus(
+        "2", "Em Trânsito", "Produto enviado pelo fornecedor"))
+    db.session.add(ModelDeliveryStatus("3", "Entregue", "Pedido Entregue"))
+    db.session.commit()
+
+
+@db.event.listens_for(ModelPaymentForm.__table__, 'after_create')
+def initial_payment_form(*args, **kwargs):
+    db.session.add(ModelPaymentForm(
+        1, "À vista", "Pagamento Efetuado a vista"))
+    db.session.add(ModelPaymentForm(2, "Depósito Bancário",
+                                    "Pagamento efetuado por meio de depósito bancário"))
+    db.session.add(ModelPaymentForm(3, "A Prazo", "Pagamento a prazo"))
+    db.session.commit()
+
+
+@db.event.listens_for(ModelPaymentMethod.__table__, 'after_create')
+def initial_payment_method(*args, **kwargs):
+    db.session.add(ModelPaymentMethod(
+        1, "Dinheiro", "Pagemento efetuado em dinheiro"))
+    db.session.add(ModelPaymentMethod(
+        2, "Cartão", "Pagemento efetuado em cartão de débito ou crédito"))
+    db.session.commit()
+
+
+@db.event.listens_for(ModelPaymentStatus.__table__, 'after_create')
+def initial_payment_status(*args, **kwargs):
+    db.session.add(ModelPaymentStatus(1, "Pendente", "Pagamento Pendente"))
+    db.session.add(ModelPaymentStatus(2, "Pago", "Pagamento efetuado"))
+    db.session.add(ModelPaymentStatus(3, "Cancelado", "Pagamento cancelado"))
+    pass

@@ -7,7 +7,7 @@ from flask import request, url_for
 from db import db
 
 from model.stock import ModelStock
-
+from model.products_unit import ModelProductUnit
 providers = db.Table('providers',
                      db.Column('privider_id', db.Integer, db.ForeignKey(
                          'provider.provider_id'), primary_key=True),
@@ -22,8 +22,10 @@ class ModelProducts(db.Model):
     id_product = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80))
     category = db.Column(db.Integer, db.ForeignKey(
-        'category.id_category'), nullable=False)
+        'product_category.id_category'), nullable=False)
     brand = db.Column(db.Integer)
+    unit = db.Column(db.Integer, db.ForeignKey(
+        'product_unit.id_unit'), nullable=False)
     minimum_stock = db.Column(db.Float(precision=2))
     maximum_stock = db.Column(db.Float(precision=2))
     long_description = db.Column(db.Text)
@@ -46,6 +48,8 @@ class ModelProducts(db.Model):
     category_name = db.relationship(
         "ModelCategoryProduct", foreign_keys=category)
 
+    unit_name = db.relationship("ModelProductUnit", foreign_keys=unit)
+
     # category_name = db.relationship(    ##fast
     #     "ModelCategoryProduct", backref=db.backref('category', lazy='dynamic'))
 
@@ -54,12 +58,16 @@ class ModelProducts(db.Model):
     latest_purchases = db.relationship(
         'ModelPurchaseItem', backref='product', lazy=True)
 
+    stock = db.relationship("ModelStock", backref='product',
+                            lazy='joined', uselist=False)
+
     __mapper_args__ = {
         "order_by": id_product
     }
 
-    def __init__(self, id, name, category, brand, minimum_stock, maximum_stock,
-                 long_description, short_description, cover, available_stock,
+    def __init__(self, id, name, category, brand, unit,
+                 minimum_stock, maximum_stock,
+                 long_description, short_description, cover,
                  sale_price, weight,
                  available, height, widht, length, maximum_discount, **kwargs):
         self.id = id
@@ -78,7 +86,8 @@ class ModelProducts(db.Model):
         self.weight = weight
         self.maximum_discount = maximum_discount
         self.cover = cover
-        self.available_stock = available_stock
+
+        self.unit = unit
 
     def list_product(self):
         return {
@@ -87,9 +96,10 @@ class ModelProducts(db.Model):
             "category": self.category_name.name,
             "brand": self.brand,
             "cover": request.url_root[:-1] + url_for("api.static", filename="images/{}".format(self.cover)) if self.cover else "",
-            "available_stock": self.available_stock,
+            "available_stock": self.stock.available_stock,
             "sale_price": self.sale_price,
-            "available": self.available
+
+
 
         }
 
@@ -100,7 +110,7 @@ class ModelProducts(db.Model):
             # "category": self.category_name.name,
             "brand": self.brand,
             "cover": request.url_root[:-1] + url_for("api.static", filename="images/{}".format(self.cover)) if self.cover else "",
-            "available_stock": self.available_stock,
+            "available_stock": self.stock.available_stock,
             "sale_price": self.sale_price,
             "available": self.available,
             "images": [image.list_images() for image in self.images],
@@ -161,6 +171,7 @@ class ModelProducts(db.Model):
             self.cover = cover
 
 
+# Triger Function to inserto product into stock table
 """ Trigers """
 func = db.DDL(
     """
@@ -175,6 +186,8 @@ func = db.DDL(
     """
 
 )
+
+
 trigger = db.DDL(
     """
     CREATE TRIGGER  create_stock
@@ -194,3 +207,5 @@ db.event.listen(
     'after_create',
     trigger.execute_if(dialect='postgresql')
 )
+
+# End Triger

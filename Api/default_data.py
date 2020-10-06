@@ -13,103 +13,6 @@ from model.purchase import ModelPurchase, ModelPurchaseItem
 
 def delivery_data():
 
-    delivery_status = [
-        {
-            "id": 1,
-            "name": "Pendente",
-            "description": "Envio pendente pelo fornecedor"
-
-        },
-        {
-            "id": 2,
-            "name": "Em Trânsito",
-            "description": "Produto enviado pelo fornecedor"
-
-        },
-        {
-            "id": 3,
-            "name": "Entregue",
-            "description": "Pedido Entregue"
-
-        }
-    ]
-
-    for delivery in delivery_status:
-        status = ModelDeliveryStatus.find_status(delivery.get("id"))
-
-        if not status:
-            status = ModelDeliveryStatus(**delivery)
-            status.save_status()
-
-    payment_status = [{
-        "id": 1,
-        "name": "Pendente",
-        "description": "Pagamento Pendente"
-    },
-        {
-        "id": 2,
-        "name": "Pago",
-        "description": "Pagamento efetuado"
-    },
-        {
-        "id": 3,
-        "name": "Cancelado",
-        "description": "Pagamento Cancelado"
-    }]
-
-    for payment in payment_status:
-        status = ModelPaymentStatus.find_status(payment.get("id"))
-
-        if not status:
-            status = ModelPaymentStatus(**payment)
-            status.save_status()
-
-    payment_form = [{
-        "id": 1,
-        "name": "À vista",
-        "description": "Pagamento Efetuado a vista"
-    },
-        {
-        "id": 2,
-        "name": "Depósito Bancário",
-        "description": "Pagamento efetuado por meio de depósito bancário"
-    },
-        {
-        "id": 3,
-        "name": "A Prazo",
-        "description": "Pagamento a prazo"
-    }]
-
-    for payment in payment_form:
-        status = ModelPaymentForm.find_form(payment.get("id"))
-
-        if not status:
-            status = ModelPaymentForm(**payment)
-            status.save_form()
-
-    payment_method = [{
-        "id": 1,
-        "name": "Dinheiro",
-        "description": "Pagamento Efetuado usando dinheiro"
-    },
-        {
-        "id": 2,
-        "name": "Cartão",
-        "description": "Pagamento efetuado usando Cartão"
-    },
-        {
-        "id": 3,
-        "name": "A Prazo",
-        "description": "Pagamento a prazo"
-    }]
-
-    for payment in payment_method:
-        status = ModelPaymentMethod.find_method(payment.get("id"))
-
-        if not status:
-            status = ModelPaymentMethod(**payment)
-            status.save_method()
-
     category = {
         "id": "1",
         "name": "Categoria Teste",
@@ -156,6 +59,7 @@ def delivery_data():
         "id": "0",
         "name": "Produto Teste",
         "brand": 1,
+        "unit": 1,
         "category": 1,
         "long_description": "Descrição longa do produto",
         "short_description": "Descrição curta do produto",

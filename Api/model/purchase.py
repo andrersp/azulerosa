@@ -28,7 +28,7 @@ class ModelPurchase(db.Model):
     payment_status = db.Column(db.Integer, db.ForeignKey(
         'payment_status.id_status'), default=1)
     obs = db.Column(db.String(80))
-    date = db.Column(db.DateTime, default=datetime.now())
+    date = db.Column(db.DateTime, server_default=db.func.now())
     itens = db.relationship('ModelPurchaseItem',
                             backref='purchase_item', lazy=True)
 

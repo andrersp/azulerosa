@@ -28,6 +28,7 @@ schema = {
     "name": {"type": "string", "required": True, "empty": False, "description": "Nome do produto"},
     "category": {"type": "integer", "required": True, "description": "int ID da categoria"},
     "brand": {"type": "integer", "required": True, "description": "int ID da marca ou 0 para nenhuma"},
+    "unit": {"type": "integer", "required": True, "description": "int ID Unidade de medida"},
     "minimum_stock": {"type": "float", "required": True, "description": "Float Quantidade mínima em estoque."},
     "maximum_stock": {"type": "float", "required": True, "description": "Float Quantidade máxima em estoque"},
     "short_description": {"type": "string", "required": True, "empty": False, "description": "Descrição curta do produto, Máximo 200 caracteres ", "maxlength": 200},
@@ -36,7 +37,6 @@ schema = {
     "sale_price": {"type": "float", "required": True, "description": "Float valor de venda."},
     "available": {"type": "boolean", "required": True, "description": "Se produto esta disponível"},
     "height": {"type": "float", "required": True, "description": "Altura da embalagem. "},
-    "available_stock": {"type": "float", "required": True, "description": "Avalilable stock"},
     "widht": {"type": "float", "required": True, "description": "Largura da embalagem"},
     "length": {"type": "float", "required": True, "description": "Comprimento da embalagem"},
     "weight": {"type": "float", "required": True, "description": "Peso da embalagem"},
@@ -127,7 +127,8 @@ class Products(Resource):
 
             return {"message": "product created", "data": product.json_product()}, 201
 
-        except:
+        except Exception as err:
+            print(err)
             return {"message": "Internal error"}, 500
 
         return {"messa": "ok"}, 200
