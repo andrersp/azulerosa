@@ -28,18 +28,16 @@ class ModelProducts(db.Model):
         'product_unit.id_unit'), nullable=False)
     minimum_stock = db.Column(db.Float(precision=2))
     maximum_stock = db.Column(db.Float(precision=2))
-    long_description = db.Column(db.Text)
     short_description = db.Column(db.String(200))
+    long_description = db.Column(db.Text)
     cover = db.Column(db.String(80))
     height = db.Column(db.Float(precision=2))
     widht = db.Column(db.Float(precision=2))
     length = db.Column(db.Float(precision=2))
     weight = db.Column(db.Float(precision=2))
-    purchase_price = db.Column(db.Float(precision=2))
     percentage_sale = db.Column(db.Float(precision=2), nullable=True)
     update_price = db.Column(db.Boolean, default=False)
     sale_price = db.Column(db.Float(precision=2))
-    available_stock = db.Column(db.Float(precision=2), default=0.00)
     maximum_discount = db.Column(db.Float(precision=2))
     available = db.Column(db.Boolean)
     images = db.relationship("ModelImagesProduct",
@@ -66,9 +64,9 @@ class ModelProducts(db.Model):
     }
 
     def __init__(self, id, name, category, brand, unit,
-                 minimum_stock, maximum_stock,
+                 minimum_stock, maximum_stock, percentage_sale,
                  long_description, short_description, cover,
-                 sale_price, weight,
+                 sale_price, weight, update_price,
                  available, height, widht, length, maximum_discount, **kwargs):
         self.id = id
         self.name = name
@@ -86,7 +84,8 @@ class ModelProducts(db.Model):
         self.weight = weight
         self.maximum_discount = maximum_discount
         self.cover = cover
-
+        self.update_price = update_price
+        self.percentage_sale = percentage_sale
         self.unit = unit
 
     def list_product(self):
@@ -107,15 +106,29 @@ class ModelProducts(db.Model):
         return {
             "id": self.id_product,
             "name": self.name,
-            # "category": self.category_name.name,
+            "category": self.category,
             "brand": self.brand,
+            "unit": self.unit,
+            "minimum_stock": self.minimum_stock,
+            "maximum_stock": self.maximum_discount,
+            "short_description": self.short_description,
+            "long_description": self.long_description,
             "cover": request.url_root[:-1] + url_for("api.static", filename="images/{}".format(self.cover)) if self.cover else "",
-            "available_stock": self.stock.available_stock,
+            "height": self.height,
+            "widht": self.widht,
+            "length": self.length,
+            "weight": self.weight,
+            "percentage_sale": self.percentage_sale,
+            "update_price": self.update_price,
             "sale_price": self.sale_price,
-            "available": self.available,
+            "maximum_discount": self.maximum_discount,
             "images": [image.list_images() for image in self.images],
             "providers": [data.list_provider_product() for data in self.providers],
-            "latest_purchases": [data.latest() for data in self.latest_purchases]
+            "latest_purchases": [data.latest() for data in self.latest_purchases],
+            "stock": {
+                "purchase_price": self.stock.purchase_price,
+                "available_stock": self.stock.available_stock
+            }
         }
 
     def list_product_provider(self):
@@ -178,9 +191,9 @@ func = db.DDL(
     CREATE OR REPLACE FUNCTION create_stock()
     RETURNS TRIGGER AS $TGR_Stock$
     BEGIN
-    INSERT INTO stock (id_product, available_stock, purchase_price)
+    INSERT INTO stock (id_product, available_stock, purchase_price, initial_stock)
     VALUES
-    (NEW.id_product, NEW.available_stock, NEW.purchase_price);
+    (NEW.id_product, 0.00, 0.00, False);
     RETURN NEW;
     END; $TGR_Stock$ LANGUAGE PLPGSQL
     """

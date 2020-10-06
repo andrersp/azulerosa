@@ -67,6 +67,7 @@ def delivery_data():
         "minimum_stock": 10,
         "sale_price": 10.50,
         "available": True,
+        "update_price": True,
         "height": 10,
         "provider": [1],
         "cover": "",
@@ -75,14 +76,15 @@ def delivery_data():
         "length": 1.5,
         "weight": 0.75,
         "widht": 1.25,
-        "maximum_discount": 10.00
+        "maximum_discount": 10.00,
+        "percentage_sale": 5
     }
 
     prod = ModelProducts.find_product(product.get("id"))
 
     if not prod:
 
-        for _ in range(10):
+        for _ in range(3000):
             print(_)
             ModelProducts(**product).save_product()
 

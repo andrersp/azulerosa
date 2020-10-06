@@ -8,8 +8,9 @@ class ModelStock(db.Model):
     __tablename__ = 'stock'
     id = db.Column(db.Integer, primary_key=True)
     id_product = db.Column(db.Integer, db.ForeignKey('product.id_product'))
-    available_stock = db.Column(db.Float(precision=2))
-    purchase_price = db.Column(db.Float(precision=2))
+    available_stock = db.Column(db.Float(precision=2), default="0.00")
+    purchase_price = db.Column(db.Float(precision=2), default="0.00")
+    initial_stock = db.Column(db.Boolean, default=False)
 
 
 class ModelStockEntry(db.Model):
@@ -17,7 +18,7 @@ class ModelStockEntry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     id_product = db.Column(db.Integer)
     qtde = db.Column(db.Float(precision=2))
-    purchase_price = db.Column(db.Float(precision=2))
+    purchase_price = db.Column(db.Float(precision=2), default=0.00)
     date_entry = db.Column(db.DateTime(timezone=True),
                            server_default=db.func.now())
 
