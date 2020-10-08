@@ -15,6 +15,8 @@ from resources.admin.clients import client_space  # Clientes
 
 from resources.admin.purchase import ns_purchase  # Purchases
 
+from resources.admin.users import ns_user  # Users
+
 authorizations = {
     'apikey': {
         'type': 'apiKey',
@@ -44,7 +46,8 @@ def database_not_found_error(e):
 
 
 # Name Spaces APi
-api.add_namespace(product_space, path="/product")  # Product
+# Product
+api.add_namespace(product_space, path="/product")
 # Products Category
 api.add_namespace(category_space, path="/product/category")
 
@@ -56,3 +59,6 @@ api.add_namespace(client_space, path="/client")
 
 # purchases
 api.add_namespace(ns_purchase, path="/purchase")
+
+# Users
+api.add_namespace(ns_user, path="/user")

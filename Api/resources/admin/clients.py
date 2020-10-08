@@ -222,6 +222,7 @@ class ClientAddress(Resource):
 @client_space.route("/<int:id_client>/address")
 class AddressPost(Resource):
     @required_params(schema)
+    @client_space.doc(params=schema)
     def post(self, id_client):
         """ Adiciona endereço de entrega """
 

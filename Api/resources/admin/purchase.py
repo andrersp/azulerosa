@@ -197,7 +197,7 @@ class PurchaseDeliveStatus(Resource):
     def post(self, id_purchase):
         """ Atualizar status da entrega.
         1: Pendente
-        2: Em Transito
+        2: Em Trânsito
         3: Entregue (Dar entrada do produto no estoque)
         """
 

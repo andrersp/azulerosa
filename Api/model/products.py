@@ -97,9 +97,6 @@ class ModelProducts(db.Model):
             "cover": request.url_root[:-1] + url_for("api.static", filename="images/{}".format(self.cover)) if self.cover else "",
             "available_stock": self.stock.available_stock,
             "sale_price": self.sale_price,
-
-
-
         }
 
     def json_product(self):
