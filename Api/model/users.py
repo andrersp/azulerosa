@@ -64,7 +64,7 @@ class ModelsUser(db.Model):
         username = cls.query.filter_by(username=username).first()
 
         if username:
-            return True
+            return username
 
         return False
 

@@ -25,10 +25,13 @@ services:
         image: postgres:9.6-alpine
         volumes: 
             - postgres_data:/var/lib/postgresql/data
+            - "/etc/timezone:/etc/timezone:ro"
+            - "/etc/localtime:/etc/localtime:ro"
         environment: 
             - POSTGRES_USER=loja
             - POSTGRES_PASSWORD=loja
             - POSTGRES_DATABASE=loja
+            
         networks: 
             - database
 

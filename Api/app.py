@@ -6,6 +6,8 @@ from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
 from flask_migrate import Migrate
 
+from blacklist import BLACKLIST
+
 from api_admin import blueprint as api_admin
 
 
@@ -41,11 +43,15 @@ def add_claims_to_access_token(user):
     return {'roles': user.get("roles"), "endoints": ['%s' % rule for rule in app.url_map.iter_rules()]}
 
 # Get User Id JWT
+
+
 @jwt.user_identity_loader
 def user_identity_lookup(user):
     return user.get("id")
 
 # Message Expire Token
+
+
 @jwt.expired_token_loader
 def my_expire_token_callback(expire_token):
     token_type = expire_token['type']
@@ -56,16 +62,25 @@ def my_expire_token_callback(expire_token):
     }), 401
 
 
+@jwt.token_in_blacklist_loader
+def check_blacklist(token):
+    return token["jti"] in BLACKLIST
+
+
 @jwt.unauthorized_loader
 def error_load_token(fn):
     return jsonify({"message": "Erro na leitura do token"}), 401
 
 # Message Error read Token in header
+
+
 @jwt.invalid_token_loader
 def erro_token(e):
     return jsonify({"message": "Erro na leitura do token"}), 422
 
 # Error token revoked
+
+
 @jwt.revoked_token_loader
 def token_invalidado():
     return jsonify({"message": "Você não esta  logado. Faça login Novamente"}), 401
@@ -82,6 +97,8 @@ def hello():
     return redirect("/api/v1")
 
 # Redirect for doc in 404
+
+
 @app.errorhandler(404)
 def page_not_found(e):
     return jsonify({"message": "URL not Found"}), 404
@@ -98,6 +115,8 @@ def createdb():
     db.session.commit()
 
 # Defaults Data
+
+
 @cli.command('create_data')
 def create_data():
     delivery_data()

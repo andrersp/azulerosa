@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
 
+from datetime import timedelta
+
 from flask import request
 from flask_restx import Resource, Namespace
+from flask_jwt_extended import create_access_token, get_raw_jwt, jwt_required, get_jwt_identity
 
 from model.users import ModelsUser
 
 from wraps import required_params
+
+from blacklist import BLACKLIST
 
 
 ns_user = Namespace("Gerenciamento de Usuarios",
@@ -23,10 +28,12 @@ schema = {
 @ns_user.route("")
 class Users(Resource):
 
+    @jwt_required
     def get(self):
         """
         Retorna uma lista com todos os usuários cadastrados
         """
+        print(get_jwt_identity())
 
         return {"data": [user.list_users() for user in ModelsUser.query.all()]}, 200
 
@@ -59,3 +66,43 @@ class Users(Resource):
 
         except Exception as err:
             print(err)
+
+
+schema = {
+    "username": {"type": "string", "required": True, "empty": False, "description": "Nome de usuário para login"},
+    "password": {"type": "string", "required": True, "empty": False, "description": "Senha do usuário"}
+}
+
+
+@ns_user.route("/login")
+class UserLogin(Resource):
+
+    @required_params(schema)
+    @ns_user.doc(params=schema)
+    def post(self):
+
+        data = request.json
+
+        user = ModelsUser.find_username(data.get("username"))
+
+        if user and user.check_password(data.get("password")):
+
+            if user.enable:
+                expire = timedelta(hours=12)
+                token = create_access_token(
+                    identity=user.list_users(), expires_delta=expire)
+                return {"data": user.list_users(), "token": token}, 200
+
+            return {"message": "Usuário desabilitado. Contate o suporte"}, 403
+
+
+@ns_user.route("/logout")
+class UserLogin(Resource):
+
+    @jwt_required
+    def post(self):
+
+        jwt_id = get_raw_jwt()["jti"]
+        BLACKLIST.add(jwt_id)
+
+        return {"message": "Logout realizado com sucesso!"}, 403

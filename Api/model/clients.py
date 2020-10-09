@@ -3,6 +3,8 @@
 from datetime import datetime
 from pytz import timezone, utc
 
+from flask_jwt_extended import get_jwt_identity
+
 
 from db import db
 
@@ -31,12 +33,11 @@ class ModelClient(db.Model):
     city = db.Column(db.String(80))
     state = db.Column(db.String(2))
     obs = db.Column(db.Text)
-    date_register = db.Column(db.DateTime(
-        timezone=True), default=datetime.now())
+    date_register = db.Column(db.DateTime, server_default=db.func.now())
     register_by = db.Column(db.Integer)
     salesman = db.Column(db.Integer)
     notify = db.Column(db.Boolean)
-    date_update = db.Column(db.DateTime(timezone=True))
+    date_update = db.Column(db.DateTime)
     delivery_address = db.relationship(
         "ModelDelivereAdrressClient", backref='addresses', lazy="joined")
 
@@ -73,6 +74,7 @@ class ModelClient(db.Model):
         self.state = state
         self.obs = obs
         self.notify = notify
+        self.date_update = datetime.now()
 
     def list_client(self):
         return {
