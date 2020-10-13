@@ -9,7 +9,7 @@ Será utitlizando o framework [Flask RESTX](https://github.com/python-restx/flas
 
 O Projeto consiste em **3 etapas**:
 - Desenvolvimento da API
-- Desenvolvimento de Software Desktop utilizando [QT](https://www.qt.io/)
+- [Desenvolvimento de Software Desktop utilizando](https://github.com/andrersp/azulerosadesktop) [QT](https://www.qt.io/)
 - Desenvolvimento de Página Web utilizazndo [Flask](https://flask.palletsprojects.com/en/1.1.x/)
 
 # Features
