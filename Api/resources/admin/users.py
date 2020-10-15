@@ -91,9 +91,10 @@ class UserLogin(Resource):
                 expire = timedelta(hours=12)
                 token = create_access_token(
                     identity=user.list_users(), expires_delta=expire)
-                return {"data": user.list_users(), "token": token}, 200
+                return {"data": { "id": user.id_user,  "token": token}}, 200
 
             return {"message": "Usuário desabilitado. Contate o suporte"}, 403
+        return {"message": "Usuário ou senha incorretos. Tente Novamente."}, 401
 
 
 @ns_user.route("/logout")
