@@ -18,7 +18,7 @@ O Projeto consiste em **3 etapas**:
 - [x] Cadastro de categorias de produtos
 - [x] Cadastro de fornecedores
 - [x] Cadastro de clientes
-- [ ] Compras
+- [x] Compras
 - [ ] Vendas
 - [ ] Controle de estoque
 - [ ] Contas a pagar

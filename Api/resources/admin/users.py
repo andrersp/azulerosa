@@ -93,8 +93,8 @@ class UserLogin(Resource):
                     identity=user.list_users(), expires_delta=expire)
                 return {"data": { "id": user.id_user,  "token": token}}, 200
 
-            return {"message": "Usuário desabilitado. Contate o suporte"}, 403
-        return {"message": "Usuário ou senha incorretos. Tente Novamente."}, 401
+            return {"message": "Usuário desabilitado. Contate o suporte"}, 400
+        return {"message": "Usuário ou senha incorretos. Tente Novamente."}, 400
 
 
 @ns_user.route("/logout")
