@@ -73,13 +73,17 @@ schema = {
     "password": {"type": "string", "required": True, "empty": False, "description": "Senha do usuário"}
 }
 
+ns_login = Namespace("Login", description="Endpoint Login")
 
-@ns_user.route("/login")
+@ns_login.route("")
 class UserLogin(Resource):
 
     @required_params(schema)
-    @ns_user.doc(params=schema)
+    @ns_login.doc(params=schema)
     def post(self):
+        """
+        Realizar Login para receber o token de acesso
+        """
 
         data = request.json
 
@@ -97,13 +101,18 @@ class UserLogin(Resource):
         return {"message": "Usuário ou senha incorretos. Tente Novamente."}, 400
 
 
-@ns_user.route("/logout")
+ns_logout = Namespace("Logout", description="Endpoint Logout")
+
+@ns_logout.route("")
 class UserLogin(Resource):
 
     @jwt_required
     def post(self):
+        """
+        Realizar Logout para revogar Token de acesso. 
+        """
 
         jwt_id = get_raw_jwt()["jti"]
         BLACKLIST.add(jwt_id)
 
-        return {"message": "Logout realizado com sucesso!"}, 403
+        return {"message": "Logout realizado com sucesso!"}, 200

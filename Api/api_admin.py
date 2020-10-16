@@ -15,7 +15,9 @@ from resources.admin.clients import client_space  # Clientes
 
 from resources.admin.purchase import ns_purchase  # Purchases
 
-from resources.admin.users import ns_user  # Users
+from resources.admin.users import ns_user, ns_login, ns_logout # Users
+
+from resources.admin.home import ns_home
 
 authorizations = {
     'apikey': {
@@ -62,3 +64,12 @@ api.add_namespace(ns_purchase, path="/purchase")
 
 # Users
 api.add_namespace(ns_user, path="/user")
+
+# Login
+api.add_namespace(ns_login, path="/login")
+
+# Logout
+api.add_namespace(ns_logout, path="/logout")
+
+# Home
+api.add_namespace(ns_home, path="/home")
