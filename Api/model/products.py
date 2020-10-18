@@ -154,10 +154,12 @@ class ModelProducts(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-    def update_product(self, id, name, category, brand, minimum_stock, maximum_stock,
-                       long_description, short_description, sale_price, weight,
-                       cover, images, provider, available_stock,
-                       available, height, widht, length, maximum_discount):
+    def update_product(self, id, name, category, brand, unit,
+                 minimum_stock, maximum_stock, percentage_sale,
+                 long_description, short_description, cover,
+                 sale_price, weight, update_price,
+                 available, height, widht, length, maximum_discount, **kwargs):
+        self.id = id
         self.name = name
         self.category = category
         self.brand = brand
@@ -172,13 +174,10 @@ class ModelProducts(db.Model):
         self.length = length
         self.weight = weight
         self.maximum_discount = maximum_discount
-        # self.provider = provider
-        self.providers.clear()
-
-        if cover:
-            path = "static/images/{}".format(self.cover)
-            os.remove(path)
-            self.cover = cover
+        self.cover = cover
+        self.update_price = update_price
+        self.percentage_sale = percentage_sale
+        self.unit = unit
 
 
 # Triger Function to inserto product into stock table
