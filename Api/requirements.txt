@@ -10,3 +10,4 @@ Flask-Bcrypt==0.7.1
 gunicorn
 Pillow
 python-resize-image
+lorem==0.1.1

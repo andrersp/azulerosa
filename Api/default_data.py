@@ -10,6 +10,8 @@ from model.products import ModelProducts
 from model.provider import ModelProvider
 from model.purchase import ModelPurchase, ModelPurchaseItem
 
+from lorem.text import TextLorem
+
 
 def delivery_data():
 
@@ -84,8 +86,10 @@ def delivery_data():
 
     if not prod:
 
-        for _ in range(3000):
+        for _ in range(20):
             print(_)
+            lorem = TextLorem(srange=(1, 2))
+            product["name"] = lorem.sentence()
             ModelProducts(**product).save_product()
 
     purchase = {

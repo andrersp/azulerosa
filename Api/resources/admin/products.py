@@ -61,7 +61,7 @@ def upload_image(image, cover=False):
         filename = str(uuid4()) + "-cover." + extension
         pic = io.BytesIO(image)
         with Image.open(pic) as image_pil:
-            cover = resizeimage.resize_cover(image_pil, [150, 150])
+            cover = resizeimage.resize_height(image_pil, 150)
             cover.save("static/images/{}".format(filename), image_pil.format)
     else:
         with open(os.path.join("static/images/" + filename), "wb") as file_to_save:
