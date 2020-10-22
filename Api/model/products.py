@@ -155,10 +155,10 @@ class ModelProducts(db.Model):
         db.session.commit()
 
     def update_product(self, id, name, category, brand, unit,
-                 minimum_stock, maximum_stock, percentage_sale,
-                 long_description, short_description, cover,
-                 sale_price, weight, update_price,
-                 available, height, widht, length, maximum_discount, **kwargs):
+                       minimum_stock, maximum_stock, percentage_sale,
+                       long_description, short_description, cover,
+                       sale_price, weight, update_price,
+                       available, height, widht, length, maximum_discount, **kwargs):
         self.id = id
         self.name = name
         self.category = category
