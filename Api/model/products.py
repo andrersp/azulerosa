@@ -92,6 +92,7 @@ class ModelProducts(db.Model):
         return {
             "id": self.id_product,
             "name": self.name,
+            "short_description": self.short_description,
             "category": self.category_name.name,
             "brand": self.brand,
             "cover": request.url_root[:-1] + url_for("api.static", filename="images/{}".format(self.cover)) if self.cover else "",
