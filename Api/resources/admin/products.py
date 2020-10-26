@@ -25,6 +25,7 @@ product_space = Namespace(
 
 schema = {
     "id": {"type": "numeric", "required": True, "description": "String vazia ou Int com o ID do produto"},
+    "internal_code": {"type": "string", "required": True, "empty": False, "description": "Código interno do produto"},
     "name": {"type": "string", "required": True, "empty": False, "description": "Nome do produto"},
     "category": {"type": "integer", "required": True, "description": "int ID da categoria"},
     "brand": {"type": "integer", "required": True, "description": "int ID da marca ou 0 para nenhuma"},
