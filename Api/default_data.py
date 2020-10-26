@@ -59,6 +59,7 @@ def delivery_data():
 
     product = {
         "id": "0",
+        "internal_code": "can123",
         "name": "Produto Teste",
         "brand": 1,
         "unit": 1,
@@ -69,7 +70,6 @@ def delivery_data():
         "minimum_stock": 10,
         "sale_price": 10.50,
         "available": True,
-        "update_price": True,
         "height": 10,
         "provider": [1],
         "cover": "",
@@ -79,7 +79,8 @@ def delivery_data():
         "weight": 0.75,
         "widht": 1.25,
         "maximum_discount": 10.00,
-        "percentage_sale": 5
+        "minimum_sale": 1,
+        "subtract": False
     }
 
     prod = ModelProducts.find_product(product.get("id"))

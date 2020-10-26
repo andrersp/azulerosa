@@ -20,6 +20,7 @@ class ModelProducts(db.Model):
 
     __tablename__ = "product"
     id_product = db.Column(db.Integer, primary_key=True)
+    internal_code = db.Column(db.String(12))
     name = db.Column(db.String(80))
     category = db.Column(db.Integer, db.ForeignKey(
         'product_category.id_category'), nullable=False)
@@ -35,11 +36,11 @@ class ModelProducts(db.Model):
     widht = db.Column(db.Float(precision=2))
     length = db.Column(db.Float(precision=2))
     weight = db.Column(db.Float(precision=2))
-    percentage_sale = db.Column(db.Float(precision=2), nullable=True)
-    update_price = db.Column(db.Boolean, default=False)
+    minimum_sale = db.Column(db.Float(precision=2), nullable=True)
     sale_price = db.Column(db.Float(precision=2))
     maximum_discount = db.Column(db.Float(precision=2))
     available = db.Column(db.Boolean)
+    subtract = db.Column(db.Boolean)
     images = db.relationship("ModelImagesProduct",
                              backref="product", lazy=True)
 
@@ -64,11 +65,12 @@ class ModelProducts(db.Model):
     }
 
     def __init__(self, id, name, category, brand, unit,
-                 minimum_stock, maximum_stock, percentage_sale,
+                 minimum_stock, maximum_stock, minimum_sale,
                  long_description, short_description, cover,
-                 sale_price, weight, update_price,
+                 sale_price, weight, subtract, internal_code,
                  available, height, widht, length, maximum_discount, **kwargs):
         self.id = id
+        self.internal_code = internal_code
         self.name = name
         self.category = category
         self.brand = brand
@@ -84,9 +86,9 @@ class ModelProducts(db.Model):
         self.weight = weight
         self.maximum_discount = maximum_discount
         self.cover = cover
-        self.update_price = update_price
-        self.percentage_sale = percentage_sale
+        self.minimum_sale = minimum_sale
         self.unit = unit
+        self.subtract = subtract
 
     def list_product(self):
         return {
@@ -103,12 +105,14 @@ class ModelProducts(db.Model):
     def json_product(self):
         return {
             "id": self.id_product,
+            "internal_code": self.internal_code,
             "name": self.name,
             "category": self.category,
             "brand": self.brand,
             "unit": self.unit,
             "minimum_stock": self.minimum_stock,
             "maximum_stock": self.maximum_discount,
+            "subtract": self.subtract,
             "short_description": self.short_description,
             "long_description": self.long_description,
             "cover": request.url_root[:-1] + url_for("api.static", filename="images/{}".format(self.cover)) if self.cover else "",
@@ -116,8 +120,7 @@ class ModelProducts(db.Model):
             "widht": self.widht,
             "length": self.length,
             "weight": self.weight,
-            "percentage_sale": self.percentage_sale,
-            "update_price": self.update_price,
+            "minimum_sale": self.minimum_sale,
             "sale_price": self.sale_price,
             "maximum_discount": self.maximum_discount,
             "images": [image.list_images() for image in self.images],
@@ -156,9 +159,9 @@ class ModelProducts(db.Model):
         db.session.commit()
 
     def update_product(self, id, name, category, brand, unit,
-                       minimum_stock, maximum_stock, percentage_sale,
+                       minimum_stock, maximum_stock, minimum_sale,
                        long_description, short_description, cover,
-                       sale_price, weight, update_price,
+                       sale_price, weight, subtract, internal_code,
                        available, height, widht, length, maximum_discount, **kwargs):
         self.id = id
         self.name = name
@@ -176,9 +179,10 @@ class ModelProducts(db.Model):
         self.weight = weight
         self.maximum_discount = maximum_discount
         self.cover = cover
-        self.update_price = update_price
-        self.percentage_sale = percentage_sale
+        self.minimum_sale = minimum_sale
         self.unit = unit
+        self.subtract = subtract
+        self.internal_code = internal_code
 
 
 # Triger Function to inserto product into stock table
