@@ -179,6 +179,22 @@ class Products(Resource):
             return {"message": "internal error"}, 500
 
 
+@product_space.route("/selects")
+class ProductSelect(Resource):
+
+    def get(self):
+        """ Itens Cadastro de Produto
+        Lista contendo todos os itens necessários para cadastro de produto """
+
+        providers = [provider.list_provider_product()
+                     for provider in ModelProvider.query.all()]
+
+        categories = [category.list_category()
+                      for category in ModelCategoryProduct.query.all()]
+
+        return {"data": {"providers": providers, "categories": categories}}, 200
+
+
 @product_space.route("/<int:id_product>")
 class ProductGet(Resource):
 
