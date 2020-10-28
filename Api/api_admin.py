@@ -8,6 +8,8 @@ from sqlalchemy.orm.exc import NoResultFound
 # Namespaces
 from resources.admin.products import product_space  # Products
 from resources.admin.products_category import category_space  # Categories Product
+from resources.admin.products_brand import brand_space  # Categories Product
+from resources.admin.products_unit import unit_space  # Units Product Space
 
 from resources.admin.provider import provider_space  # Providers
 
@@ -15,7 +17,7 @@ from resources.admin.clients import client_space  # Clientes
 
 from resources.admin.purchase import ns_purchase  # Purchases
 
-from resources.admin.users import ns_user, ns_login, ns_logout # Users
+from resources.admin.users import ns_user, ns_login, ns_logout  # Users
 
 from resources.admin.home import ns_home
 
@@ -52,6 +54,10 @@ def database_not_found_error(e):
 api.add_namespace(product_space, path="/product")
 # Products Category
 api.add_namespace(category_space, path="/product/category")
+# Products Brand
+api.add_namespace(brand_space, path="/product/brand")
+# Product Unit
+api.add_namespace(unit_space, path="/product/unit")
 
 # Provider
 api.add_namespace(provider_space, path="/provider")

@@ -7,14 +7,14 @@ class ModelProductUnit(db.Model):
     __tablename__ = 'product_unit'
     id_unit = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True)
-    description = db.Column(db.String(200))
+    description = db.Column(db.String(120))
 
     __mapper_args__ = {
-        "order_by": id
+        "order_by": id_unit
     }
 
     def __repr__(self):
-        return "<Category %r>" % self.name
+        return "<Unit %r>" % self.name
 
     def __init__(self, id, name, description):
         self.id = id
@@ -31,6 +31,15 @@ class ModelProductUnit(db.Model):
         if unit:
             return unit
 
+        return None
+
+    @classmethod
+    def find_unit_name(cls, name):
+
+        unit = cls.query.filter_by(name=name).first()
+
+        if unit:
+            return unit
         return None
 
     # Return List Units json

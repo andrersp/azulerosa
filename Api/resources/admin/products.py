@@ -19,6 +19,8 @@ from model.products import ModelProducts
 from model.products_image import ModelImagesProduct
 from model.provider import ModelProvider
 from model.products_category import ModelCategoryProduct
+from model.products_brand import ModelBrandProduct
+from model.products_unit import ModelProductUnit
 
 product_space = Namespace(
     "Gerenciamento de Produtos", description="Endpoints para gerenciamento de produto")
@@ -192,7 +194,12 @@ class ProductSelect(Resource):
         categories = [category.list_category()
                       for category in ModelCategoryProduct.query.all()]
 
-        return {"data": {"providers": providers, "categories": categories}}, 200
+        units = [unit.json_units() for unit in ModelProductUnit.query.all()]
+
+        brands = [brand.list_brand()
+                  for brand in ModelBrandProduct.query.all()]
+
+        return {"data": {"providers": providers, "categories": categories, "brands": brands,  "units": units}}, 200
 
 
 @product_space.route("/<int:id_product>")
