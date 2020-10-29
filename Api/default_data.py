@@ -77,7 +77,7 @@ def delivery_data():
         "images": [],
         "length": 1.5,
         "weight": 0.75,
-        "widht": 1.25,
+        "width": 1.25,
         "maximum_discount": 10.00,
         "minimum_sale": 1,
         "subtract": False

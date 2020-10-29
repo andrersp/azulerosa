@@ -33,7 +33,7 @@ class ModelProducts(db.Model):
     long_description = db.Column(db.Text)
     cover = db.Column(db.String(80))
     height = db.Column(db.Float(precision=2))
-    widht = db.Column(db.Float(precision=2))
+    width = db.Column(db.Float(precision=2))
     length = db.Column(db.Float(precision=2))
     weight = db.Column(db.Float(precision=2))
     minimum_sale = db.Column(db.Float(precision=2), nullable=True)
@@ -68,7 +68,7 @@ class ModelProducts(db.Model):
                  minimum_stock, maximum_stock, minimum_sale,
                  long_description, short_description, cover,
                  sale_price, weight, subtract, internal_code,
-                 available, height, widht, length, maximum_discount, **kwargs):
+                 available, height, width, length, maximum_discount, **kwargs):
         self.id = id
         self.internal_code = internal_code
         self.name = name
@@ -81,7 +81,7 @@ class ModelProducts(db.Model):
         self.sale_price = sale_price
         self.available = available
         self.height = height
-        self.widht = widht
+        self.width = width
         self.length = length
         self.weight = weight
         self.maximum_discount = maximum_discount
@@ -111,13 +111,14 @@ class ModelProducts(db.Model):
             "brand": self.brand,
             "unit": self.unit,
             "minimum_stock": self.minimum_stock,
-            "maximum_stock": self.maximum_discount,
+            "maximum_stock": self.maximum_stock,
             "subtract": self.subtract,
             "short_description": self.short_description,
             "long_description": self.long_description,
             "cover": request.url_root[:-1] + url_for("api.static", filename="images/{}".format(self.cover)) if self.cover else "",
+            "available": self.available,
             "height": self.height,
-            "widht": self.widht,
+            "width": self.width,
             "length": self.length,
             "weight": self.weight,
             "minimum_sale": self.minimum_sale,
@@ -162,7 +163,7 @@ class ModelProducts(db.Model):
                        minimum_stock, maximum_stock, minimum_sale,
                        long_description, short_description, cover,
                        sale_price, weight, subtract, internal_code,
-                       available, height, widht, length, maximum_discount, **kwargs):
+                       available, height, width, length, maximum_discount, **kwargs):
         self.id = id
         self.name = name
         self.category = category
@@ -174,7 +175,7 @@ class ModelProducts(db.Model):
         self.sale_price = sale_price
         self.available = available
         self.height = height
-        self.widht = widht
+        self.width = width
         self.length = length
         self.weight = weight
         self.maximum_discount = maximum_discount

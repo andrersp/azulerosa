@@ -39,10 +39,9 @@ schema = {
     "long_description": {"type": "string", "required": True, "empty": True, "description": "Descrição longa do produto. Aceita HTML"},
     "cover": {"type": "string", "required": True, "empty": True, "description": "Imagem de descate do produto."},
     "height": {"type": "float", "required": True, "description": "Altura da embalagem. "},
-    "widht": {"type": "float", "required": True, "description": "Largura da embalagem"},
+    "width": {"type": "float", "required": True, "description": "Largura da embalagem"},
     "length": {"type": "float", "required": True, "description": "Comprimento da embalagem"},
     "weight": {"type": "float", "required": True, "description": "Peso da embalagem"},
-    "purchase_price": {"type": "float", "required": True, "description": "Float valor de compra."},
     "minimum_sale": {"type": "float", "required": True, "description": "Float Quantidade mínima de venda."},
     "sale_price": {"type": "float", "required": True, "description": "Float valor de venda."},
     "maximum_discount": {"type": "float", "required": True, "description": "Float porcentagem desconto máximo"},
@@ -104,6 +103,7 @@ class Products(Resource):
 
         # Check if provider exist
         lst_provider = []
+
         for id_provider in data.get("provider"):
             provider = ModelProvider.find_provider(id_provider)
             if not provider:
@@ -126,6 +126,7 @@ class Products(Resource):
                     upload_image(images), product))
 
             # Appending provider
+            print(lst_provider)
             [product.providers.append(provider) for provider in lst_provider]
 
             # Save Product

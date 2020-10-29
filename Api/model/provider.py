@@ -4,7 +4,6 @@ from datetime import datetime
 from pytz import timezone, utc
 
 
-
 from db import db
 
 
@@ -33,7 +32,8 @@ class ModelProvider(db.Model):
     city = db.Column(db.String(80))
     state = db.Column(db.String(2))
     obs = db.Column(db.Text)
-    date_register = db.Column(db.DateTime(timezone=True), default=datetime.now())
+    date_register = db.Column(db.DateTime(
+        timezone=True), default=datetime.now())
     # register_by = db.Column(
     #     db.Integer, db.ForeignKey("usuario.usuario_id"))
     products = db.relationship('ModelProducts', secondary="providers", lazy='dynamic',
@@ -88,6 +88,7 @@ class ModelProvider(db.Model):
         }
 
     def list_provider_product(self):
+        print(self.fancy_name)
         return {
             "id": self.provider_id,
             "fancy_name": self.fancy_name

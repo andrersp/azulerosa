@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import os
+import random
+import string
 
 # SQLALCHEMY_DATABASE_URI = "postgresql://andre:rsp@127.0.0.1/dhpp"  # local
 # SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -13,7 +15,8 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "sqlite://")
     # SQLALCHEMY_DATABASE_URI = "postgresql://andre:rsp@127.0.0.1/loja2"  # local
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    JWT_SECRET_KEY = "passwordkeysecret"
+    JWT_SECRET_KEY = "".join(random.choice(
+        string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(32))
     PROPAGATE_EXCEPTIONS = True
     JWT_BLACKLIST_ENABLED = True
     ERROR_404_HELP = False
