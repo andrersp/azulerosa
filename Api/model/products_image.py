@@ -24,14 +24,12 @@ class ModelImagesProduct(db.Model):
         }
 
     @classmethod
-    def find_image(cls, id_product, id_image):
+    def find_image(cls, id_image):
 
-        print(id_product, id_image)
         if not id_image:
             return None
 
-        image = cls.query.filter_by(id_product=id_product).filter_by(
-            id_image=id_image).first()
+        image = cls.query.filter_by(id_image=id_image).first()
 
         if image:
             return image

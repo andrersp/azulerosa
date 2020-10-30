@@ -179,6 +179,11 @@ class ModelProducts(db.Model):
         self.length = length
         self.weight = weight
         self.maximum_discount = maximum_discount
+
+        if self.cover:
+            path = "static/images/{}".format(self.cover)
+            os.remove(path)
+
         self.cover = cover
         self.minimum_sale = minimum_sale
         self.unit = unit

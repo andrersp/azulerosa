@@ -63,7 +63,8 @@ def upload_image(image, cover=False):
         filename = str(uuid4()) + "-cover." + extension
         pic = io.BytesIO(image)
         with Image.open(pic) as image_pil:
-            cover = resizeimage.resize_height(image_pil, 150)
+
+            cover = resizeimage.resize_height(image_pil, 150, validate=False)
             cover.save("static/images/{}".format(filename), image_pil.format)
     else:
         with open(os.path.join("static/images/" + filename), "wb") as file_to_save:
@@ -218,13 +219,13 @@ class ProductGet(Resource):
         return {"message": "product not found"}, 404
 
 
-@product_space.route("/image/<int:id_product>/<int:id_image>")
+@product_space.route("/image/<int:id_image>")
 class ProductImage(Resource):
 
-    def delete(self, id_product, id_image):
+    def delete(self, id_image):
         """ Deletar imagem por ID do produto e ID da Imagem. """
 
-        image = ModelImagesProduct.find_image(id_product, id_image)
+        image = ModelImagesProduct.find_image(id_image)
 
         if image:
             try:
