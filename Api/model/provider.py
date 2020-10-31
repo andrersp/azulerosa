@@ -88,7 +88,6 @@ class ModelProvider(db.Model):
         }
 
     def list_provider_product(self):
-        print(self.fancy_name)
         return {
             "id": self.provider_id,
             "fancy_name": self.fancy_name

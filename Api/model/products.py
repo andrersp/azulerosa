@@ -151,6 +151,18 @@ class ModelProducts(db.Model):
             return product
         return None
 
+    @classmethod
+    def find_internal_code(cls, code):
+        if not code:
+            return None
+
+        product = cls.query.filter_by(internal_code=code).first()
+
+        if product:
+            return product
+
+        return None
+
     def save_product(self):
         db.session.add(self)
         db.session.commit()

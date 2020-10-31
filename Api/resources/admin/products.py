@@ -29,11 +29,11 @@ schema = {
     "id": {"type": "numeric", "required": True, "description": "String vazia ou Int com o ID do produto"},
     "internal_code": {"type": "string", "required": True, "empty": False, "description": "Código interno do produto"},
     "name": {"type": "string", "required": True, "empty": False, "description": "Nome do produto"},
-    "category": {"type": "integer", "required": True, "description": "int ID da categoria"},
+    "category": {"type": "integer", "required": True, "min": 1, "description": "int ID da categoria"},
     "brand": {"type": "integer", "required": True, "description": "int ID da marca ou 0 para nenhuma"},
-    "unit": {"type": "integer", "required": True, "description": "int ID Unidade de medida"},
-    "minimum_stock": {"type": "float", "required": True, "description": "Float Quantidade mínima em estoque."},
-    "maximum_stock": {"type": "float", "required": True, "description": "Float Quantidade máxima em estoque"},
+    "unit": {"type": "integer", "required": True, "min": 1, "description": "int ID Unidade de medida"},
+    "minimum_stock": {"type": "float", "required": True, "min": 1, "description": "Float Quantidade mínima em estoque."},
+    "maximum_stock": {"type": "float", "required": True, "min": 1, "description": "Float Quantidade máxima em estoque"},
     "subtract": {"type": "boolean", "required": True, "description": "Reduzir estoque ao efetuar venda"},
     "short_description": {"type": "string", "required": True, "empty": False, "description": "Descrição curta do produto, Máximo 200 caracteres ", "maxlength": 200},
     "long_description": {"type": "string", "required": True, "empty": True, "description": "Descrição longa do produto. Aceita HTML"},
@@ -42,7 +42,7 @@ schema = {
     "width": {"type": "float", "required": True, "description": "Largura da embalagem"},
     "length": {"type": "float", "required": True, "description": "Comprimento da embalagem"},
     "weight": {"type": "float", "required": True, "description": "Peso da embalagem"},
-    "minimum_sale": {"type": "float", "required": True, "description": "Float Quantidade mínima de venda."},
+    "minimum_sale": {"type": "float", "required": True, "min": 1, "description": "Float Quantidade mínima de venda."},
     "sale_price": {"type": "float", "required": True, "description": "Float valor de venda."},
     "maximum_discount": {"type": "float", "required": True, "description": "Float porcentagem desconto máximo"},
     "available": {"type": "boolean", "required": True, "description": "Se produto esta disponível"},
@@ -59,16 +59,15 @@ def upload_image(image, cover=False):
     extension = imghdr.what(None, h=image)
     filename = str(uuid4()) + "." + extension
 
-    if cover:
-        filename = str(uuid4()) + "-cover." + extension
-        pic = io.BytesIO(image)
-        with Image.open(pic) as image_pil:
-
-            cover = resizeimage.resize_height(image_pil, 150, validate=False)
-            cover.save("static/images/{}".format(filename), image_pil.format)
-    else:
-        with open(os.path.join("static/images/" + filename), "wb") as file_to_save:
-            file_to_save.write(image)
+    # if cover:
+    #     filename = str(uuid4()) + "-cover." + extension
+    pic = io.BytesIO(image)
+    with Image.open(pic) as image_pil:
+        cover = resizeimage.resize_height(image_pil, 600, validate=False)
+        cover.save("static/images/{}".format(filename), image_pil.format)
+    # else:
+    #     with open(os.path.join("static/images/" + filename), "wb") as file_to_save:
+    #         file_to_save.write(image)
 
     return filename
 
@@ -95,6 +94,11 @@ class Products(Resource):
         if product:
             return self.put()
 
+        product_code = ModelProducts.find_internal_code(
+            data.get("internal_code"))
+        if product_code:
+            return {"message": "Product Code in use to other product"}, 400
+
         # Check if category exist
         if not ModelCategoryProduct.find_category(data.get("category")):
             return {"message": "Category id {} not found".format(data.get("category"))}, 400
@@ -117,7 +121,7 @@ class Products(Resource):
             b64_cover = data.get("cover")
 
             if b64_cover:
-                data["cover"] = upload_image(b64_cover, cover=True)
+                data["cover"] = upload_image(b64_cover)
 
             product = ModelProducts(**data)
 
@@ -127,7 +131,7 @@ class Products(Resource):
                     upload_image(images), product))
 
             # Appending provider
-            print(lst_provider)
+            # print(lst_provider)
             [product.providers.append(provider) for provider in lst_provider]
 
             # Save Product
@@ -161,9 +165,15 @@ class Products(Resource):
 
             lst_provider.append(provider)
 
+        product_code = ModelProducts.find_internal_code(
+            data.get("internal_code"))
+        if product_code:
+            if product_code.id_product != data.get("id"):
+                return {"message": "Product Code in use to other product"}, 400
+
         try:
             if data.get("cover"):
-                data["cover"] = upload_image(data.get("cover"), cover=True)
+                data["cover"] = upload_image(data.get("cover"))
 
             product.update_product(**data)
             # Appending Images
