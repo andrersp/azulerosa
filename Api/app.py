@@ -94,7 +94,7 @@ def create_tables():
 
 @app.route("/")
 def hello():
-    return redirect("/api/v1")
+    return redirect("/api/v1/admin")
 
 # Redirect for doc in 404
 
