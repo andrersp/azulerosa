@@ -39,7 +39,7 @@ func = db.DDL(
     BEGIN
     IF (TG_OP = 'INSERT') THEN
         SELECT (available_stock) into old_qtde FROM stock WHERE id_product = NEW.id_product;
-        UPDATE stock SET available_stock=(old_qtde + NEW.qtde), purchase_price=NEW.purchase_price WHERE id_product = NEW.id_product;
+        UPDATE stock SET available_stock=(old_qtde + NEW.qtde), purchase_price=NEW.purchase_price, initial_stock = true WHERE id_product = NEW.id_product;
         RETURN NEW;
     
     ELSEIF (TG_OP = 'DELETE') THEN
