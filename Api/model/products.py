@@ -201,6 +201,8 @@ class ModelProducts(db.Model):
         self.unit = unit
         self.subtract = subtract
         self.internal_code = internal_code
+        # [self.providers.remove(data) for data in self.providers]
+        self.providers.clear()
 
 
 # Triger Function to inserto product into stock table

@@ -15,19 +15,36 @@ from lorem.text import TextLorem
 
 def delivery_data():
 
-    category = {
-        "id": "1",
-        "name": "Categoria Teste",
-        "description": ""
-    }
+    category = [
+        {
+            "id": "1",
+            "name": "Caneca",
+            "description": ""
+        },
+        {
+            "id": "2",
+            "name": "Azulejo",
+            "description": ""
+        },
+        {
+            "id": "3",
+            "name": "SmartWatch",
+            "description": ""
+        },
+        {
+            "id": "4",
+            "name": "Fone de Ouvido",
+            "description": ""
+        }
+    ]
 
-    cat = ModelCategoryProduct.find_category(category.get("id"))
+    for cat in category:
+        cate = ModelCategoryProduct.find_category(cat.get("id"))
+        if not cate:
+            cat = ModelCategoryProduct(**cat)
+            cat.save_category()
 
-    if not cat:
-        cat = ModelCategoryProduct(**category)
-        cat.save_category()
-
-    provider = {
+    provider = [{
         "id": "1",
         "enable": True,
         "type_registration": 2,
@@ -49,13 +66,37 @@ def delivery_data():
         "site": "",
         "state": "RJ",
         "zip_code": "28015161"
+    },
+        {
+        "id": "2",
+        "enable": True,
+        "type_registration": 2,
+        "cnpj": "16897733000100",
+        "cell_phone": "22997069161",
+        "phone": "",
+        "company_name": "Azul e Rosa Teste Update",
+        "contact_name": "andre",
+        "fancy_name": "Fornecedor 2",
+        "municipal_registration": "",
+        "state_registration": "",
+        "address": "Rua Major Euclides",
+        "city": "Campos dos Goytacazes",
+        "complement": "",
+        "email": "",
+        "neighborhood": "Turf",
+        "number": "",
+        "obs": "",
+        "site": "",
+        "state": "RJ",
+        "zip_code": "28015161"
     }
+    ]
 
-    prov = ModelProvider.find_provider(provider.get("id"))
-
-    if not prov:
-        provider = ModelProvider(**provider)
-        provider.save_provider()
+    for provider in provider:
+        prov = ModelProvider.find_provider(provider.get("id"))
+        if not prov:
+            provider = ModelProvider(**provider)
+            provider.save_provider()
 
     product = {
         "id": "0",

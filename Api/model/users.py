@@ -73,3 +73,11 @@ class ModelsUser(db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password, password)
+
+
+@db.event.listens_for(ModelsUser.__table__, "after_create")
+def initial_user(*args, **kwargs):
+    user = ModelsUser(1, "admin", "admin", True)
+    user.generate_hash()
+    db.session.add(user)
+    db.session.commit()
