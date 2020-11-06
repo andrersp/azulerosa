@@ -27,7 +27,6 @@ schema = {
 
 @ns_user.route("")
 class Users(Resource):
-
     @jwt_required
     def get(self):
         """
@@ -37,6 +36,7 @@ class Users(Resource):
 
         return {"data": [user.list_users() for user in ModelsUser.query.all()]}, 200
 
+    @jwt_required
     @ns_user.doc(params=schema)
     @required_params(schema)
     def post(self):
@@ -75,6 +75,7 @@ schema = {
 
 ns_login = Namespace("Login", description="Endpoint Login")
 
+
 @ns_login.route("")
 class UserLogin(Resource):
 
@@ -95,13 +96,14 @@ class UserLogin(Resource):
                 expire = timedelta(hours=12)
                 token = create_access_token(
                     identity=user.list_users(), expires_delta=expire)
-                return {"data": { "id": user.id_user,  "token": token}}, 200
+                return {"data": {"id": user.id_user,  "token": token}}, 200
 
             return {"message": "Usuário desabilitado. Contate o suporte"}, 400
         return {"message": "Usuário ou senha incorretos. Tente Novamente."}, 400
 
 
 ns_logout = Namespace("Logout", description="Endpoint Logout")
+
 
 @ns_logout.route("")
 class UserLogin(Resource):

@@ -3,6 +3,7 @@
 
 from flask import request
 from flask_restx import Namespace, Resource
+from flask_jwt_extended import jwt_required
 
 from model.products_unit import ModelProductUnit
 
@@ -23,6 +24,7 @@ schema = {
 @unit_space.route("")
 class UnitProduct(Resource):
 
+    @jwt_required
     def get(self):
         """ LIsta de todas as unidades de medida cadastradas
         Retorna lista de unidades para ser usada no cadastro de produto. """
@@ -31,6 +33,7 @@ class UnitProduct(Resource):
 
         return {"data": units}, 200
 
+    @jwt_required
     @unit_space.doc(params=schema)
     @required_params(schema)
     def post(self):
@@ -59,6 +62,7 @@ class UnitProduct(Resource):
         except:
             return {"message": "Internal error"}, 500
 
+    @jwt_required
     @unit_space.hide
     @required_params(schema)
     def put(self):
@@ -81,7 +85,7 @@ class UnitProduct(Resource):
 
 @unit_space.route("/<int:id_unit>")
 class UnitProductGet(Resource):
-
+    @jwt_required
     def get(self, id_unit):
 
         unit = ModelProductUnit.find_unit(id_unit)

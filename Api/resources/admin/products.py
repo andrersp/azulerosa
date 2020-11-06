@@ -74,14 +74,14 @@ def upload_image(image, cover=False):
 
 @product_space.route("")
 class Products(Resource):
-    # @jwt_required
+    @jwt_required
     def get(self):
         """Lista de todos os produtos cadastrados.
         Retorna uma lista contendo todos os produtos"""
 
         return {"data": [product.list_product() for product in ModelProducts.query.all()]}
 
-    # @jwt_required
+    @jwt_required
     @required_params(schema)
     @product_space.doc(params=schema)
     def post(self):
@@ -145,7 +145,7 @@ class Products(Resource):
 
         return {"messa": "ok"}, 200
 
-    # @jwt_required
+    @jwt_required
     @product_space.hide
     def put(self):
         data = request.json
@@ -196,6 +196,7 @@ class Products(Resource):
 @product_space.route("/selects")
 class ProductSelect(Resource):
 
+    @jwt_required
     def get(self):
         """ Itens Cadastro de Produto
         Lista contendo todos os itens necessários para cadastro de produto """
@@ -216,7 +217,7 @@ class ProductSelect(Resource):
 
 @product_space.route("/<int:id_product>")
 class ProductGet(Resource):
-
+    @jwt_required
     def get(self, id_product):
         """ Seleciona o produto pelo ID
         Retorna o produto selecionado por id caso exista."""
@@ -231,7 +232,7 @@ class ProductGet(Resource):
 
 @product_space.route("/image/<int:id_image>")
 class ProductImage(Resource):
-
+    @jwt_required
     def delete(self, id_image):
         """ Deletar imagem por ID do produto e ID da Imagem. """
 

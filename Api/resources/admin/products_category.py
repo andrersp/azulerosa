@@ -21,6 +21,7 @@ schema = {
 @category_space.route("")
 class CategoryProductView(Resource):
 
+    @jwt_required
     def get(self):
         """ Lista de todos as categorias cadastradas.
         Retorna uma lista contendo todos as categorias"""
@@ -29,7 +30,7 @@ class CategoryProductView(Resource):
 
     @category_space.doc(params=schema)
     @required_params(schema)
-    # @jwt_required
+    @jwt_required
     def post(self):
         """ Adicionar ou editar categoria.
         Para criar envie string vazia em id e para editar envie um int com o ID da categoria"""
@@ -51,7 +52,7 @@ class CategoryProductView(Resource):
         except:
             return {"message": "Internal error"}, 500
 
-    # @jwt_required
+    @jwt_required
     @category_space.hide
     @required_params(schema)
     def put(self):
@@ -76,6 +77,7 @@ class CategoryProductView(Resource):
 @category_space.route("/<int:id_category>")
 class CategoryGet(Resource):
 
+    @jwt_required
     def get(self, id_category):
         """ Seleciona categoria pelo ID.
         Retorna a categoria seleciona caso exista."""

@@ -21,6 +21,7 @@ schema = {
 @brand_space.route("")
 class brandProductView(Resource):
 
+    @jwt_required
     def get(self):
         """ Lista de todos as marcas cadastradas.
         Retorna uma lista contendo todos as marcas"""
@@ -29,7 +30,7 @@ class brandProductView(Resource):
 
     @brand_space.doc(params=schema)
     @required_params(schema)
-    # @jwt_required
+    @jwt_required
     def post(self):
         """ Adicionar ou editar categoria.
         Para criar envie string vazia em id e para editar envie um int com o ID da categoria"""
@@ -51,7 +52,7 @@ class brandProductView(Resource):
         except:
             return {"message": "Internal error"}, 500
 
-    # @jwt_required
+    @jwt_required
     @brand_space.hide
     @required_params(schema)
     def put(self):
@@ -76,6 +77,7 @@ class brandProductView(Resource):
 @brand_space.route("/<int:id_brand>")
 class brandGet(Resource):
 
+    @jwt_required
     def get(self, id_brand):
         """ Seleciona categoria pelo ID.
         Retorna a categoria seleciona caso exista."""
