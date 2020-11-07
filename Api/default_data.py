@@ -100,8 +100,7 @@ def delivery_data():
             provider.save_provider()
 
     product = {
-        "id": "0",
-        "internal_code": "desc{}".format(randint(0, 9999)),
+        "internal_code": "acb123",
         "name": "Produto Teste",
         "brand": 1,
         "unit": 1,
@@ -115,7 +114,6 @@ def delivery_data():
         "height": 10,
         "provider": [1],
         "cover": "",
-        "available_stock": 0.00,
         "images": [],
         "length": 1.5,
         "weight": 0.75,
@@ -129,7 +127,7 @@ def delivery_data():
 
     if not prod:
 
-        for _ in range(5000):
+        for _ in range(5):
             print(_)
             lorem = TextLorem(srange=(1, 2))
             product["name"] = lorem.sentence()

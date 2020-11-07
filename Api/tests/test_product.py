@@ -16,7 +16,7 @@ class TestProduct(TestCase):
             "brand": 1,
             "category": 1,
             "minimum_sale": 1,
-            "internal_code": "abc{}".format(randint(0, 666)),
+            "internal_code": "acb124543",
             "subtract": False,
             "long_description": "",
             "short_description": "Descrição curta do produto",
@@ -34,7 +34,6 @@ class TestProduct(TestCase):
             "width": 1.25,
             "maximum_discount": 10.00
         }
-
         response = self.client.post(("/api/v1/admin/products/"), json=data)
         self.assertEqual(201, response.status_code)
 
@@ -44,7 +43,7 @@ class TestProduct(TestCase):
             "brand": 1,
             "category": 1,
             "minimum_sale": 1,
-            "internal_code": "abc{}".format(randint(0, 666)),
+            "internal_code": "acb12356",
             "subtract": False,
             "long_description": "",
             "short_description": "Descrição curta do produto",
@@ -80,7 +79,7 @@ class TestProduct(TestCase):
             "brand": 1,
             "category": 1,
             "minimum_sale": 1,
-            "internal_code": "can123",
+            "internal_code": "acb123",
             "subtract": False,
             "long_description": "",
             "short_description": "Descrição curta do produto",
