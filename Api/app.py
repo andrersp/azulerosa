@@ -1,6 +1,7 @@
 # -*- coding: utf-8
 
 from flask import Flask, jsonify, Blueprint, redirect, url_for
+from werkzeug.middleware.proxy_fix import ProxyFix
 from flask.cli import FlaskGroup
 from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
@@ -18,6 +19,8 @@ from default_data import delivery_data
 app = Flask(__name__)
 
 app.config.from_object("config.Config")
+
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 # Register Bluprint
 app.register_blueprint(api_admin, url_prefix="/api/v1/admin")
