@@ -131,3 +131,4 @@ AzulERosa.code-workspace
 Api/migrations/
 Api/static/images/*
 azulerosa.code-workspace
+*vscode*
