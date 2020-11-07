@@ -5,6 +5,7 @@ import re
 
 __all__ = ['validar_cpf', 'validar_cnpj']
 
+
 def validar_cpf(cpf):
     """
     Valida CPFs, retornando apenas a string de números válida.
@@ -29,7 +30,7 @@ def validar_cpf(cpf):
     >>> validar_cpf('  955 243 615 03  ')
     '95524361503'
     """
-    cpf = ''.join(re.findall('\d', str(cpf)))
+    cpf = ''.join(re.findall(r'\d', str(cpf)))
 
     if (not cpf) or (len(cpf) < 11):
         return False
@@ -39,7 +40,7 @@ def validar_cpf(cpf):
     novo = inteiros[:9]
 
     while len(novo) < 11:
-        r = sum([(len(novo)+1-i)*v for i,v in enumerate(novo)]) % 11
+        r = sum([(len(novo)+1-i)*v for i, v in enumerate(novo)]) % 11
 
         if r > 1:
             f = 11 - r
@@ -51,6 +52,7 @@ def validar_cpf(cpf):
     if novo == inteiros:
         return cpf
     return False
+
 
 def validar_cnpj(cnpj):
     """
@@ -78,7 +80,7 @@ def validar_cnpj(cnpj):
     >>> validar_cnpj('  11 222 333 0001 81  ')
     '11222333000181'
     """
-    cnpj = ''.join(re.findall('\d', str(cnpj)))
+    cnpj = ''.join(re.findall(r'\d', str(cnpj)))
 
     if (not cnpj) or (len(cnpj) < 14):
         return False

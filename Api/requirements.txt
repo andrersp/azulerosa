@@ -11,3 +11,5 @@ gunicorn
 Pillow
 python-resize-image
 lorem==0.1.1
+pytest==5.3.4
+coverage==5.0.3

@@ -9,7 +9,7 @@ from flask_migrate import Migrate
 
 from blacklist import BLACKLIST
 
-from api_admin import blueprint as api_admin
+from api_admin import bp_admin as api_admin
 
 
 from db import db
@@ -23,7 +23,7 @@ app.config.from_object("config.Config")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 # Register Bluprint
-app.register_blueprint(api_admin, url_prefix="/api/v1/admin")
+app.register_blueprint(api_admin)
 
 
 # BCrypt

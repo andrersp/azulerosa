@@ -12,10 +12,6 @@ class ModelBrandProduct(db.Model):
     name = db.Column(db.String(80))
     description = db.Column(db.String(120))
 
-    __mapper_args__ = {
-        "order_by": id_brand
-    }
-
     def __init__(self, id, name, description):
         self.id = id
         self.name = name

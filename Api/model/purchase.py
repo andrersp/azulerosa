@@ -46,10 +46,6 @@ class ModelPurchase(db.Model):
     payment_status_name = db.relationship('ModelPaymentStatus',
                                           foreign_keys=payment_status, lazy='joined')
 
-    __mapper_args__ = {
-        "order_by": id_purchase
-    }
-
     def __init__(self, id, provider_id, value, freight, discount, total_value,
                  delivery_time, payment_method, parcel, delivery_status,
                  payment_form,

@@ -40,10 +40,6 @@ class ModelProvider(db.Model):
                                backref=db.backref('provider', lazy=True))
     date_update = db.Column(db.DateTime(timezone=True))
 
-    __mapper_args__ = {
-        "order_by": provider_id
-    }
-
     def __repr__(self):
         return "<provider %r>" % self.fancy_name
 

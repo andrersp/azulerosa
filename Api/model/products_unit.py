@@ -9,10 +9,6 @@ class ModelProductUnit(db.Model):
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(120))
 
-    __mapper_args__ = {
-        "order_by": id_unit
-    }
-
     def __repr__(self):
         return "<Unit %r>" % self.name
 

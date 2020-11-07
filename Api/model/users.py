@@ -13,10 +13,6 @@ class ModelsUser(db.Model):
     password = db.Column(db.String(80))
     enable = db.Column(db.Boolean, default=False)
 
-    __mapper_args__ = {
-        "order_by": id_user
-    }
-
     def __repr__(self):
         return "<User %r>" % self.username
 

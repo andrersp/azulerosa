@@ -41,10 +41,6 @@ class ModelClient(db.Model):
     delivery_address = db.relationship(
         "ModelDelivereAdrressClient", backref='addresses', lazy="joined")
 
-    __mapper_args__ = {
-        "order_by": client_id
-    }
-
     def __repr__(self):
         return "<client %r>" % self.fancy_name
 
@@ -182,10 +178,6 @@ class ModelDelivereAdrressClient(db.Model):
     current = db.Column(db.Boolean)
     client = db.Column(db.Integer, db.ForeignKey(
         "client.client_id"), nullable=False)
-
-    __mapper_args__ = {
-        "order_by": id
-    }
 
     def __init__(self, zip_code, address, number, complement, neighborhood,
                  city, state, current, client):

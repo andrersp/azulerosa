@@ -11,6 +11,7 @@ from model.provider import ModelProvider
 from model.purchase import ModelPurchase, ModelPurchaseItem
 
 from lorem.text import TextLorem
+from random import randint
 
 
 def delivery_data():
@@ -100,7 +101,7 @@ def delivery_data():
 
     product = {
         "id": "0",
-        "internal_code": "can123",
+        "internal_code": "desc{}".format(randint(0, 9999)),
         "name": "Produto Teste",
         "brand": 1,
         "unit": 1,
@@ -128,7 +129,7 @@ def delivery_data():
 
     if not prod:
 
-        for _ in range(20):
+        for _ in range(5000):
             print(_)
             lorem = TextLorem(srange=(1, 2))
             product["name"] = lorem.sentence()

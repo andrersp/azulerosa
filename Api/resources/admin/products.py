@@ -9,7 +9,8 @@ from PIL import Image
 from resizeimage import resizeimage
 import io
 
-from flask import request
+from flask import request, jsonify
+from flask.views import MethodView
 from flask_restx import Namespace, Resource
 from flask_jwt_extended import jwt_required
 
@@ -26,7 +27,6 @@ product_space = Namespace(
     "Gerenciamento de Produtos", description="Endpoints para gerenciamento de produto")
 
 schema = {
-    "id": {"type": "numeric", "required": True, "description": "String vazia ou Int com o ID do produto"},
     "internal_code": {"type": "string", "required": True, "empty": False, "description": "Código interno do produto"},
     "name": {"type": "string", "required": True, "empty": False, "description": "Nome do produto"},
     "category": {"type": "integer", "required": True, "min": 1, "description": "int ID da categoria"},
@@ -72,6 +72,124 @@ def upload_image(image, cover=False):
     return filename
 
 
+class ProductApi(MethodView):
+
+    def get(self, product_id):
+        if product_id is None:
+            data = ModelProducts.list_product()
+
+            # data = [product
+            #         for product in ModelProducts.query.with_entities(ModelProducts.name).all()]
+            return jsonify({"data": data}), 200
+
+        product = ModelProducts.find_product(product_id)
+
+        if not product:
+            return jsonify({"message": "Product not found"}), 404
+
+        return jsonify({"data": product.get_product()}), 200
+
+    @required_params(schema)
+    def post(self):
+        """ Adicionar ou editar produto.
+        Para criar envie string vazia em id e para editar envie um int com o ID do produto"""
+
+        data = request.json
+
+        product_code = ModelProducts.find_internal_code(
+            data.get("internal_code"))
+        if product_code:
+            return jsonify({"message": "Product Code in use to other product"}), 400
+
+        # Check if category exist
+        if not ModelCategoryProduct.find_category(data.get("category")):
+            return jsonify({"message": "Category id {} not found".format(data.get("category"))}), 400
+
+        # Check if provider exist
+        lst_provider = []
+
+        for id_provider in data.get("provider"):
+            provider = ModelProvider.find_provider(id_provider)
+            if not provider:
+                return jsonify({"message": "provider id {} not found".format(id_provider)}), 400
+
+            lst_provider.append(provider)
+
+        try:
+
+            b64_cover = data.get("cover")
+
+            if b64_cover:
+                data["cover"] = upload_image(b64_cover)
+
+            product = ModelProducts(**data)
+
+            # Appending Images
+            for images in data.get("images"):
+                product.images.append(ModelImagesProduct(
+                    upload_image(images), product))
+
+            # Appending provider
+            # print(lst_provider)
+            [product.providers.append(provider) for provider in lst_provider]
+
+            # Save Product
+            product.save_product()
+
+            return jsonify({"message": "product created", "data": product.get_product()}), 201
+
+        except:
+
+            return jsonify({"message": "Internal error"}), 500
+
+    @required_params(schema)
+    def put(self, product_id):
+
+        data = request.json
+
+        product = ModelProducts.find_product(product_id)
+
+        # Check if category exist
+        if not ModelCategoryProduct.find_category(data.get("category")):
+            return jsonify({"message": "Category id {} not found".format(data.get("category"))}), 400
+
+        # Check if provider exist
+        lst_provider = []
+        for id_provider in data.get("provider"):
+            provider = ModelProvider.find_provider(id_provider)
+            if not provider:
+                return jsonify({"message": "provider id {} not found".format(id_provider)}), 400
+
+            lst_provider.append(provider)
+
+        product_code = ModelProducts.find_internal_code(
+            data.get("internal_code"))
+        if product_code:
+            if product_code.id_product != data.get("id"):
+                return jsonify({"message": "Product Code in use to other product"}), 400
+
+        try:
+            if data.get("cover"):
+                data["cover"] = upload_image(data.get("cover"))
+
+            product.update_product(**data)
+            # Appending Images
+            for images in data.get("images"):
+                product.images.append(ModelImagesProduct(
+                    upload_image(images), product))
+
+            # Appending provider
+            [product.providers.append(provider) for provider in lst_provider]
+
+            # Save Prodict
+            product.save_product()
+
+            return jsonify({"message": "Product Updated", "data": product.get_product()}), 200
+        except Exception as err:
+            print(err)
+            return {"message": "internal error"}, 500
+
+
 @product_space.route("")
 class Products(Resource):
     @jwt_required
@@ -89,10 +207,6 @@ class Products(Resource):
         Para criar envie string vazia em id e para editar envie um int com o ID do produto"""
 
         data = request.json
-
-        product = ModelProducts.find_product(data.get("id"))
-        if product:
-            return self.put()
 
         product_code = ModelProducts.find_internal_code(
             data.get("internal_code"))
