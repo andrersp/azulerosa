@@ -57,7 +57,7 @@ class ModelProductUnit(db.Model):
 
 @db.event.listens_for(ModelProductUnit.__table__, 'after_create')
 def inicial_units(*args, **kwargs):
-    db.session.add(ModelProductUnit("", "UN", ""))
-    db.session.add(ModelProductUnit("", "KG", ""))
-    db.session.add(ModelProductUnit("", "CX", ""))
+    db.session.add(ModelProductUnit(name="UN", description=""))
+    db.session.add(ModelProductUnit(name="KG", description=""))
+    db.session.add(ModelProductUnit(name="CX", description=""))
     db.session.commit()
