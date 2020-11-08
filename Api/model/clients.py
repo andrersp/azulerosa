@@ -44,33 +44,8 @@ class ModelClient(db.Model):
     def __repr__(self):
         return "<client %r>" % self.fancy_name
 
-    def __init__(self, id, enable, type_registration, cnpj, state_registration,
-                 municipal_registration, delivery_address,
-                 fancy_name, company_name, contact_name, phone, cell_phone,
-                 email, zip_code, address, number, complement,
-                 neighborhood, city, state, obs, notify):
-        self.id = id
-        self.enable = enable
-        self.type_registration = type_registration
-        self.cnpj = cnpj
-        self.state_registration = state_registration
-        self.municipal_registration = municipal_registration
-        self.fancy_name = fancy_name
-        self.company_name = company_name
-        self.contact_name = contact_name
-        self.phone = phone
-        self.cell_phone = cell_phone
-        self.email = email
-        self.zip_code = zip_code
-        self.address = address
-        self.number = number
-        self.complement = complement
-        self.neighborhood = neighborhood
-        self.city = city
-        self.state = state
-        self.obs = obs
-        self.notify = notify
-        self.date_update = datetime.now()
+    def __init__(self,  delivery_address, **kwargs):
+        super(ModelClient, self).__init__(**kwargs)
 
     def list_client(self):
         return {
@@ -178,18 +153,6 @@ class ModelDelivereAdrressClient(db.Model):
     current = db.Column(db.Boolean)
     client = db.Column(db.Integer, db.ForeignKey(
         "client.client_id"), nullable=False)
-
-    def __init__(self, zip_code, address, number, complement, neighborhood,
-                 city, state, current, client):
-        self.zip_code = zip_code
-        self.address = address
-        self.number = number
-        self.complement = complement
-        self.neighborhood = neighborhood
-        self.state = state
-        self.current = current
-        self.client = client
-        self.city = city
 
     def list_address(self):
         return {

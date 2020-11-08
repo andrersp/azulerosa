@@ -2,7 +2,8 @@
 
 from datetime import datetime
 
-from flask import request
+from flask import request, jsonify
+from flask.views import MethodView
 from flask_restx import Resource, Namespace
 
 from wraps import required_params
@@ -24,7 +25,6 @@ def to_date(s): return datetime.strptime(s, "%Y-%m-%d")
 
 
 schema = {
-    "id": {"type": "numeric", "required": True, "description": "String vazia para criar um novo ou Inteiro com ID do pedido para editar"},
     "provider_id": {"type": "integer", "required": True, "empty": False, "description": "ID Fornecedor"},
     "value": {"type": "float", "required": True, "empty": False, "description": "Valor total dos produtos"},
     "freight": {"type": "float", "required": True, "empty": False, "description": "Valor do Frete. 0 Se não hoyver"},
@@ -50,13 +50,25 @@ schema = {
 }
 
 
-@ns_purchase.route("")
-class Purchase(Resource):
+schema_delivery = {
+    "delivery_status": {"type": "integer", "required": True, "allowed": [1, 2, 3], "description": "Int ID status entrega. Permitidos: 1, 2 ou 3"}
+}
 
-    def get(self):
+
+@ns_purchase.route("")
+class PurchaseApi(MethodView):
+
+    def get(self, purchase_id):
         """ Get list of all purchase """
 
-        return {"data": [data.list_purchases() for data in ModelPurchase.query.all()]}, 200
+        if purchase_id:
+            purchase = ModelPurchase.find_purchase(purchase_id)
+            if purchase:
+                return jsonify({"data": purchase.json_purchase()}), 200
+
+            return jsonify({"message": "Purchase not found"})
+
+        return jsonify({"data": [data.list_purchases() for data in ModelPurchase.query.all()]}), 200
 
     @required_params(schema)
     @ns_purchase.doc(params=schema)
@@ -65,16 +77,10 @@ class Purchase(Resource):
 
         data = request.json
 
-        # Find if purchase exist
-        purchase = ModelPurchase.find_purchase(data.get("id"))
-
-        if purchase:
-            return self.put()
-
         provider = ModelProvider.find_provider(data.get("provider_id"))
 
         if not provider:
-            return {"message": "Provider not found"}, 400
+            return jsonify({"message": "Provider not found"}), 400
 
         total = []
         for itens in data.get("itens"):
@@ -82,20 +88,20 @@ class Purchase(Resource):
             item = ModelProducts.find_product(itens.get("product_id"))
 
             if not item:
-                return {"message": "Item Not Found", "item": itens}, 400
+                return jsonify({"message": "Item Not Found", "item": itens}), 400
 
             if not itens.get("unit_price") * itens.get("qtde") == itens.get("total_price"):
-                return {"message": "Total value of item: {} does not check".format(item.name)}, 400
+                return jsonify({"message": "Total value of item: {} does not check".format(item.name)}), 400
 
             total.append(itens.get("total_price"))
 
         if sum(total) != data.get("value"):
-            return {"message": "Value does not check"}, 400
+            return jsonify({"message": "Value does not check"}), 400
 
         total_check = sum(total) + data.get("freight") - data.get("discount")
 
         if total_check != data.get("total_value"):
-            return {"message": "total value does not check "}, 400
+            return jsonify({"message": "total value does not check "}), 400
 
         try:
             purchase = ModelPurchase(**data)
@@ -106,31 +112,29 @@ class Purchase(Resource):
 
             purchase.save_purchase()
 
-            return {"message": "purchase saved", "data": purchase.json_purchase()}, 201
+            return jsonify({"message": "purchase saved", "data": purchase.json_purchase()}), 201
         except Exception as err:
             print(err)
-            return {"message": "Internal error"}, 500
+            return jsonify({"message": "Internal error"}), 500
 
     # Update Purchase
 
-    @ns_purchase.hide
-    def put(self):
+    def put(self, purchase_id):
 
         data = request.json
-        print(data.get("delivery_time"))
 
-        purchase = ModelPurchase.find_purchase(data.get("id"))
+        purchase = ModelPurchase.find_purchase(purchase_id)
 
         if not purchase:
-            return {"message": "Compra não encontrada"}, 404
+            return jsonify({"message": "Purchase  not found"}), 404
 
         if purchase.delivery_status == 1:
-            return {"message": "Compra ja entregue não pode ser alterada"}, 400
+            return jsonify({"message": "Delivered purchase cannot be changed"}), 400
 
         provider = ModelProvider.find_provider(data.get("provider_id"))
 
         if not provider:
-            return {"message": "Provider not found"}, 400
+            return jsonify({"message": "Provider not found"}), 400
 
         total = []
         for itens in data.get("itens"):
@@ -138,20 +142,20 @@ class Purchase(Resource):
             item = ModelProducts.find_product(itens.get("product_id"))
 
             if not item:
-                return {"message": "Item Not Found", "item": itens}, 400
+                return jsonify({"message": "Item Not Found", "item": itens}), 400
 
             if not itens.get("unit_price") * itens.get("qtde") == itens.get("total_price"):
-                return {"message": "Total value of item: {} does not check".format(item.name)}, 400
+                return jsonify({"message": "Total value of item: {} does not check".format(item.name)}), 400
 
             total.append(itens.get("total_price"))
 
         if sum(total) != data.get("value"):
-            return {"message": "Value does not check"}, 400
+            return jsonify({"message": "Value does not check"}), 400
 
         total_check = sum(total) + data.get("freight") - data.get("discount")
 
         if total_check != data.get("total_value"):
-            return {"message": "total value does not check "}, 400
+            return jsonify({"message": "total value does not check "}), 400
 
         try:
             purchase.update_purchase(**data)
@@ -162,39 +166,13 @@ class Purchase(Resource):
 
             purchase.save_purchase()
 
-            return {"message": "Compra atualizada", "data": purchase.json_purchase()}, 200
+            return jsonify({"message": "Purchase updated", "data": purchase.json_purchase()}), 200
         except Exception as err:
             print(err)
-            return {"message": "Internal error"}, 500
+            return jsonify({"message": "Internal error"}), 500
 
-        return {"data": data}, 200
-
-
-schema = {
-    "delivery_status": {"type": "integer", "required": True, "allowed": [1, 2, 3], "description": "Int ID status entrega. Permitidos: 1, 2 ou 3"}
-}
-
-
-@ns_purchase.route("/<int:id_purchase>")
-class PurchaseGet(Resource):
-
-    def get(self, id_purchase):
-        """ Seleciona compra por ID """
-
-        purchase = ModelPurchase.find_purchase(id_purchase)
-
-        if purchase:
-            return {"data": purchase.json_purchase()}, 200
-
-        return {"message": "Purchase not foud"}
-
-
-@ns_purchase.route("/<int:id_purchase>/delivery")
-class PurchaseDeliveStatus(Resource):
-
-    @required_params(schema)
-    @ns_purchase.doc(params=schema)
-    def post(self, id_purchase):
+    @required_params(schema_delivery)
+    def patch(self, purchase_id):
         """ Atualizar status da entrega.
         1: Pendente
         2: Em Trânsito
@@ -202,26 +180,25 @@ class PurchaseDeliveStatus(Resource):
         """
 
         data = request.json
-        print(id_purchase)
 
-        purchase = ModelPurchase.find_purchase(id_purchase)
+        purchase = ModelPurchase.find_purchase(purchase_id)
 
         if purchase:
 
             delivery_status = purchase.delivery_status
 
             if delivery_status == 3:
-                return {"message": "Compras recebidas não podem ser alteradas"}, 400
+                return jsonify({"message": "Delivered purchase cannot be changed"}), 400
 
             if data.get("delivery_status") == delivery_status:
-                return {"message": "Nenhuma alteração a fazer"}, 400
+                return jsonify({"message": "No changes to make"}), 400
 
             try:
                 purchase.update_delivery_status(data.get("delivery_status"))
                 purchase.save_purchase()
-                return {"message": "Status de entrega alterado", "status": purchase.delivery_status_name.name}
+                return jsonify({"message": "Updated delivery status", "status": purchase.delivery_status_name.name}), 200
             except Exception as err:
                 print(err)
-                return {"message": "internal error"}, 400
+                return jsonify({"message": "internal error"}), 400
 
         return {"message": "purchase not found"}, 404

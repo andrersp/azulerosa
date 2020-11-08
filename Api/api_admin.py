@@ -12,6 +12,8 @@ from resources.admin.products_brand import BrandProductApi  # Brands Product
 from resources.admin.products_unit import UnitProductApi  # unit Products
 from resources.admin.provider import ProviderApi  # Provider
 from resources.admin.users import UsersApi, LoginApi, LogoutApi  # user and login
+from resources.admin.clients import ClientApi, ClientAddressApi  # Clients
+from resources.admin.purchase import PurchaseApi  # Purchase
 
 
 # Namespaces
@@ -38,9 +40,26 @@ from resources.admin.users import UsersApi, LoginApi, LogoutApi  # user and logi
 #     }
 # }
 
-# Set BluePrint
+""" BluePrint """
 bp_admin = Blueprint(
     'api', __name__, static_folder='static', url_prefix="/api/v1/admin")
+
+""" Urls Rules """
+# user
+user_view = UsersApi.as_view("user_view")
+bp_admin.add_url_rule("/users/", defaults={"user_id": None},
+                      view_func=user_view, methods=['GET', ])
+bp_admin.add_url_rule("/users/", view_func=user_view, methods=['POST', ])
+bp_admin.add_url_rule("/users/<int:user_id>", view_func=user_view,
+                      methods=['GET', 'PUT'])
+
+# Login
+login_view = LoginApi.as_view("login_api")
+bp_admin.add_url_rule("/login/", view_func=login_view, methods=['POST', ])
+
+# Logout
+logout_view = LogoutApi.as_view("logout_view")
+bp_admin.add_url_rule("/logout/", view_func=logout_view, methods=['POST', ])
 
 # Home
 home_view = HomeApi.as_view("home_view")
@@ -105,18 +124,30 @@ bp_admin.add_url_rule("/products/selects/",
                       view_func=product_selects_view, methods=['GET'])
 
 
-# user
-user_view = UsersApi.as_view("user_view")
-bp_admin.add_url_rule("/users/", defaults={"user_id": None},
-                      view_func=user_view, methods=['GET', ])
-bp_admin.add_url_rule("/users/", view_func=user_view, methods=['POST', ])
-bp_admin.add_url_rule("/users/<int:user_id>", view_func=user_view,
-                      methods=['GET', 'PUT'])
+# Clients
+client_view = ClientApi.as_view("client_view")
 
-# Login
-login_view = LoginApi.as_view("login_api")
-bp_admin.add_url_rule("/login/", view_func=login_view, methods=['POST', ])
+bp_admin.add_url_rule("/clients/", defaults={"client_id": None},
+                      view_func=client_view, methods=['GET', ])
+bp_admin.add_url_rule("/clients/", view_func=client_view, methods=['POST', ])
+bp_admin.add_url_rule("/clients/<int:client_id>",
+                      view_func=client_view, methods=['GET', 'PUT'])
 
-# Logout
-logout_view = LogoutApi.as_view("logout_view")
-bp_admin.add_url_rule("/logout/", view_func=logout_view, methods=['POST', ])
+# Client Address
+
+client_address_view = ClientAddressApi.as_view("client_address_view")
+
+bp_admin.add_url_rule("/clients/<int:client_id>/address/<int:address_id>",
+                      view_func=client_address_view, methods=['DELETE', 'PUT', 'PATCH', ])
+bp_admin.add_url_rule("/clients/<int:client_id>/address/",
+                      view_func=client_address_view, methods=['POST', ])
+
+# Purchase
+purchase_view = PurchaseApi.as_view("purchase_view")
+
+bp_admin.add_url_rule("/purchases/", defaults={"purchase_id": None},
+                      view_func=purchase_view, methods=['GET', ])
+bp_admin.add_url_rule(
+    "/purchases/", view_func=purchase_view, methods=['POST', ])
+bp_admin.add_url_rule("/purchases/<int:purchase_id>",
+                      view_func=purchase_view, methods=['GET', 'PUT', 'PATCH', ])
