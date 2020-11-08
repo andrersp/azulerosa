@@ -12,16 +12,10 @@ class ModelProductUnit(db.Model):
     def __repr__(self):
         return "<Unit %r>" % self.name
 
-    def __init__(self, id, name, description):
-        self.id = id
-        self.name = name
-        self.description = description
-
     @classmethod
     def find_unit(cls, id_unit):
         if not id_unit:
             return None
-
         unit = cls.query.filter_by(id_unit=id_unit).first()
 
         if unit:
@@ -32,10 +26,12 @@ class ModelProductUnit(db.Model):
     @classmethod
     def find_unit_name(cls, name):
 
-        unit = cls.query.filter_by(name=name).first()
+        unit = cls.query.filter_by(name=name).all()
+
+        units = [data.id_unit for data in unit]
 
         if unit:
-            return unit
+            return units
         return None
 
     # Return List Units json
@@ -54,7 +50,7 @@ class ModelProductUnit(db.Model):
         db.sesstion.delete(self)
         db.session.commit()
 
-    def update_unit(self, id, name, description):
+    def update_unit(self, name, description):
         self.name = name
         self.description = description
 

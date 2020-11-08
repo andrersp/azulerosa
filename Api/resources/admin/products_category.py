@@ -2,15 +2,12 @@
 
 from flask import request, jsonify
 from flask.views import MethodView
-from flask_restx import Resource, Namespace
 from flask_jwt_extended import jwt_required
 
 from model.products_category import ModelCategoryProduct
 
 from wraps import required_params
 
-category_space = Namespace(
-    'Gerenciamento de categorias do produtos', description="Endpoints para gerenciamento de categorias dos produtos")
 
 schema = {
     "name": {"type": "string", "required": True, "empty": False, "description": "Nome da Categoria"},
@@ -18,7 +15,6 @@ schema = {
 }
 
 
-@category_space.route("")
 class CategoryProductApi(MethodView):
 
     # @jwt_required
@@ -36,7 +32,6 @@ class CategoryProductApi(MethodView):
 
         return {"data": [data.list_category() for data in ModelCategoryProduct.query.all()]}, 200
 
-    @category_space.doc(params=schema)
     @required_params(schema)
     # @jwt_required
     def post(self):
@@ -55,7 +50,6 @@ class CategoryProductApi(MethodView):
             return jsonify({"message": "Internal error"}), 500
 
     # @jwt_required
-    @category_space.hide
     @required_params(schema)
     def put(self, category_id):
 
@@ -70,7 +64,5 @@ class CategoryProductApi(MethodView):
                 return jsonify({"messahe": "cateory updated", "data": category.list_category()}), 200
             except:
                 return jsonify({"message": "Internal error"}), 500
-        
-        return jsonify({"message": "Category not found"}), 404
-        
 
+        return jsonify({"message": "Category not found"}), 404

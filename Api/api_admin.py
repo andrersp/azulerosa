@@ -7,7 +7,9 @@ from sqlalchemy.orm.exc import NoResultFound
 # resources
 
 from resources.admin.products import ProductApi, ProductSelect  # Products
-from resources.admin.products_category import CategoryProductApi
+from resources.admin.products_category import CategoryProductApi  # Category products
+from resources.admin.products_brand import BrandProductApi  # Brands Product
+from resources.admin.products_unit import UnitProductApi
 
 
 # Namespaces
@@ -46,7 +48,31 @@ bp_admin.add_url_rule("/products/categories/", defaults={"category_id": None},
 bp_admin.add_url_rule("/products/categories/",
                       view_func=category_product_view, methods=['POST', ])
 bp_admin.add_url_rule("/products/categories/<int:category_id>",
-                      view_func=category_product_view, methods=['GET', 'PUT', 'DELETE'])
+                      view_func=category_product_view,
+                      methods=['GET', 'PUT', 'DELETE'])
+
+# Brands Product
+brand_product_view = BrandProductApi.as_view("brand_product_view")
+bp_admin.add_url_rule(
+    "/products/brands/", defaults={"brand_id": None},
+    view_func=brand_product_view, methods=['GET', ])
+bp_admin.add_url_rule("/products/brands/",
+                      view_func=brand_product_view, methods=['POST'])
+bp_admin.add_url_rule("/products/brands/<int:brand_id>",
+                      view_func=brand_product_view,
+                      methods=['GET', 'PUT', 'DELETE'])
+
+
+# Unit Product
+
+unit_product_view = UnitProductApi.as_view("unit_product_view")
+bp_admin.add_url_rule("/products/units/",
+                      defaults={"unit_id": None},
+                      view_func=unit_product_view, methods=['GET', ])
+bp_admin.add_url_rule("/products/units/",
+                      view_func=unit_product_view, methods=['POST', ])
+bp_admin.add_url_rule("/products/units/<int:unit_id>",
+                      view_func=unit_product_view, methods=['GET', 'PUT'])
 
 # Products endpoints
 product_view = ProductApi.as_view("product_view")
@@ -62,37 +88,3 @@ bp_admin.add_url_rule("/products/image/<int:image_id>",
                       view_func=product_view, methods=['DELETE', ])
 bp_admin.add_url_rule("/products/selects/",
                       view_func=product_selects_view, methods=['GET'])
-
-
-# # Inicilize Api
-# api = Api(blueprint, version="1.0", title="Azul e Rosa Rest APi", contact={"email": "rsp.assistencia@gmail.com"},
-#           description="Api for product register [http://swagger.io](http://swagger.io)", authorizations=authorizations)
-# @api.errorhandler
-# def default_error_handler(e):
-#     return {"message": "An unhandled exception occurred"}, 500
-# @api.errorhandler(NoResultFound)
-# def database_not_found_error(e):
-#     return {"message": "A database result was required but none was found"}, 404
-# # Name Spaces APi
-# # Product
-# api.add_namespace(product_space, path="/product")
-# # Products Category
-# api.add_namespace(category_space, path="/product/category")
-# # Products Brand
-# api.add_namespace(brand_space, path="/product/brand")
-# # Product Unit
-# api.add_namespace(unit_space, path="/product/unit")
-# # Provider
-# api.add_namespace(provider_space, path="/provider")
-# # Cliente
-# api.add_namespace(client_space, path="/client")
-# # purchases
-# api.add_namespace(ns_purchase, path="/purchase")
-# # Users
-# api.add_namespace(ns_user, path="/user")
-# # Login
-# api.add_namespace(ns_login, path="/login")
-# # Logout
-# api.add_namespace(ns_logout, path="/logout")
-# # Home
-# api.add_namespace(ns_home, path="/home")

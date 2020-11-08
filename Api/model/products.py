@@ -10,6 +10,7 @@ from model.stock import ModelStock
 from model.products_unit import ModelProductUnit
 from model.products_category import ModelCategoryProduct
 from model.products_image import ModelImagesProduct
+from model.products_brand import ModelBrandProduct
 providers = db.Table('providers',
                      db.Column('privider_id', db.Integer, db.ForeignKey(
                          'provider.provider_id'), primary_key=True),
@@ -46,13 +47,7 @@ class ModelProducts(db.Model):
     images = db.relationship("ModelImagesProduct",
                              backref="product", lazy=True)
 
-    category_name = db.relationship(
-        "ModelCategoryProduct", foreign_keys=category)
-
-    unit_name = db.relationship("ModelProductUnit", foreign_keys=unit)
-
-    # category_name = db.relationship(    ##fast
-    #     "ModelCategoryProduct", backref=db.backref('category', lazy='dynamic'))
+    # unit_name = db.relationship("ModelProductUnit", foreign_keys=unit)
 
     providers = db.relationship('ModelProvider', secondary=providers, lazy='subquery',
                                 backref=db.backref('providers', lazy=True))
@@ -102,7 +97,7 @@ class ModelProducts(db.Model):
             "short_description": description,
             "internal_code": internal_code,
             "category": category,
-            "brand": brand,
+            "brand": brand if brand else "",
             "cover": request.url_root[:-1] + url_for("api.static", filename="images/{}".format(cover)) if cover else "",
             "sale_price": sale_price,
             "qtde": qtde
@@ -111,9 +106,10 @@ class ModelProducts(db.Model):
             sale_price, qtde in
             cls.query.join(ModelStock)
             .join(ModelCategoryProduct)
+            .outerjoin(ModelBrandProduct, cls.brand == ModelBrandProduct.id_brand)
             .with_entities(
             cls.id_product, cls.name, cls.short_description, cls.internal_code,
-            ModelCategoryProduct.name, cls.brand, cls.cover,
+            ModelCategoryProduct.name, ModelBrandProduct.name, cls.cover,
             cls.sale_price, ModelStock.available_stock).order_by(cls.id_product)
         ]
 

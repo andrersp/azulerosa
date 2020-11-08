@@ -12,7 +12,6 @@ import io
 from flask import request, jsonify
 from flask.views import MethodView
 from flask_jwt_extended import jwt_required
-
 from wraps import required_params
 
 from model.products import ModelProducts
@@ -124,7 +123,7 @@ class ProductApi(MethodView):
             [product.providers.append(provider) for provider in lst_provider]
 
             # Save Product
-            # product.save_product()
+            product.save_product()
 
             return jsonify({"message": "product created", "data": product.get_product()}), 201
 
@@ -155,6 +154,7 @@ class ProductApi(MethodView):
 
         product_code = ModelProducts.find_internal_code(
             data.get("internal_code"))
+
         if product_code:
             if len(product_code) > 1:
                 return jsonify({"message": "Product Code in use to other product"}), 400
