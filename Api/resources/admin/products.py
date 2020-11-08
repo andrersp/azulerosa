@@ -206,7 +206,8 @@ class ProductSelect(MethodView):
         """ Itens Cadastro de Produto
         Lista contendo todos os itens necessários para cadastro de produto """
 
-        providers = ModelProvider.list_provider_product()
+        providers = [data.list_provider_product()
+                     for data in ModelProvider.query.all()]
 
         categories = [category.list_category()
                       for category in ModelCategoryProduct.query.all()]

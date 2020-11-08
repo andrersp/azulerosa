@@ -55,20 +55,11 @@ class ModelProvider(db.Model):
             "products": [data.list_product_provider() for data in self.products]
         }
 
-    @classmethod
-    def list_provider_product(cls):
-
-        data = [
-            {
-                "id": provider_id,
-                "fancy_name": fancy_name
-            }
-
-            for provider_id, fancy_name
-            in cls.query.with_entities(cls.provider_id, cls.fancy_name)
-
-        ]
-        return data
+    def list_provider_product(self):
+        return {
+            "id": self.provider_id,
+            "fancy_name": self.fancy_name
+        }
 
     def json_provider(self):
         return {
