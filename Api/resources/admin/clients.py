@@ -4,15 +4,12 @@
 
 from flask import request, jsonify
 from flask.views import MethodView
-from flask_restx import Resource, Namespace
 from flask_jwt_extended import jwt_required
 
 from wraps import required_params
 
 from model.clients import ModelClient, ModelDelivereAdrressClient
 
-client_space = Namespace("Gerenciamento de clientes",
-                         description="Endpoints para gerenciamento de clientes")
 
 schema = {
     "enable": {"type": "boolean", "required": True, "description": "Boolean status do cliente"},
@@ -49,8 +46,8 @@ schema = {
 }
 
 
-class ClientApi(Resource):
-
+class ClientApi(MethodView):
+    @jwt_required
     def get(self, client_id):
         """ Lista com todos os clientes cadastrados """
 
@@ -64,8 +61,7 @@ class ClientApi(Resource):
 
         return jsonify({"data": [data.list_client() for data in ModelClient.query.all()]}), 200
 
-    # @jwt_required
-
+    @jwt_required
     @required_params(schema)
     def post(self):
         """ Adicionar ou editar cliente.
@@ -79,7 +75,7 @@ class ClientApi(Resource):
             "delivery_address", "{}") if address.get("current")])
         if len(data.get("delivery_address")) > 1:
             if current != 1:
-                return {"message": "Only one address current required"}, 400
+                return jsonify({"message": "Only one address current required"}), 400
         else:
             data["delivery_address"][0]["current"] = True
         # End check current address
@@ -94,10 +90,11 @@ class ClientApi(Resource):
             client.save_client()
 
             return jsonify({"message": "Client created", "data": client.json_client()}), 201
-        except Exception as err:
-            print(err)
+        except:
+
             return jsonify({"message": "Internal error"}), 500
 
+    @jwt_required
     @required_params(schema)
     def put(self, client_id):
 
@@ -133,6 +130,7 @@ schema = {
 
 
 class ClientAddressApi(MethodView):
+    @jwt_required
     def delete(self, client_id, address_id):
         """ Deletar endereço de entrega cadastrado. """
 
@@ -148,6 +146,7 @@ class ClientAddressApi(MethodView):
 
         return jsonify({"message": "Address not found"}), 404
 
+    @jwt_required
     @required_params(schema)
     def put(self, client_id, address_id):
         """ Atualiza endereço de entrega cadastrador"""
@@ -164,12 +163,13 @@ class ClientAddressApi(MethodView):
                 address.save_address()
 
                 return jsonify({"message": "address updated", "data": address.list_address()}), 200
-            except Exception as err:
-                print(err)
+            except:
+
                 return jsonify({"message": "Internal error"}), 500
 
         return jsonify({"message": "Address not found"}), 404
 
+    @jwt_required
     def patch(self, client_id, address_id):
         """ Seleciona o endereço de entrega como padrão """
 
@@ -197,10 +197,11 @@ class ClientAddressApi(MethodView):
             address.save_address()
 
             return jsonify({"message": "address updated to current", "data": address.list_address()}), 200
-        except Exception as err:
-            print(err)
+        except:
+
             return jsonify({"message": "internal error"}), 500
 
+    @jwt_required
     def post(self, client_id):
         """ Adiciona endereço de entrega """
 
@@ -229,6 +230,5 @@ class ClientAddressApi(MethodView):
             address.save_address()
 
             return jsonify({"message": "address created", "data": address.list_address()}), 201
-        except Exception as err:
-            print(err)
+        except:
             return jsonify({"message": "internal error"}), 200

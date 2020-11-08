@@ -18,7 +18,7 @@ schema = {
 
 class UnitProductApi(MethodView):
 
-    # @jwt_required
+    @jwt_required
     def get(self, unit_id):
         """ LIsta de todas as unidades de medida cadastradas
         Retorna lista de unidades para ser usada no cadastro de produto. """
@@ -35,7 +35,7 @@ class UnitProductApi(MethodView):
 
         return jsonify({"data": units}), 200
 
-    # @jwt_required
+    @jwt_required
     @required_params(schema)
     def post(self):
         """ Adicionar ou editar Unidade.
@@ -58,7 +58,7 @@ class UnitProductApi(MethodView):
         except:
             return {"message": "Internal error"}, 500
 
-    # @jwt_required
+    @jwt_required
     @required_params(schema)
     def put(self, unit_id):
 

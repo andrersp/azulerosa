@@ -35,7 +35,7 @@ schema = {
 
 # @provider_space.route("")
 class ProviderApi(MethodView):
-
+    @jwt_required
     def get(self, provider_id):
         """ List of all Provider """
 
@@ -49,7 +49,7 @@ class ProviderApi(MethodView):
 
         return jsonify({"data": [data.list_provider() for data in ModelProvider.query.all()]}), 200
 
-    # @jwt_required
+    @jwt_required
     @required_params(schema)
     def post(self):
         """  Create or Updated provider """

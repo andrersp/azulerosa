@@ -4,7 +4,7 @@ from datetime import datetime
 
 from flask import request, jsonify
 from flask.views import MethodView
-from flask_restx import Resource, Namespace
+from flask_jwt_extended import jwt_required
 
 from wraps import required_params
 
@@ -15,10 +15,6 @@ from model.purchase_options import (ModelDeliveryStatus,
                                     ModelPaymentStatus,
                                     ModelPaymentForm,
                                     ModelPaymentMethod)
-
-
-ns_purchase = Namespace("Purchasing Management",
-                        description="Endpoind para gerenciamento de compras")
 
 
 def to_date(s): return datetime.strptime(s, "%Y-%m-%d")
@@ -55,9 +51,8 @@ schema_delivery = {
 }
 
 
-@ns_purchase.route("")
 class PurchaseApi(MethodView):
-
+    @jwt_required
     def get(self, purchase_id):
         """ Get list of all purchase """
 
@@ -70,8 +65,8 @@ class PurchaseApi(MethodView):
 
         return jsonify({"data": [data.list_purchases() for data in ModelPurchase.query.all()]}), 200
 
+    @jwt_required
     @required_params(schema)
-    @ns_purchase.doc(params=schema)
     def post(self):
         """ Create or update purchase """
 
@@ -118,7 +113,7 @@ class PurchaseApi(MethodView):
             return jsonify({"message": "Internal error"}), 500
 
     # Update Purchase
-
+    @jwt_required
     def put(self, purchase_id):
 
         data = request.json
@@ -171,6 +166,7 @@ class PurchaseApi(MethodView):
             print(err)
             return jsonify({"message": "Internal error"}), 500
 
+    @jwt_required
     @required_params(schema_delivery)
     def patch(self, purchase_id):
         """ Atualizar status da entrega.

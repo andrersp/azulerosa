@@ -17,7 +17,7 @@ schema = {
 
 class BrandProductApi(MethodView):
 
-    # @jwt_required
+    @jwt_required
     def get(self, brand_id):
         """ Lista de todos as marcas cadastradas.
         Retorna uma lista contendo todos as marcas """
@@ -33,7 +33,7 @@ class BrandProductApi(MethodView):
         return jsonify({"data": [data.list_brand() for data in ModelBrandProduct.query.all()]}), 200
 
     @required_params(schema)
-    # @jwt_required
+    @jwt_required
     def post(self):
         """ Adicionar ou editar categoria.
         Para criar envie string vazia em id e para editar envie um int com o ID da categoria"""
@@ -49,7 +49,7 @@ class BrandProductApi(MethodView):
         except:
             return jsonify({"message": "Internal error"}), 500
 
-    # @jwt_required
+    @jwt_required
     @required_params(schema)
     def put(self, brand_id):
 

@@ -17,7 +17,7 @@ schema = {
 
 class CategoryProductApi(MethodView):
 
-    # @jwt_required
+    @jwt_required
     def get(self, category_id):
         """ Lista de todos as categorias cadastradas.
         Retorna uma lista contendo todos as categorias"""
@@ -32,8 +32,8 @@ class CategoryProductApi(MethodView):
 
         return {"data": [data.list_category() for data in ModelCategoryProduct.query.all()]}, 200
 
+    @jwt_required
     @required_params(schema)
-    # @jwt_required
     def post(self):
         """ Adicionar ou editar categoria.
         Para criar envie string vazia em id e para editar envie um int com o ID da categoria"""
@@ -49,7 +49,7 @@ class CategoryProductApi(MethodView):
         except:
             return jsonify({"message": "Internal error"}), 500
 
-    # @jwt_required
+    @jwt_required
     @required_params(schema)
     def put(self, category_id):
 

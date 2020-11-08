@@ -63,7 +63,7 @@ def upload_image(image, cover=False):
 
 
 class ProductApi(MethodView):
-
+    @jwt_required
     def get(self, product_id):
 
         if product_id is None:
@@ -78,6 +78,7 @@ class ProductApi(MethodView):
 
         return jsonify({"data": product.get_product()}), 200
 
+    @jwt_required
     @required_params(schema)
     def post(self):
         """ Adicionar ou editar produto.
@@ -132,6 +133,7 @@ class ProductApi(MethodView):
 
             return jsonify({"message": "Internal error"}), 500
 
+    @jwt_required
     @required_params(schema)
     def put(self, product_id):
 
@@ -182,6 +184,7 @@ class ProductApi(MethodView):
             print(err)
             return {"message": "internal error"}, 500
 
+    @jwt_required
     def delete(self, image_id):
         """ 
         Deletar imagem por ID do produto e ID da Imagem.
@@ -201,7 +204,7 @@ class ProductApi(MethodView):
 
 
 class ProductSelect(MethodView):
-
+    @jwt_required
     def get(self):
         """ Itens Cadastro de Produto
         Lista contendo todos os itens necessários para cadastro de produto """

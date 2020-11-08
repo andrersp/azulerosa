@@ -63,6 +63,7 @@ class UsersApi(MethodView):
             return jsonify({"message": "Internal Error"}), 500
 
     @jwt_required
+    @required_params(schema)
     def put(self, user_id):
 
         data = request.json
