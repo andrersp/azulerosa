@@ -57,7 +57,7 @@ def user_identity_lookup(user):
 
 @jwt.expired_token_loader
 def my_expire_token_callback(expire_token):
-    token_type = expire_token['type']
+
     return jsonify({
         'status': 401,
         'sub_status': 42,
@@ -72,14 +72,14 @@ def check_blacklist(token):
 
 @jwt.unauthorized_loader
 def error_load_token(fn):
-    return jsonify({"message": "Erro na leitura do token"}), 401
+    return jsonify({"message": "Sem autorização. Faça Login!"}), 401
 
 # Message Error read Token in header
 
 
 @jwt.invalid_token_loader
 def erro_token(e):
-    return jsonify({"message": "Erro na leitura do token"}), 422
+    return jsonify({"message": "Token inválido"}), 422
 
 # Error token revoked
 

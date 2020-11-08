@@ -57,31 +57,6 @@ class ModelProducts(db.Model):
     stock = db.relationship("ModelStock", backref='product',
                             lazy='joined', uselist=False)
 
-    # def __init__(self, name, category, brand, unit,
-    #              minimum_stock, maximum_stock, minimum_sale,
-    #              long_description, short_description, cover,
-    #              sale_price, weight, subtract, internal_code,
-    #              available, height, width, length, maximum_discount, images, provider):
-    #     self.internal_code = internal_code
-    #     self.name = name
-    #     self.category = category
-    #     self.brand = brand
-    #     self.minimum_stock = minimum_stock
-    #     self.maximum_stock = maximum_stock
-    #     self.long_description = long_description
-    #     self.short_description = short_description
-    #     self.sale_price = sale_price
-    #     self.available = available
-    #     self.height = height
-    #     self.width = width
-    #     self.length = length
-    #     self.weight = weight
-    #     self.maximum_discount = maximum_discount
-    #     self.cover = cover
-    #     self.minimum_sale = minimum_sale
-    #     self.unit = unit
-    #     self.subtract = subtract
-
     def __init__(self, images, provider, **kwargs):
         super(ModelProducts, self).__init__(**kwargs)
 

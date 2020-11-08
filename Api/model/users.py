@@ -16,12 +16,6 @@ class ModelsUser(db.Model):
     def __repr__(self):
         return "<User %r>" % self.username
 
-    def __init__(self, id, username, password, enable):
-        self.id = id,
-        self.username = username
-        self.password = password
-        self.enable = enable
-
     def list_users(self):
         return {
             "id": self.id_user,
@@ -36,8 +30,6 @@ class ModelsUser(db.Model):
             db.session.commit()
         except:
             db.session.rollback()
-            print("errr")
-            raise
 
     @classmethod
     def find_user(cls, id_user):
@@ -57,12 +49,30 @@ class ModelsUser(db.Model):
         if not username:
             return False
 
-        username = cls.query.filter_by(username=username).first()
+        username = cls.query.filter_by(username=username).all()
+
+        usernames = [data.id_user for data in username]
 
         if username:
-            return username
+            return usernames
 
         return False
+
+    @classmethod
+    def user_login(cls, username):
+        if not username:
+            return None
+
+        user = cls.query.filter_by(username=username).first()
+
+        if user:
+            return user
+        return None
+
+    def update_user(self, username, password, enable):
+        self.username = username
+        self.password = password
+        self.enable = enable
 
     def generate_hash(self):
         self.password = generate_password_hash(self.password).decode("utf8")

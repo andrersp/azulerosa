@@ -67,8 +67,7 @@ def delivery_data():
             cat = ModelBrandProduct(**bran)
             cat.save_brand()
 
-    provider = [{
-        "id": "1",
+    providers = [{
         "enable": True,
         "type_registration": 2,
         "cnpj": "16897733000100",
@@ -91,7 +90,6 @@ def delivery_data():
         "zip_code": "28015161"
     },
         {
-        "id": "2",
         "enable": True,
         "type_registration": 2,
         "cnpj": "16897733000100",
@@ -115,7 +113,7 @@ def delivery_data():
     }
     ]
 
-    for provider in provider:
+    for provider in providers:
         prov = ModelProvider.find_provider(provider.get("id"))
         if not prov:
             provider = ModelProvider(**provider)

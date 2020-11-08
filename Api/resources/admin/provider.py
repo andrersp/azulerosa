@@ -1,17 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from flask import request
-from flask_restx import Resource, Namespace
+from flask import request, jsonify
+from flask.views import MethodView
 from flask_jwt_extended import jwt_required
 
 from wraps import required_params
 
 from model.provider import ModelProvider
 
-provider_space = Namespace("Providers Manager", description="REsource for providers")
 
 schema = {
-    "id": {"type": "numeric", "required": True, "description": "numeric string value or int"},
     "enable": {"type": "boolean", "required": True, "description": "Status of provider"},
     "type_registration": {"type": "integer", "allowed": [1, 2], "required": True, "description": "Type of provider registration. 1 : CPF, 2: CNPJ"},
     "cnpj": {"type": "string", "required": True, "check_with": "registration"},
@@ -35,71 +33,52 @@ schema = {
 }
 
 
-@provider_space.route("")
-class ProviderView(Resource):
+# @provider_space.route("")
+class ProviderApi(MethodView):
 
-    def get(self):
+    def get(self, provider_id):
         """ List of all Provider """
 
-        return {"data": [data.list_provider() for data in ModelProvider.query.all()]}, 200
+        if provider_id:
+            provider = ModelProvider.find_provider(provider_id)
+
+            if provider:
+                return jsonify({"data": provider.json_provider()}), 200
+
+            return jsonify({"message": "Provider not found"}), 404
+
+        return jsonify({"data": [data.list_provider() for data in ModelProvider.query.all()]}), 200
 
     # @jwt_required
-    @provider_space.doc(params=schema)
     @required_params(schema)
     def post(self):
-
-        """  Create or Updated provider """       
+        """  Create or Updated provider """
 
         data = request.json
-
-        provider = ModelProvider.find_provider(data.get("id"))
-
-        if provider:
-            return self.put()
 
         try:
             provider = ModelProvider(**data)
             provider.save_provider()
 
-            return {"message": "provided created", "data": provider.json_provider()}, 201
+            return jsonify({"message": "provided created", "data": provider.json_provider()}), 201
         except Exception as err:
             print(err)
-            return {"message": "Internal error"}, 500
+            return jsonify({"message": "Internal error"}), 500
 
-        return {"data": data}
-    
-    @provider_space.hide
     @required_params(schema)
-    def put(self):
+    def put(self, provider_id):
 
         data = request.json
 
-        provider = ModelProvider.find_provider(data.get("id"))
+        provider = ModelProvider.find_provider(provider_id)
+
+        if not provider:
+            return jsonify({"message": "Provider not found"}), 404
 
         if provider:
-
             try:
-
                 provider.update_provider(**data)
                 provider.save_provider()
-
-                return {"message": "provider updated", "data": provider.json_provider()}, 200
-            
+                return jsonify({"message": "provider updated", "data": provider.json_provider()}), 200
             except:
-                return {"message": "Internal Error"}, 500
-        
-        return {"message": "Provider not found"}, 404
-
-@provider_space.route("/<int:id_provider>")
-class ProviderGet(Resource):
-
-
-    def get(self, id_provider):
-        """ Get provider By id """
-
-        provider = ModelProvider.find_provider(id_provider)
-
-        if provider:
-            return {"data": provider.json_provider()}, 200
-        
-        return {"message": "Provider not found"}, 404       
+                return jsonify({"message": "Internal Error"}), 500
