@@ -10,9 +10,11 @@ from wraps import required_params
 
 from model.clients import ModelClient, ModelDelivereAdrressClient
 
+from cerberus_validate import CustomValidator2
+
 
 schema = {
-    "enable": {"type": "boolean", "required": True, "description": "Boolean status do cliente"},
+    "enable": {"type": "boolean", "required": True},
     "type_registration": {"type": "integer", "allowed": [1, 2], "required": True, "description": "Tipo de registo. 1 : CPF, 2: CNPJ"},
     "cnpj": {"type": "string", "required": True, "check_with": "registration", "description": "CNPJ/CPF do cliente."},
     "state_registration": {"type": "string", "required": True, "description": "Inscrição Estadual caso CNPJ, RG Caso CPF", "maxlength": 20},
@@ -61,38 +63,47 @@ class ClientApi(MethodView):
 
         return jsonify({"data": [data.list_client() for data in ModelClient.query.all()]}), 200
 
-    @jwt_required
-    @required_params(schema)
+    # @jwt_required
+
     def post(self):
         """ Adicionar ou editar cliente.
         Para criar envie string vazia em id e para editar envie um int com o ID do cliente
         """
 
-        data = request.json
+        data = request.json if request.json else {}
 
-        # Check if delivery_addres has one current selected
-        current = len([address.get("current") for address in data.get(
-            "delivery_address", "{}") if address.get("current")])
-        if len(data.get("delivery_address")) > 1:
-            if current != 1:
-                return jsonify({"message": "Only one address current required"}), 400
-        else:
-            data["delivery_address"][0]["current"] = True
-        # End check current address
+        v = CustomValidator2(schema)
 
-        try:
-            client = ModelClient(**data)
+        if not v.validate(data):
+            return jsonify({"message": v.errors}), 400
 
-            for address in data.get("delivery_address"):
-                client.delivery_address.append(
-                    ModelDelivereAdrressClient(client=client, **address))
+        # data = v.document
 
-            client.save_client()
+        return jsonify(data)
 
-            return jsonify({"message": "Client created", "data": client.json_client()}), 201
-        except:
+        # # Check if delivery_addres has one current selected
+        # current = len([address.get("current") for address in data.get(
+        #     "delivery_address", "{}") if address.get("current")])
+        # if len(data.get("delivery_address")) > 1:
+        #     if current != 1:
+        #         return jsonify({"message": "Only one address current required"}), 400
+        # else:
+        #     data["delivery_address"][0]["current"] = True
+        # # End check current address
 
-            return jsonify({"message": "Internal error"}), 500
+        # try:
+        #     client = ModelClient(**data)
+
+        #     for address in data.get("delivery_address"):
+        #         client.delivery_address.append(
+        #             ModelDelivereAdrressClient(client=client, **address))
+
+        #     client.save_client()
+
+        #     return jsonify({"message": "Client created", "data": client.json_client()}), 201
+        # except:
+
+        #     return jsonify({"message": "Internal error"}), 500
 
     @jwt_required
     @required_params(schema)

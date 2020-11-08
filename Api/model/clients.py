@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from pytz import timezone, utc
 
 from flask_jwt_extended import get_jwt_identity
 

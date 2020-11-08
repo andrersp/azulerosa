@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask_restx import Api
+
 from flask import Blueprint
 from sqlalchemy.orm.exc import NoResultFound
 
