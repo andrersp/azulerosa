@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from pytz import timezone, utc
 
 
 from db import db
@@ -40,40 +39,8 @@ class ModelProvider(db.Model):
                                backref=db.backref('provider', lazy=True))
     date_update = db.Column(db.DateTime(timezone=True))
 
-    __mapper_args__ = {
-        "order_by": provider_id
-    }
-
     def __repr__(self):
         return "<provider %r>" % self.fancy_name
-
-    def __init__(self, id, enable, type_registration, cnpj, state_registration,
-                 municipal_registration,
-                 fancy_name, company_name, contact_name, phone, cell_phone,
-                 email, site, zip_code, address, number, complement,
-                 neighborhood, city, state, obs):
-        self.id = id
-        self.enable = enable
-        self.type_registration = type_registration
-        self.cnpj = cnpj
-        self.state_registration = state_registration
-        self.municipal_registration = municipal_registration
-        self.fancy_name = fancy_name
-        self.company_name = company_name
-        self.contact_name = contact_name
-        self.phone = phone
-        self.cell_phone = cell_phone
-        self.email = email
-        self.site = site
-        self.zip_code = zip_code
-        self.address = address
-        self.number = number
-        self.complement = complement
-        self.neighborhood = neighborhood
-        self.city = city
-        self.state = state
-        self.obs = obs
-        # self.cadastrado_por = cadastrado_por
 
     def list_provider(self):
         return {
@@ -93,12 +60,9 @@ class ModelProvider(db.Model):
             "fancy_name": self.fancy_name
         }
 
-    # def product_list(self):
-    #     return [self.provider_id, self.fancy_name]
-
     def json_provider(self):
         return {
-            "provider_id": self.provider_id,
+            "id": self.provider_id,
             "enable": self.enable,
             "type_registration": self.type_registration,
             "cnpj": self.cnpj,
@@ -121,9 +85,8 @@ class ModelProvider(db.Model):
             "obs": self.obs,
             "date_register": "{}-{}-{}".format(self.date_register.day,
                                                self.date_register.month,
-                                               self.date_register.year),
-            # "cadastrado_por": self.cadastrado_por,
-            # "produtos": [products.lista_json() for products in self.products]
+                                               self.date_register.year)
+
         }
 
     @classmethod
@@ -150,8 +113,7 @@ class ModelProvider(db.Model):
                         municipal_registration,
                         fancy_name, company_name, contact_name, phone, cell_phone,
                         email, site, zip_code, address, number, complement,
-                        neighborhood, city, state, obs, **kwargs):
-        self.id = id
+                        neighborhood, city, state, obs):
         self.enable = enable
         self.type_registration = type_registration
         self.cnpj = cnpj

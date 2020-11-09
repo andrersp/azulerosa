@@ -1,81 +1,153 @@
 # -*- coding: utf-8 -*-
 
-from flask_restx import Api
+
 from flask import Blueprint
 from sqlalchemy.orm.exc import NoResultFound
 
+# resources
+from resources.admin.home import HomeApi  # Home
+from resources.admin.products import ProductApi, ProductSelect  # Products
+from resources.admin.products_category import CategoryProductApi  # Category products
+from resources.admin.products_brand import BrandProductApi  # Brands Product
+from resources.admin.products_unit import UnitProductApi  # unit Products
+from resources.admin.provider import ProviderApi  # Provider
+from resources.admin.users import UsersApi, LoginApi, LogoutApi  # user and login
+from resources.admin.clients import ClientApi, ClientAddressApi  # Clients
+from resources.admin.purchase import PurchaseApi  # Purchase
+
 
 # Namespaces
-from resources.admin.products import product_space  # Products
-from resources.admin.products_category import category_space  # Categories Product
-from resources.admin.products_brand import brand_space  # Categories Product
-from resources.admin.products_unit import unit_space  # Units Product Space
+# from resources.admin.products import product_space  # Products
+# from resources.admin.products_category import category_space  # Categories Product
+# from resources.admin.products_brand import brand_space  # Categories Product
+# from resources.admin.products_unit import unit_space  # Units Product Space
 
-from resources.admin.provider import provider_space  # Providers
+# from resources.admin.provider import provider_space  # Providers
 
-from resources.admin.clients import client_space  # Clientes
+# from resources.admin.clients import client_space  # Clientes
 
-from resources.admin.purchase import ns_purchase  # Purchases
+# from resources.admin.purchase import ns_purchase  # Purchases
 
-from resources.admin.users import ns_user, ns_login, ns_logout  # Users
+# from resources.admin.users import ns_user, ns_login, ns_logout  # Users
 
-from resources.admin.home import ns_home
+# from resources.admin.home import ns_home
 
-authorizations = {
-    'apikey': {
-        'type': 'apiKey',
-        'in': 'header',
-        'name': 'Bearer'
-    }
-}
+# authorizations = {
+#     'apikey': {
+#         'type': 'apiKey',
+#         'in': 'header',
+#         'name': 'Bearer'
+#     }
+# }
 
-# Set BluePrint
-blueprint = Blueprint(
-    'api', __name__, static_folder='static')
+""" BluePrint """
+bp_admin = Blueprint(
+    'api', __name__, static_folder='static', url_prefix="/api/v1/admin")
 
-
-# Inicilize Api
-api = Api(blueprint, version="1.0", title="Azul e Rosa Rest APi", contact={"email": "rsp.assistencia@gmail.com"},
-          description="Api for product register [http://swagger.io](http://swagger.io)", authorizations=authorizations)
-
-
-@api.errorhandler
-def default_error_handler(e):
-    return {"message": "An unhandled exception occurred"}, 500
-
-
-@api.errorhandler(NoResultFound)
-def database_not_found_error(e):
-    return {"message": "A database result was required but none was found"}, 404
-
-
-# Name Spaces APi
-# Product
-api.add_namespace(product_space, path="/product")
-# Products Category
-api.add_namespace(category_space, path="/product/category")
-# Products Brand
-api.add_namespace(brand_space, path="/product/brand")
-# Product Unit
-api.add_namespace(unit_space, path="/product/unit")
-
-# Provider
-api.add_namespace(provider_space, path="/provider")
-
-# Cliente
-api.add_namespace(client_space, path="/client")
-
-# purchases
-api.add_namespace(ns_purchase, path="/purchase")
-
-# Users
-api.add_namespace(ns_user, path="/user")
+""" Urls Rules """
+# user
+user_view = UsersApi.as_view("user_view")
+bp_admin.add_url_rule("/users/", defaults={"user_id": None},
+                      view_func=user_view, methods=['GET', ])
+bp_admin.add_url_rule("/users/", view_func=user_view, methods=['POST', ])
+bp_admin.add_url_rule("/users/<int:user_id>", view_func=user_view,
+                      methods=['GET', 'PUT'])
 
 # Login
-api.add_namespace(ns_login, path="/login")
+login_view = LoginApi.as_view("login_api")
+bp_admin.add_url_rule("/login/", view_func=login_view, methods=['POST', ])
 
 # Logout
-api.add_namespace(ns_logout, path="/logout")
+logout_view = LogoutApi.as_view("logout_view")
+bp_admin.add_url_rule("/logout/", view_func=logout_view, methods=['POST', ])
 
 # Home
-api.add_namespace(ns_home, path="/home")
+home_view = HomeApi.as_view("home_view")
+bp_admin.add_url_rule("/", view_func=home_view, methods=['GET', ])
+
+
+# Category Products
+category_product_view = CategoryProductApi.as_view("category_product_view")
+bp_admin.add_url_rule("/products/categories/", defaults={"category_id": None},
+                      view_func=category_product_view,
+                      methods=['GET', ])
+bp_admin.add_url_rule("/products/categories/",
+                      view_func=category_product_view, methods=['POST', ])
+bp_admin.add_url_rule("/products/categories/<int:category_id>",
+                      view_func=category_product_view,
+                      methods=['GET', 'PUT', 'DELETE'])
+
+# Brands Product
+brand_product_view = BrandProductApi.as_view("brand_product_view")
+bp_admin.add_url_rule(
+    "/products/brands/", defaults={"brand_id": None},
+    view_func=brand_product_view, methods=['GET', ])
+bp_admin.add_url_rule("/products/brands/",
+                      view_func=brand_product_view, methods=['POST'])
+bp_admin.add_url_rule("/products/brands/<int:brand_id>",
+                      view_func=brand_product_view,
+                      methods=['GET', 'PUT', 'DELETE'])
+
+
+# Unit Product
+unit_product_view = UnitProductApi.as_view("unit_product_view")
+bp_admin.add_url_rule("/products/units/",
+                      defaults={"unit_id": None},
+                      view_func=unit_product_view, methods=['GET', ])
+bp_admin.add_url_rule("/products/units/",
+                      view_func=unit_product_view, methods=['POST', ])
+bp_admin.add_url_rule("/products/units/<int:unit_id>",
+                      view_func=unit_product_view, methods=['GET', 'PUT'])
+
+# Providers
+provider_view = ProviderApi.as_view("provider_view")
+
+bp_admin.add_url_rule("/providers/", defaults={"provider_id": None},
+                      view_func=provider_view, methods=['GET', ])
+bp_admin.add_url_rule(
+    "/providers/", view_func=provider_view, methods=['POST', ])
+bp_admin.add_url_rule("/providers/<int:provider_id>", view_func=provider_view,
+                      methods=['GET', 'PUT', ])
+
+# Products endpoints
+product_view = ProductApi.as_view("product_view")
+product_selects_view = ProductSelect.as_view("product_selects")
+
+bp_admin.add_url_rule(
+    "/products/", defaults={"product_id": None}, view_func=product_view, methods=['GET', ])
+bp_admin.add_url_rule("/products/", view_func=product_view, methods=['POST', ])
+bp_admin.add_url_rule("/products/<int:product_id>",
+                      view_func=product_view, methods=['GET', 'PUT', 'DELETE', ])
+bp_admin.add_url_rule("/products/image/<int:image_id>",
+                      view_func=product_view, methods=['DELETE', ])
+bp_admin.add_url_rule("/products/selects/",
+                      view_func=product_selects_view, methods=['GET'])
+
+
+# Clients
+client_view = ClientApi.as_view("client_view")
+
+bp_admin.add_url_rule("/clients/", defaults={"client_id": None},
+                      view_func=client_view, methods=['GET', ])
+bp_admin.add_url_rule("/clients/", view_func=client_view, methods=['POST', ])
+bp_admin.add_url_rule("/clients/<int:client_id>",
+                      view_func=client_view, methods=['GET', 'PUT'])
+
+# Client Address
+
+client_address_view = ClientAddressApi.as_view("client_address_view")
+
+bp_admin.add_url_rule("/clients/<int:client_id>/address/<int:address_id>",
+                      view_func=client_address_view, methods=['DELETE', 'PUT', 'PATCH', ])
+bp_admin.add_url_rule("/clients/<int:client_id>/address/",
+                      view_func=client_address_view, methods=['POST', ])
+
+# Purchase
+purchase_view = PurchaseApi.as_view("purchase_view")
+
+bp_admin.add_url_rule("/purchases/", defaults={"purchase_id": None},
+                      view_func=purchase_view, methods=['GET', ])
+bp_admin.add_url_rule(
+    "/purchases/", view_func=purchase_view, methods=['POST', ])
+bp_admin.add_url_rule("/purchases/<int:purchase_id>",
+                      view_func=purchase_view, methods=['GET', 'PUT', 'PATCH', ])

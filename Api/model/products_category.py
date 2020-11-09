@@ -12,15 +12,6 @@ class ModelCategoryProduct(db.Model):
     name = db.Column(db.String(80))
     description = db.Column(db.String(120))
 
-    __mapper_args__ = {
-        "order_by": id_category
-    }
-
-    def __init__(self, id, name, description):
-        self.id = id
-        self.name = name
-        self.description = description
-
     def list_category(self):
         return {
             "id": self.id_category,
@@ -49,7 +40,7 @@ class ModelCategoryProduct(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-    def update_category(self, id, name, description):
+    def update_category(self, name, description):
         self.name = name
         self.description = description
 

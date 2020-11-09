@@ -9,30 +9,28 @@ from model.products_category import ModelCategoryProduct
 from model.products import ModelProducts
 from model.provider import ModelProvider
 from model.purchase import ModelPurchase, ModelPurchaseItem
+from model.products_brand import ModelBrandProduct
 
 from lorem.text import TextLorem
+from random import randint
 
 
 def delivery_data():
 
     category = [
         {
-            "id": "1",
             "name": "Caneca",
             "description": ""
         },
         {
-            "id": "2",
             "name": "Azulejo",
             "description": ""
         },
         {
-            "id": "3",
             "name": "SmartWatch",
             "description": ""
         },
         {
-            "id": "4",
             "name": "Fone de Ouvido",
             "description": ""
         }
@@ -44,8 +42,32 @@ def delivery_data():
             cat = ModelCategoryProduct(**cat)
             cat.save_category()
 
-    provider = [{
-        "id": "1",
+    brand = [
+        {
+            "name": "Marca 1",
+            "description": ""
+        },
+        {
+            "name": "Azulejo",
+            "description": "Marca 2"
+        },
+        {
+            "name": "Marca 3",
+            "description": ""
+        },
+        {
+            "name": "Marca 4",
+            "description": ""
+        }
+    ]
+
+    for bran in brand:
+        cate = ModelBrandProduct.find_brand(bran.get("id"))
+        if not cate:
+            cat = ModelBrandProduct(**bran)
+            cat.save_brand()
+
+    providers = [{
         "enable": True,
         "type_registration": 2,
         "cnpj": "16897733000100",
@@ -68,7 +90,6 @@ def delivery_data():
         "zip_code": "28015161"
     },
         {
-        "id": "2",
         "enable": True,
         "type_registration": 2,
         "cnpj": "16897733000100",
@@ -92,17 +113,16 @@ def delivery_data():
     }
     ]
 
-    for provider in provider:
+    for provider in providers:
         prov = ModelProvider.find_provider(provider.get("id"))
         if not prov:
             provider = ModelProvider(**provider)
             provider.save_provider()
 
     product = {
-        "id": "0",
-        "internal_code": "can123",
+        "internal_code": "acb123",
         "name": "Produto Teste",
-        "brand": 1,
+        "brand": randint(1, 4),
         "unit": 1,
         "category": 1,
         "long_description": "Descrição longa do produto",
@@ -114,7 +134,6 @@ def delivery_data():
         "height": 10,
         "provider": [1],
         "cover": "",
-        "available_stock": 0.00,
         "images": [],
         "length": 1.5,
         "weight": 0.75,
@@ -128,14 +147,12 @@ def delivery_data():
 
     if not prod:
 
-        for _ in range(20):
-            print(_)
+        for _ in range(1):
             lorem = TextLorem(srange=(1, 2))
             product["name"] = lorem.sentence()
             ModelProducts(**product).save_product()
 
     purchase = {
-        "id": "",
         "provider_id": 1,
         "value": 20.10,
         "freight": 1,

@@ -46,27 +46,8 @@ class ModelPurchase(db.Model):
     payment_status_name = db.relationship('ModelPaymentStatus',
                                           foreign_keys=payment_status, lazy='joined')
 
-    __mapper_args__ = {
-        "order_by": id_purchase
-    }
-
-    def __init__(self, id, provider_id, value, freight, discount, total_value,
-                 delivery_time, payment_method, parcel, delivery_status,
-                 payment_form,
-                 obs, itens):
-        self.id = id
-        self.provider_id = provider_id
-        self.value = value
-        self.freight = freight
-        self.discount = discount
-        self.total_value = total_value
-        self.delivery_status = delivery_status
-        self.delivery_time = delivery_time
-        self.payment_method = payment_method
-        self.parcel = parcel
-        self.obs = obs
-        self.payment_form = payment_form
-        # self.itens = itens
+    def __init__(self, itens, **kwargs):
+        super(ModelPurchase, self).__init__(**kwargs)
 
     def list_purchases(self):
         return {
@@ -117,11 +98,11 @@ class ModelPurchase(db.Model):
 
         return None
 
-    def update_purchase(self, id, provider_id, value, freight, discount, total_value,
+    def update_purchase(self, provider_id, value, freight, discount, total_value,
                         delivery_time, payment_method, parcel, delivery_status,
                         payment_form,
                         obs, itens):
-        self.id = id
+
         self.provider_id = provider_id
         self.value = value
         self.freight = freight

@@ -3,31 +3,31 @@
 
 import re
 
-__all__ = ['validar_cpf', 'validar_cnpj']
+__all__ = ['validate_cpf', 'validate_cnpj']
 
 
-def validar_cpf(cpf):
+def validate_cpf(cpf):
     """
     Valida CPFs, retornando apenas a string de números válida.
 
     # CPFs errados
-    >>> validar_cpf('abcdefghijk')
+    >>> validate_cpf('abcdefghijk')
     False
-    >>> validar_cpf('123')
+    >>> validate_cpf('123')
     False
-    >>> validar_cpf('')
+    >>> validate_cpf('')
     False
-    >>> validar_cpf(None)
+    >>> validate_cpf(None)
     False
-    >>> validar_cpf('12345678900')
+    >>> validate_cpf('12345678900')
     False
 
     # CPFs corretos
-    >>> validar_cpf('95524361503')
+    >>> validate_cpf('95524361503')
     '95524361503'
-    >>> validar_cpf('955.243.615-03')
+    >>> validate_cpf('955.243.615-03')
     '95524361503'
-    >>> validar_cpf('  955 243 615 03  ')
+    >>> validate_cpf('  955 243 615 03  ')
     '95524361503'
     """
     cpf = ''.join(re.findall(r'\d', str(cpf)))
@@ -54,30 +54,30 @@ def validar_cpf(cpf):
     return False
 
 
-def validar_cnpj(cnpj):
+def validate_cnpj(cnpj):
     """
     Valida CNPJs, retornando apenas a string de números válida.
 
     # CNPJs errados
-    >>> validar_cnpj('abcdefghijklmn')
+    >>> validate_cnpj('abcdefghijklmn')
     False
-    >>> validar_cnpj('123')
+    >>> validate_cnpj('123')
     False
-    >>> validar_cnpj('')
+    >>> validate_cnpj('')
     False
-    >>> validar_cnpj(None)
+    >>> validate_cnpj(None)
     False
-    >>> validar_cnpj('12345678901234')
+    >>> validate_cnpj('12345678901234')
     False
-    >>> validar_cnpj('11222333000100')
+    >>> validate_cnpj('11222333000100')
     False
 
     # CNPJs corretos
-    >>> validar_cnpj('11222333000181')
+    >>> validate_cnpj('11222333000181')
     '11222333000181'
-    >>> validar_cnpj('11.222.333/0001-81')
+    >>> validate_cnpj('11.222.333/0001-81')
     '11222333000181'
-    >>> validar_cnpj('  11 222 333 0001 81  ')
+    >>> validate_cnpj('  11 222 333 0001 81  ')
     '11222333000181'
     """
     cnpj = ''.join(re.findall(r'\d', str(cnpj)))

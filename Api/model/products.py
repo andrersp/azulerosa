@@ -8,6 +8,9 @@ from db import db
 
 from model.stock import ModelStock
 from model.products_unit import ModelProductUnit
+from model.products_category import ModelCategoryProduct
+from model.products_image import ModelImagesProduct
+from model.products_brand import ModelBrandProduct
 providers = db.Table('providers',
                      db.Column('privider_id', db.Integer, db.ForeignKey(
                          'provider.provider_id'), primary_key=True),
@@ -20,7 +23,7 @@ class ModelProducts(db.Model):
 
     __tablename__ = "product"
     id_product = db.Column(db.Integer, primary_key=True)
-    internal_code = db.Column(db.String(12))
+    internal_code = db.Column(db.String(18))
     name = db.Column(db.String(80))
     category = db.Column(db.Integer, db.ForeignKey(
         'product_category.id_category'), nullable=False)
@@ -44,13 +47,7 @@ class ModelProducts(db.Model):
     images = db.relationship("ModelImagesProduct",
                              backref="product", lazy=True)
 
-    category_name = db.relationship(
-        "ModelCategoryProduct", foreign_keys=category)
-
-    unit_name = db.relationship("ModelProductUnit", foreign_keys=unit)
-
-    # category_name = db.relationship(    ##fast
-    #     "ModelCategoryProduct", backref=db.backref('category', lazy='dynamic'))
+    # unit_name = db.relationship("ModelProductUnit", foreign_keys=unit)
 
     providers = db.relationship('ModelProvider', secondary=providers, lazy='subquery',
                                 backref=db.backref('providers', lazy=True))
@@ -60,49 +57,40 @@ class ModelProducts(db.Model):
     stock = db.relationship("ModelStock", backref='product',
                             lazy='joined', uselist=False)
 
-    __mapper_args__ = {
-        "order_by": id_product
-    }
+    def __init__(self, images, provider, **kwargs):
+        super(ModelProducts, self).__init__(**kwargs)
 
-    def __init__(self, id, name, category, brand, unit,
-                 minimum_stock, maximum_stock, minimum_sale,
-                 long_description, short_description, cover,
-                 sale_price, weight, subtract, internal_code,
-                 available, height, width, length, maximum_discount, **kwargs):
-        self.id = id
-        self.internal_code = internal_code
-        self.name = name
-        self.category = category
-        self.brand = brand
-        self.minimum_stock = minimum_stock
-        self.maximum_stock = maximum_stock
-        self.long_description = long_description
-        self.short_description = short_description
-        self.sale_price = sale_price
-        self.available = available
-        self.height = height
-        self.width = width
-        self.length = length
-        self.weight = weight
-        self.maximum_discount = maximum_discount
-        self.cover = cover
-        self.minimum_sale = minimum_sale
-        self.unit = unit
-        self.subtract = subtract
+    @classmethod
+    def list_product(cls):
 
-    def list_product(self):
-        return {
-            "id": self.id_product,
-            "name": self.name,
-            "short_description": self.short_description,
-            "category": self.category_name.name,
-            "brand": self.brand,
-            "cover": request.url_root[:-1] + url_for("api.static", filename="images/{}".format(self.cover)) if self.cover else "",
-            "available_stock": self.stock.available_stock,
-            "sale_price": self.sale_price,
-        }
+        data = cls.query.with_entities(
+            cls.id_product, cls.name, cls.stock)
 
-    def json_product(self):
+        data = [{
+            "id": id,
+            "name": name,
+            "short_description": description,
+            "internal_code": internal_code,
+            "category": category,
+            "brand": brand if brand else "",
+            "cover": request.url_root[:-1] + url_for("api.static", filename="images/{}".format(cover)) if cover else "",
+            "sale_price": sale_price,
+            "qtde": qtde
+
+        } for id, name, description, internal_code, category, brand, cover,
+            sale_price, qtde in
+            cls.query.join(ModelStock)
+            .join(ModelCategoryProduct)
+            .outerjoin(ModelBrandProduct, cls.brand == ModelBrandProduct.id_brand)
+            .with_entities(
+            cls.id_product, cls.name, cls.short_description, cls.internal_code,
+            ModelCategoryProduct.name, ModelBrandProduct.name, cls.cover,
+            cls.sale_price, ModelStock.available_stock).order_by(cls.id_product)
+        ]
+
+        return data
+
+    def get_product(self):
         return {
             "id": self.id_product,
             "internal_code": self.internal_code,
@@ -156,10 +144,12 @@ class ModelProducts(db.Model):
         if not code:
             return None
 
-        product = cls.query.filter_by(internal_code=code).first()
+        product = cls.query.filter_by(internal_code=code).all()
+
+        products = [data.id_product for data in product]
 
         if product:
-            return product
+            return products
 
         return None
 
@@ -171,12 +161,12 @@ class ModelProducts(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-    def update_product(self, id, name, category, brand, unit,
+    def update_product(self, name, category, brand, unit,
                        minimum_stock, maximum_stock, minimum_sale,
                        long_description, short_description, cover,
                        sale_price, weight, subtract, internal_code,
-                       available, height, width, length, maximum_discount, **kwargs):
-        self.id = id
+                       available, height, width, length, maximum_discount, images, provider):
+
         self.name = name
         self.category = category
         self.brand = brand
