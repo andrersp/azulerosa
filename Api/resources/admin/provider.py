@@ -4,9 +4,8 @@ from flask import request, jsonify
 from flask.views import MethodView
 from flask_jwt_extended import jwt_required
 
-from wraps import required_params
-
 from model.provider import ModelProvider
+from cerberus_validate import CustomValidator
 
 
 schema = {
@@ -50,11 +49,17 @@ class ProviderApi(MethodView):
         return jsonify({"data": [data.list_provider() for data in ModelProvider.query.all()]}), 200
 
     @jwt_required
-    @required_params(schema)
     def post(self):
         """  Create or Updated provider """
 
-        data = request.json
+        data = request.json if request.json else{}
+
+        v = CustomValidator(schema)
+
+        if not v.validate(data):
+            return jsonify({"message": v.errors}), 400
+
+        data = v.document
 
         try:
             provider = ModelProvider(**data)
@@ -65,10 +70,16 @@ class ProviderApi(MethodView):
             print(err)
             return jsonify({"message": "Internal error"}), 500
 
-    @required_params(schema)
     def put(self, provider_id):
 
-        data = request.json
+        data = request.json if request.json else{}
+
+        v = CustomValidator(schema)
+
+        if not v.validate(data):
+            return jsonify({"message": v.errors}), 400
+
+        data = v.document
 
         provider = ModelProvider.find_provider(provider_id)
 

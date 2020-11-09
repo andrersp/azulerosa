@@ -5,15 +5,19 @@ from datetime import datetime
 from inc.cpf_cnpj_validator import validate_cnpj, validate_cpf
 
 
-class CustomValidator2(Validator):
+def to_date(s): return datetime.strptime(s, "%Y-%m-%d")
 
-    def to_date(s): return datetime.strptime(s, "%Y-%m-%d")
+
+class CustomValidator(Validator):
+
+    # def to_date(s): return datetime.strptime(s, "%Y-%m-%d")
 
     def _check_with_registration(self, field, value):
 
         type_reg = self.document.get("type_registration")
 
         value = "".join(re.findall(r'\d', value))
+        print(value)
 
         if not value:
             self._error(field, "empty values not allowed")
@@ -72,6 +76,9 @@ class CustomValidator2(Validator):
 
     def _normalize_coerce_form_date(self, value):
         return to_date(value)
+
+    def _normalize_coerce_numbers(self, value):
+        return "".join(re.findall(r"\d", value))
 
     def _validate_description(self, description, field, value):
         """ Insert Description for swagger.

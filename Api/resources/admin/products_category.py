@@ -5,8 +5,7 @@ from flask.views import MethodView
 from flask_jwt_extended import jwt_required
 
 from model.products_category import ModelCategoryProduct
-
-from wraps import required_params
+from cerberus_validate import CustomValidator
 
 
 schema = {
@@ -33,12 +32,18 @@ class CategoryProductApi(MethodView):
         return {"data": [data.list_category() for data in ModelCategoryProduct.query.all()]}, 200
 
     @jwt_required
-    @required_params(schema)
     def post(self):
         """ Adicionar ou editar categoria.
         Para criar envie string vazia em id e para editar envie um int com o ID da categoria"""
 
-        data = request.json
+        data = request.json if request.json else{}
+
+        v = CustomValidator(schema)
+
+        if not v.validate(data):
+            return jsonify({"message": v.errors}), 400
+
+        data = v.document
 
         try:
             category = ModelCategoryProduct(**data)
@@ -50,11 +55,16 @@ class CategoryProductApi(MethodView):
             return jsonify({"message": "Internal error"}), 500
 
     @jwt_required
-    @required_params(schema)
     def put(self, category_id):
 
-        data = request.json
+        data = request.json if request.json else{}
 
+        v = CustomValidator(schema)
+
+        if not v.validate(data):
+            return jsonify({"message": v.errors}), 400
+
+        data = v.document
         category = ModelCategoryProduct.find_category(category_id)
 
         if category:

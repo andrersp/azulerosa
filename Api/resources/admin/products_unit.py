@@ -6,8 +6,7 @@ from flask.views import MethodView
 from flask_jwt_extended import jwt_required
 
 from model.products_unit import ModelProductUnit
-
-from wraps import required_params
+from cerberus_validate import CustomValidator
 
 
 schema = {
@@ -36,12 +35,18 @@ class UnitProductApi(MethodView):
         return jsonify({"data": units}), 200
 
     @jwt_required
-    @required_params(schema)
     def post(self):
         """ Adicionar ou editar Unidade.
         Para criar envie string vazia em id e para editar envie um int com o ID da unidade """
 
-        data = request.json
+        data = request.json if request.json else{}
+
+        v = CustomValidator(schema)
+
+        if not v.validate(data):
+            return jsonify({"message": v.errors}), 400
+
+        data = v.document
 
         unit_name = ModelProductUnit.find_unit_name(data.get("name"))
 
@@ -59,10 +64,16 @@ class UnitProductApi(MethodView):
             return {"message": "Internal error"}, 500
 
     @jwt_required
-    @required_params(schema)
     def put(self, unit_id):
 
-        data = request.json
+        data = request.json if request.json else{}
+
+        v = CustomValidator(schema)
+
+        if not v.validate(data):
+            return jsonify({"message": v.errors}), 400
+
+        data = v.document
 
         unit = ModelProductUnit.find_unit(unit_id)
 

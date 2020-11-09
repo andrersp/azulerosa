@@ -8,7 +8,7 @@ from flask_jwt_extended import create_access_token, get_raw_jwt, jwt_required, g
 
 from model.users import ModelsUser
 
-from wraps import required_params
+from cerberus_validate import CustomValidator
 
 from blacklist import BLACKLIST
 
@@ -37,13 +37,19 @@ class UsersApi(MethodView):
         return jsonify({"data": [user.list_users() for user in ModelsUser.query.all()]}), 200
 
     @jwt_required
-    @required_params(schema)
     def post(self):
         """
         Adicionar ou Editar novo usuário.
         Para criar envie string vazia em id e para editar envie um int com o ID do usuário
         """
-        data = request.json
+        data = request.json if request.json else{}
+
+        v = CustomValidator(schema)
+
+        if not v.validate(data):
+            return jsonify({"message": v.errors}), 400
+
+        data = v.document
 
         username = ModelsUser.find_username(data.get("username"))
 
@@ -63,10 +69,16 @@ class UsersApi(MethodView):
             return jsonify({"message": "Internal Error"}), 500
 
     @jwt_required
-    @required_params(schema)
     def put(self, user_id):
 
-        data = request.json
+        data = request.json if request.json else{}
+
+        v = CustomValidator(schema)
+
+        if not v.validate(data):
+            return jsonify({"message": v.errors}), 400
+
+        data = v.document
 
         user = ModelsUser.find_user(user_id)
 
@@ -91,7 +103,7 @@ class UsersApi(MethodView):
             return jsonify({"message": "Internal error"})
 
 
-schema = {
+schema_login = {
     "username": {"type": "string", "required": True, "empty": False, "description": "Nome de usuário para login"},
     "password": {"type": "string", "required": True, "empty": False, "description": "Senha do usuário"}
 }
@@ -99,13 +111,19 @@ schema = {
 
 class LoginApi(MethodView):
 
-    @required_params(schema)
     def post(self):
         """
         Realizar Login para receber o token de acesso
         """
 
-        data = request.json
+        data = request.json if request.json else{}
+
+        v = CustomValidator(schema_login)
+
+        if not v.validate(data):
+            return jsonify({"message": v.errors}), 400
+
+        data = v.document
 
         user = ModelsUser.user_login(data.get("username"))
 

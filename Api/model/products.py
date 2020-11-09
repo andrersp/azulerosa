@@ -23,7 +23,7 @@ class ModelProducts(db.Model):
 
     __tablename__ = "product"
     id_product = db.Column(db.Integer, primary_key=True)
-    internal_code = db.Column(db.String(12))
+    internal_code = db.Column(db.String(18))
     name = db.Column(db.String(80))
     category = db.Column(db.Integer, db.ForeignKey(
         'product_category.id_category'), nullable=False)

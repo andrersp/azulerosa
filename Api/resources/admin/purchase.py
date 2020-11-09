@@ -6,8 +6,7 @@ from flask import request, jsonify
 from flask.views import MethodView
 from flask_jwt_extended import jwt_required
 
-from wraps import required_params
-
+from cerberus_validate import CustomValidator
 from model.purchase import ModelPurchaseItem, ModelPurchase
 from model.provider import ModelProvider
 from model.products import ModelProducts
@@ -66,11 +65,17 @@ class PurchaseApi(MethodView):
         return jsonify({"data": [data.list_purchases() for data in ModelPurchase.query.all()]}), 200
 
     @jwt_required
-    @required_params(schema)
     def post(self):
         """ Create or update purchase """
 
-        data = request.json
+        data = request.json if request.json else{}
+
+        v = CustomValidator(schema)
+
+        if not v.validate(data):
+            return jsonify({"message": v.errors}), 400
+
+        data = v.document
 
         provider = ModelProvider.find_provider(data.get("provider_id"))
 
@@ -116,7 +121,14 @@ class PurchaseApi(MethodView):
     @jwt_required
     def put(self, purchase_id):
 
-        data = request.json
+        data = request.json if request.json else{}
+
+        v = CustomValidator(schema)
+
+        if not v.validate(data):
+            return jsonify({"message": v.errors}), 400
+
+        data = v.document
 
         purchase = ModelPurchase.find_purchase(purchase_id)
 
@@ -167,7 +179,6 @@ class PurchaseApi(MethodView):
             return jsonify({"message": "Internal error"}), 500
 
     @jwt_required
-    @required_params(schema_delivery)
     def patch(self, purchase_id):
         """ Atualizar status da entrega.
         1: Pendente
@@ -175,7 +186,14 @@ class PurchaseApi(MethodView):
         3: Entregue (Dar entrada do produto no estoque)
         """
 
-        data = request.json
+        data = request.json if request.json else{}
+
+        v = CustomValidator(schema)
+
+        if not v.validate(schema_delivery):
+            return jsonify({"message": v.errors}), 400
+
+        data = v.document
 
         purchase = ModelPurchase.find_purchase(purchase_id)
 

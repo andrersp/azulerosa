@@ -12,7 +12,8 @@ import io
 from flask import request, jsonify
 from flask.views import MethodView
 from flask_jwt_extended import jwt_required
-from wraps import required_params
+from cerberus_validate import CustomValidator
+
 
 from model.products import ModelProducts
 from model.products_image import ModelImagesProduct
@@ -22,7 +23,7 @@ from model.products_brand import ModelBrandProduct
 from model.products_unit import ModelProductUnit
 
 schema = {
-    "internal_code": {"type": "string", "required": True, "empty": False, "description": "Código interno do produto"},
+    "internal_code": {"type": "string", "required": True, "empty": False, "description": "Código interno do produto", "maxlength": 12},
     "name": {"type": "string", "required": True, "empty": False, "description": "Nome do produto"},
     "category": {"type": "integer", "required": True, "min": 1, "description": "int ID da categoria"},
     "brand": {"type": "integer", "required": True, "description": "int ID da marca ou 0 para nenhuma"},
@@ -79,12 +80,18 @@ class ProductApi(MethodView):
         return jsonify({"data": product.get_product()}), 200
 
     @jwt_required
-    @required_params(schema)
     def post(self):
         """ Adicionar ou editar produto.
         Para criar envie string vazia em id e para editar envie um int com o ID do produto"""
 
-        data = request.json
+        data = request.json if request.json else{}
+
+        v = CustomValidator(schema)
+
+        if not v.validate(data):
+            return jsonify({"message": v.errors}), 400
+
+        data = v.document
 
         product_code = ModelProducts.find_internal_code(
             data.get("internal_code"))
@@ -134,10 +141,16 @@ class ProductApi(MethodView):
             return jsonify({"message": "Internal error"}), 500
 
     @jwt_required
-    @required_params(schema)
     def put(self, product_id):
 
-        data = request.json
+        data = request.json if request.json else{}
+
+        v = CustomValidator(schema)
+
+        if not v.validate(data):
+            return jsonify({"message": v.errors}), 400
+
+        data = v.document
 
         product = ModelProducts.find_product(product_id)
 
