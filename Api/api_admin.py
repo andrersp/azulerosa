@@ -16,30 +16,6 @@ from resources.admin.clients import ClientApi, ClientAddressApi  # Clients
 from resources.admin.purchase import PurchaseApi  # Purchase
 
 
-# Namespaces
-# from resources.admin.products import product_space  # Products
-# from resources.admin.products_category import category_space  # Categories Product
-# from resources.admin.products_brand import brand_space  # Categories Product
-# from resources.admin.products_unit import unit_space  # Units Product Space
-
-# from resources.admin.provider import provider_space  # Providers
-
-# from resources.admin.clients import client_space  # Clientes
-
-# from resources.admin.purchase import ns_purchase  # Purchases
-
-# from resources.admin.users import ns_user, ns_login, ns_logout  # Users
-
-# from resources.admin.home import ns_home
-
-# authorizations = {
-#     'apikey': {
-#         'type': 'apiKey',
-#         'in': 'header',
-#         'name': 'Bearer'
-#     }
-# }
-
 """ BluePrint """
 bp_admin = Blueprint(
     'api', __name__, static_folder='static', url_prefix="/api/v1/admin")

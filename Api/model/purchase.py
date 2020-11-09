@@ -165,9 +165,7 @@ class ModelPurchaseItem(db.Model):
         return {
             "qtde": self.qtde,
             "unit_price": self.unit_price,
-            "provider": self.privider_name.fancy_name,
-            # "delivery_date": "{}-{}-{}".format(self.delivery_date.year,
-            #                                    self.delivery_date.month, self.delivery_date.day) if self.delivery_date else "Pendente"
+            "provider": self.privider_name.fancy_name, 
         }
 
     def delete_item(self):
@@ -222,6 +220,3 @@ db.event.listen(
     trigger.execute_if(dialect='postgresql')
 )
 
-# old_qtde integer;
-# available_stock=(old_qtde + item.qtde), purchase_price=item.unit_price  WHERE id_product=item.id_product;
-# SELECT (available_stock) into old_qtde FROM stock WHERE id_product=item.id_product;
