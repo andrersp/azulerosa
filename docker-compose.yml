@@ -7,6 +7,8 @@ services:
         command: python app.py run -h 0.0.0.0
         volumes: 
             - ./Api:/usr/src/api
+            - static_files:/usr/src/api/static/images
+            
         ports: 
             - 5000:5000
         env_file: ./.env.dev
@@ -17,6 +19,7 @@ services:
         networks: 
             - database
             - net
+        
 
     
     db:
@@ -34,6 +37,7 @@ services:
 
 volumes: 
     postgres_data:
+    static_files:
 
 networks: 
     database:
