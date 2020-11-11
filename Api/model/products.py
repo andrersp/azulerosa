@@ -56,6 +56,9 @@ class ModelProducts(db.Model):
 
     stock = db.relationship("ModelStock", backref='product',
                             lazy='joined', uselist=False)
+    
+    def __repr__(self):
+        return '<Product %r>' % self.name
 
     def __init__(self, images, provider, **kwargs):
         super(ModelProducts, self).__init__(**kwargs)
@@ -85,10 +88,35 @@ class ModelProducts(db.Model):
             .with_entities(
             cls.id_product, cls.name, cls.short_description, cls.internal_code,
             ModelCategoryProduct.name, ModelBrandProduct.name, cls.cover,
-            cls.sale_price, ModelStock.available_stock).order_by(cls.id_product)
+            cls.sale_price, ModelStock.available_stock).order_by(cls.id_product).all()
         ]
 
         return data
+    
+    @classmethod
+    def list_initial_stock(cls):
+
+        data = [
+            {
+                "id": id,
+                "name": name,
+                "qtde": qtde                
+            }
+
+            for
+                id, name, qtde
+            in
+            cls.query.join(ModelStock)
+            .with_entities(cls.id_product, cls.name, ModelStock.available_stock)
+            .filter(ModelStock.initial_stock == False).all()
+
+
+
+        ]
+
+        return data
+
+
 
     def get_product(self):
         return {
@@ -151,6 +179,23 @@ class ModelProducts(db.Model):
         if product:
             return products
 
+        return None
+    
+    @classmethod
+    def find_product_without_stock(cls, product_id):
+
+        if not product_id:
+            return None
+
+        product = (cls.query.join(ModelStock)
+        .filter(cls.id_product == product_id, ModelStock.initial_stock == False)
+        .first())
+        
+
+        if product:
+            return product
+
+        
         return None
 
     def save_product(self):

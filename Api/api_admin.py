@@ -6,7 +6,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 # resources
 from resources.admin.home import HomeApi  # Home
-from resources.admin.products import ProductApi, ProductSelect  # Products
+from resources.admin.products import ProductApi, ProductSelect, StockApi  # Products
 from resources.admin.products_category import CategoryProductApi  # Category products
 from resources.admin.products_brand import BrandProductApi  # Brands Product
 from resources.admin.products_unit import UnitProductApi  # unit Products
@@ -88,6 +88,7 @@ bp_admin.add_url_rule("/providers/<int:provider_id>", view_func=provider_view,
 # Products endpoints
 product_view = ProductApi.as_view("product_view")
 product_selects_view = ProductSelect.as_view("product_selects")
+stock_view = StockApi.as_view("stock_view")
 
 bp_admin.add_url_rule(
     "/products/", defaults={"product_id": None}, view_func=product_view, methods=['GET', ])
@@ -98,6 +99,7 @@ bp_admin.add_url_rule("/products/image/<int:image_id>",
                       view_func=product_view, methods=['DELETE', ])
 bp_admin.add_url_rule("/products/selects/",
                       view_func=product_selects_view, methods=['GET'])
+bp_admin.add_url_rule("/products/stock/", view_func=stock_view, methods=['GET', 'POST', ]) 
 
 
 # Clients

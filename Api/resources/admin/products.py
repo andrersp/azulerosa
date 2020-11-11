@@ -234,3 +234,62 @@ class ProductSelect(MethodView):
                   for brand in ModelBrandProduct.query.all()]
 
         return {"data": {"providers": providers, "categories": categories, "brands": brands,  "units": units}}, 200
+
+
+schema_stock = {
+      "products": {"type": "list", "schema": {"type": "dict", "schema": {
+        "id": {"type": "integer", "required": True},
+        "value" : {"type": "float", "required": True}
+    }}}
+}
+class StockApi(MethodView):
+
+    def get(self):
+
+        products = ModelProducts.list_initial_stock()
+
+        return jsonify({"data": products}), 200
+    
+    def post(self):
+
+        data = request.json if request.json else {}
+
+        v = CustomValidator(schema_stock)
+
+        if not v.validate(data):
+            return jsonify({"message": v.errors}), 400
+        data = v.document
+
+        list_data = []
+
+        for product in data.get("products"):
+            
+            if product.get("value"):
+                data_product = ModelProducts.find_product_without_stock(product.get("id"))
+                
+                if not data_product:
+                    return jsonify({"message": "product {} not found or stock already registered".format(product.get("id"))}), 400
+                
+                data_product.stock.available_stock = product.get("value")
+                data_product.stock.initial_stock = True
+
+                list_data.append(data_product)
+        
+        try:
+            [data.save_product() for data in list_data]
+            return jsonify({"message": "Updated quantities", "data": [{"name": data.name, "qtde": data.stock.available_stock } for data in list_data]}), 200             
+        
+        except:
+            return jsonify({"message": "Internal Error"})
+            pass
+
+
+                
+                
+                
+
+
+        return jsonify(data), 200
+
+        
+

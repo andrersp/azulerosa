@@ -188,9 +188,9 @@ class PurchaseApi(MethodView):
 
         data = request.json if request.json else{}
 
-        v = CustomValidator(schema)
+        v = CustomValidator(schema_delivery)
 
-        if not v.validate(schema_delivery):
+        if not v.validate(data):
             return jsonify({"message": v.errors}), 400
 
         data = v.document

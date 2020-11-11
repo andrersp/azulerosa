@@ -147,7 +147,7 @@ def delivery_data():
 
     if not prod:
 
-        for _ in range(1):
+        for _ in range(20):
             lorem = TextLorem(srange=(1, 2))
             product["name"] = lorem.sentence()
             ModelProducts(**product).save_product()
