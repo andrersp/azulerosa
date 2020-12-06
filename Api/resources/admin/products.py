@@ -237,11 +237,14 @@ class ProductSelect(MethodView):
 
 
 schema_stock = {
-      "products": {"type": "list", "schema": {"type": "dict", "schema": {
+    "products": {"type": "list", "schema": {"type": "dict", "schema": {
         "id": {"type": "integer", "required": True},
-        "value" : {"type": "float", "required": True}
+        "value": {"type": "float", "required": True},
+        "purchase_price": {"type": "float", "required": True}
     }}}
 }
+
+
 class StockApi(MethodView):
 
     def get(self):
@@ -249,7 +252,7 @@ class StockApi(MethodView):
         products = ModelProducts.list_initial_stock()
 
         return jsonify({"data": products}), 200
-    
+
     def post(self):
 
         data = request.json if request.json else {}
@@ -263,33 +266,25 @@ class StockApi(MethodView):
         list_data = []
 
         for product in data.get("products"):
-            
+
             if product.get("value"):
-                data_product = ModelProducts.find_product_without_stock(product.get("id"))
-                
+                data_product = ModelProducts.find_product_without_stock(
+                    product.get("id"))
+
                 if not data_product:
                     return jsonify({"message": "product {} not found or stock already registered".format(product.get("id"))}), 400
-                
+
                 data_product.stock.available_stock = product.get("value")
                 data_product.stock.initial_stock = True
 
                 list_data.append(data_product)
-        
+
         try:
             [data.save_product() for data in list_data]
-            return jsonify({"message": "Updated quantities", "data": [{"name": data.name, "qtde": data.stock.available_stock } for data in list_data]}), 200             
-        
+            return jsonify({"message": "Updated quantities", "data": [{"name": data.name, "qtde": data.stock.available_stock} for data in list_data]}), 200
+
         except:
             return jsonify({"message": "Internal Error"})
             pass
 
-
-                
-                
-                
-
-
         return jsonify(data), 200
-
-        
-

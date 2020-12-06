@@ -99,7 +99,8 @@ bp_admin.add_url_rule("/products/image/<int:image_id>",
                       view_func=product_view, methods=['DELETE', ])
 bp_admin.add_url_rule("/products/selects/",
                       view_func=product_selects_view, methods=['GET'])
-bp_admin.add_url_rule("/products/stock/", view_func=stock_view, methods=['GET', 'POST', ]) 
+bp_admin.add_url_rule("/products/stock/",
+                      view_func=stock_view, methods=['GET', 'POST', ])
 
 
 # Clients
