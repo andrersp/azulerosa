@@ -7,7 +7,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                echo "Testing build.."
+                echo "Testing build.. Novo"
             }
 
         }
