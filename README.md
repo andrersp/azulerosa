@@ -55,7 +55,6 @@ docker-compose exec api python app.py create_db
 * André França                rsp.assistencia@gmail.com
 
 ### Contributing
-
 1. Faça o _fork_ do projeto (<https://github.com/yourname/yourproject/fork>)
 2. Crie uma _branch_ para sua modificação (`git checkout -b feature/fooBar`)
 3. Faça o _commit_ (`git commit -am 'Add some fooBar'`)
