@@ -52,7 +52,7 @@ docker-compose exec api python app.py create_db
 ```
 
 ### Maintainers:
-* André França                rsp.assistencia@gmail.com
+* André França              rsp.assistencia@gmail.com
 
 ### Contributing
 
