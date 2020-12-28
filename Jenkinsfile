@@ -7,7 +7,8 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                echo "${BUILD_NUMBER}"
+                docker-compose up -d --build
+                docker-compose exec api python app.py create_db
             }
 
         }
