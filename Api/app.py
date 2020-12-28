@@ -1,4 +1,5 @@
 # -*- coding: utf-8
+# Teste PipélineHook
 
 from flask import Flask, jsonify, Blueprint, redirect, url_for
 from werkzeug.middleware.proxy_fix import ProxyFix
