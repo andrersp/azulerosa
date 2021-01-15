@@ -1,57 +1,53 @@
 version: "3.7"
 
-services: 
+services:
     api:
         build: ./Api
         restart: always
         command: gunicorn --workers=2 --threads=4 --worker-class=gthread --bind 0.0.0.0:5000 app:app
-        volumes: 
+        volumes:
             - ./Api:/usr/src/api
-        expose: 
+        expose:
             - 5000
-        # ports: 
+        # ports:
         #     - 80:5000
         env_file: ./.env.dev.prod
-        
-        depends_on: 
+
+        depends_on:
             - db
-        
-        networks: 
+
+        networks:
             - database
             - net
 
-    
     db:
         image: postgres:9.6-alpine
-        volumes: 
+        volumes:
             - postgres_data:/var/lib/postgresql/data
             - "/etc/timezone:/etc/timezone:ro"
             - "/etc/localtime:/etc/localtime:ro"
-        environment: 
+        environment:
             - POSTGRES_USER=loja
             - POSTGRES_PASSWORD=loja
             - POSTGRES_DATABASE=loja
-            
-        networks: 
+
+        networks:
             - database
 
     nginx:
         build: ./nginx
-        ports: 
+        ports:
             - 80:80
             - 443:443
-        depends_on: 
+        depends_on:
             - api
-        networks: 
+        networks:
             - net
         volumes:
             - /home/ubuntu/ssl:/etc/nginx/certs
-volumes: 
+volumes:
     postgres_data:
 
-networks: 
+networks:
     database:
     net:
-
-
-    

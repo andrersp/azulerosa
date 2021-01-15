@@ -7,7 +7,9 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh "docker-compose up -d --build"                
+                script {
+                    kubernetesDeploy(configs: "manifest-dev.yaml", kubeconfigId: "config_kubernet")
+                }          
             }
 
         }

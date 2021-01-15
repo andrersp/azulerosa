@@ -1,47 +1,44 @@
 version: "3.7"
 
-services: 
+services:
     api:
-        build: ./Api
+        build:
+            context: .
+            dockerfile: ./Api/Dockerfile.dev
         restart: always
         command: python app.py run -h 0.0.0.0
-        volumes: 
+        volumes:
             - ./Api:/usr/src/api
             - static_files:/usr/src/api/static/images
-            
-        ports: 
+
+        ports:
             - 5000:5000
         env_file: ./.env.dev
-        
-        depends_on: 
+
+        depends_on:
             - db
-        
-        networks: 
+
+        networks:
             - database
             - net
-        
 
-    
     db:
         image: postgres:9.6-alpine
-        volumes: 
+        volumes:
             - postgres_data:/var/lib/postgresql/data/
             - "/etc/timezone:/etc/timezone:ro"
             - "/etc/localtime:/etc/localtime:ro"
-        environment: 
+        environment:
             - POSTGRES_USER=loja
             - POSTGRES_PASSWORD=loja
-            - POSTGRES_DATABASE=loja            
-        networks: 
+            - POSTGRES_DATABASE=loja
+        networks:
             - database
 
-volumes: 
+volumes:
     postgres_data:
     static_files:
 
-networks: 
+networks:
     database:
     net:
-
-
-    

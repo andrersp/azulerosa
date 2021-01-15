@@ -11,5 +11,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy
 COPY . /usr/src/api/
 
-CMD [ "gunicorn", "-w", "2", "--bind", ":5000", "app:app"]
+# CMD [ "gunicorn", "-w", "2", "--bind", ":5000", "app:app"]
 
