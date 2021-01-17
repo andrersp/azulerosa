@@ -5,7 +5,7 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    kubernetesDeploy(configs: "manifest-dev.yaml", kubeconfigId: "kube-file")
+                    kubernetesDeploy(configs: "manifest-dev.yaml", kubeconfigId: "kube-cofig")
                 }          
             }
 
