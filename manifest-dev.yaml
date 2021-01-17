@@ -1,19 +1,5 @@
 ---
 apiVersion: extensions/v1beta1
-kind: Service
-metadata:
-  name: api-service
-spec:
-  ports:
-    - port: 5000
-      targetPort: 5000
-      nodePort: 30030
-  selector:
-    app: api
-
-  type: NodePort
----
-apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: api
