@@ -1,21 +1,21 @@
 pipeline {
     agent any
 
+    stages {
 
-    stage("echos") {
-        steps {
-            echo "Andre"
+        stage("Echo") {
+            steps {
+                echo "Andre Luis"
+            }
         }
-    }
-    
-    stage('deploy k8s') {
+
+
+        stage('deploy k8s') {
             steps {
                 script {
                     kubernetesDeploy(configs: "manifest-dev.yaml", kubeconfigId: "kube-config")
                 }
             }
         }
-    
-
     }
 }
