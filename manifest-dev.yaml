@@ -8,6 +8,7 @@ spec:
     - port: 5000
   selector:
     app: api
+  type: NodePort
 
 ---
 apiVersion: apps/v1
