@@ -5,7 +5,7 @@ metadata:
   labels:
     app: api-config
 data:
-  DATABASE_URL: postgresql://loja-user:loja123@db-service:5432/loja
+  DATABASE_URL: postgresql://loja-user:loja123@postgres:5432/loja
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
