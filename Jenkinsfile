@@ -1,8 +1,7 @@
 pipeline {
     agent {
     kubernetes {
-      	cloud 'kubernetes'
-      	defaultContainer 'jnlp'
+      	cloud 'kubernetes'      	
       }
     }
 
@@ -18,7 +17,7 @@ pipeline {
         stage('deploy k8s') {
             steps {
                 script {
-                    kubernetesDeploy(configs: "manifest-dev.yaml", kubeconfigId: "kube-config")
+                    kubernetesDeploy(configs: "manifest-dev.yaml", kubeconfigId: "kubeconfig")
                 }
             }
         }
