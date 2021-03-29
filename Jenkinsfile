@@ -1,20 +1,8 @@
 pipeline {
-    agent {
-    kubernetes {
-      	cloud 'kubernetes'
-      	defaultContainer 'jnlp'
-      }
-    }
+    agent any
 
     stages {
-
-        stage("Echo") {
-            steps {
-                echo "Andre Luis"
-            }
-        }
-
-
+        
         stage('deploy k8s') {
             steps {
                 script {
