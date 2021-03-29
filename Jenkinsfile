@@ -1,7 +1,13 @@
 pipeline {
-    agent any
+    agent {
+    kubernetes {
+      	cloud 'kubernetes'
+      	defaultContainer 'jnlp'
+      }
+    }
 
     stages {
+
         
         stage('deploy k8s') {
             steps {
