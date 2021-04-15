@@ -10,7 +10,7 @@ pipeline {
         stage('build and push web') {
             steps {
                 script {
-                    docker.withRegistry('https://dh.inquest.tech', 'docker_credentials') {
+                    docker.withRegistry('', 'docker_credentials') {
                         def customImage = docker.build("protesto:${BUILD_NUMBER}", "-f dockerfiles/Dockerfile .")
 
                         /* Push the container to the custom Registry */
