@@ -7,8 +7,6 @@ pipeline {
     }
 
     stages {
-
-        stages {
         stage('build and push web') {
             steps {
                 script {
@@ -21,6 +19,8 @@ pipeline {
                 }
             }
         }
+
+        
         
         stage('deploy k8s') {
             steps {
@@ -31,3 +31,4 @@ pipeline {
         }
     }
 }
+
