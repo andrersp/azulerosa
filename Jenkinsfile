@@ -6,18 +6,18 @@ pipeline {
     }
 
     stages {
-        // stage('build and push web') {
-        //     steps {
-        //         script {
-        //             docker.withRegistry('', 'docker_credentials') {
-        //                 def customImage = docker.build("protesto:${BUILD_NUMBER}", "-f dockerfiles/Dockerfile .")
+        stage('build and push web') {
+            steps {
+                script {
+                    docker.withRegistry('', 'docker_credentials') {
+                        def customImage = docker.build("protesto:${BUILD_NUMBER}", "-f dockerfiles/Dockerfile .")
 
-        //                 /* Push the container to the custom Registry */
-        //                 customImage.push()
-        //             }
-        //         }
-        //     }
-        // }
+                        /* Push the container to the custom Registry */
+                        customImage.push()
+                    }
+                }
+            }
+        }
 
         
         
