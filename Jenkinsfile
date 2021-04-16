@@ -1,7 +1,8 @@
 pipeline {
     agent {
     kubernetes {
-      	cloud 'kubernetes'      	
+      	cloud 'kubernetes'
+      	defaultContainer 'jenkins-slave'
       }
     }
 
