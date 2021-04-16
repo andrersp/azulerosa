@@ -1,12 +1,16 @@
 pipeline {
-    agent any
+    agent {
+    kubernetes {
+      	cloud 'kubernetes'      	
+      }
+    }
 
     stages {
         // stage('build and push web') {
         //     steps {
         //         script {
         //             docker.withRegistry('', 'docker_credentials') {
-        //                 def customImage = docker.build("protesto:${BUILD_NUMBER}", "-f Api/Dockerfile .")
+        //                 def customImage = docker.build("protesto:${BUILD_NUMBER}", "-f dockerfiles/Dockerfile .")
 
         //                 /* Push the container to the custom Registry */
         //                 customImage.push()
