@@ -7,7 +7,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('', 'docker_credentials') {
-                        def customImage = docker.build("protesto:${BUILD_NUMBER}", "-f dockerfiles/Dockerfile .")
+                        def customImage = docker.build("protesto:${BUILD_NUMBER}", "-f Api/Dockerfile .")
 
                         /* Push the container to the custom Registry */
                         customImage.push()
