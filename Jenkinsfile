@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-    kubernetes {
-      	cloud 'kubernetes'
-      	defaultContainer 'jnlp'
-      }
-    }
+    agent any
 
     stages {
         stage('build and push web') {
