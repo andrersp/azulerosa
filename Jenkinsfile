@@ -3,7 +3,9 @@ pipeline {
     
     stages {
         stage('build and push web') {
-            agent any
+            agent {
+        docker { image 'node:14-alpine' }
+    }
             steps {
                 script {
                     docker.withRegistry('https://dh.inquest.tech', 'docker_credentials') {
