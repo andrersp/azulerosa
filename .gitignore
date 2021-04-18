@@ -132,3 +132,4 @@ Api/migrations/
 Api/static/images/*
 azulerosa.code-workspace
 *vscode*
+secret_file.json

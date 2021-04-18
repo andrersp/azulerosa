@@ -42,6 +42,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: api
+            - secretRef:
+                name: api_secret
           volumeMounts:
             - mountPath: /usr/src/api/static/images
               name: api-volume
