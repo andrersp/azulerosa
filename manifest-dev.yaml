@@ -43,7 +43,7 @@ spec:
             - configMapRef:
                 name: api
             - secretRef:
-                name: api_secret
+                name: api-secret
           volumeMounts:
             - mountPath: /usr/src/api/static/images
               name: api-volume
