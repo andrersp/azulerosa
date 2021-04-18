@@ -29,6 +29,15 @@ pipeline {
                 }
             }
         }
+
+        stage('deploy Secrerts') {
+            
+            steps {
+                script {
+                    kubernetesDeploy(configs: "secrets.json", kubeconfigId: "kubeconfig")
+                }
+            }
+        }
     }
 }
 
