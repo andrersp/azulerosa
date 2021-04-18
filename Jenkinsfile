@@ -31,14 +31,14 @@ pipeline {
             }
         }
 
-        stage('deploy Secrerts') {
+        // stage('deploy Secrerts') {
             
-            steps {
-                script {
-                    kubernetesDeploy(configs: "secrets.json", kubeconfigId: "kubeconfig")
-                }
-            }
-        }
+        //     steps {
+        //         script {
+        //             kubernetesDeploy(configs: "secrets.json", kubeconfigId: "kubeconfig")
+        //         }
+        //     }
+        // }
     }
 }
 
