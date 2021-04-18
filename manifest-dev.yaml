@@ -29,7 +29,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: rspandre/ar-dev:0.1.0
+          image: dh.inquest.tech/azulerosa:${BUILD_NUMBER}
           imagePullPolicy: Always
           resources:
             limits:
