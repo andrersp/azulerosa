@@ -6,7 +6,7 @@ pipeline {
                 }
                 }
     
-    // stages {
+    stages {
     //     stage('build and push web') {
     //         agent: any
             
