@@ -27,9 +27,12 @@ spec:
       labels:
         app: api
     spec:
+      imagePullSecrets:
+        - name: registry-secret
+
       containers:
         - name: api
-          image: dh.inquest.tech/azulerosa:${BUILD_NUMBER}
+          image: registry.digitalocean.com/rspregistry/azulerosa:${BUILD_NUMBER}
           imagePullPolicy: Always
           resources:
             limits:
