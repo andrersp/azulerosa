@@ -1,29 +1,39 @@
 pipeline {
-  agent {
+      agent {
     kubernetes {
-      yaml """\
-        apiVersion: v1
-        kind: Pod
-        metadata:
-          labels:
-            some-label: some-label-value
-        spec:
-          containers:
-          - name: slave
-            image: rspandre/jenkins-slave:1          
-          
-          
-        """.stripIndent()
+      //cloud 'kubernetes'
+      containerTemplate {
+        name 'slave'
+        image 'rspandre/jenkins-slave:1'
+        ttyEnabled true
+        command 'cat'
+      }
     }
   }
-  stages {
-    stage('deploy k8s') {
+    
+    stages {
+        stage('build and push web') {
             
+            steps {
+                script {
+                    docker.withRegistry('https://dh.inquest.tech', 'docker_credentials') {
+                        def customImage = docker.build("protesto:${BUILD_NUMBER}", "-f Api/Dockerfile .")
+
+                        /* Push the container to the custom Registry */
+                        customImage.push()
+                    }
+                }
+            }
+        }        
+        
+        stage('deploy k8s') {
+          
             steps {
                 script {
                     kubernetesDeploy(configs: "manifest-dev.yaml", kubeconfigId: "kubeconfig")
                 }
             }
         }
-  }
+    }
 }
+
