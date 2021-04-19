@@ -17,7 +17,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://dh.inquest.tech', 'docker_credentials') {
-                        def customImage = docker.build("protesto:${BUILD_NUMBER}", "-f Api/Dockerfile .")
+                        def customImage = docker.build("azulerosa:${BUILD_NUMBER}", "-f Api/Dockerfile .")
 
                         /* Push the container to the custom Registry */
                         customImage.push()
