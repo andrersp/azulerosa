@@ -6,7 +6,7 @@ pipeline {
             agent any
             steps {
                 script {
-                    docker.withRegistry('registry.digitalocean.com/rspregistry', 'docker_credentials') {
+                    docker.withRegistry('https://registry.digitalocean.com/rspregistry', 'docker_credentials') {
                         def customImage = docker.build("azulerosa:${BUILD_NUMBER}", "-f Api/Dockerfile .")
                         /* Push the container to the custom Registry */
                         customImage.push()
