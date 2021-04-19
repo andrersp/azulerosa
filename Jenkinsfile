@@ -3,7 +3,7 @@ pipeline {
     
     stages {
         stage('build and push web') {
-            agent docker
+            agent any
             steps {
                 script {
                     docker.withRegistry('registry.digitalocean.com/rspregistry', 'docker_credentials') {
